@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZJS68FCQ0Q"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-ZJS68FCQ0Q');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - readysounds</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(10, 10, 10, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .header-nav {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        
+        .nav-item {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            color: white;
+        }
+        
+        .main {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 32px;
+        }
+        
+        .page-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 40px;
+        }
+        
+        .account-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+        
+        .info-value {
+            font-weight: 500;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-active {
+            background: rgba(46, 213, 115, 0.15);
+            color: #2ed573;
+        }
+        
+        .status-none {
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #9c27b0;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #7b1fa2;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .plan-card {
+            background: rgba(156, 39, 176, 0.1);
+            border: 1px solid rgba(156, 39, 176, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .plan-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #9c27b0;
+            margin-bottom: 8px;
+        }
+        
+        .plan-price {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .plan-period {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
+        /* ── Mobile nav ── */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.8);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+        }
+
+        @media (max-width: 900px) {
+            .mobile-menu-toggle { display: block; }
+            .header-nav { display: none; }
+        }
+
+        .mobile-panel-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 1998;
+            display: none;
+        }
+        .mobile-panel-overlay.active { display: block; }
+
+        .mobile-panel {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 100%; height: 100%;
+            background: #111111;
+            z-index: 1999;
+            transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 28px;
+            overflow-y: auto;
+        }
+        .mobile-panel.open { right: 0; }
+
+        .mobile-panel-close {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.55);
+            font-size: 28px;
+            cursor: pointer;
+            margin-bottom: 32px;
+            line-height: 1;
+        }
+        .mobile-panel-nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: 700;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            text-transform: lowercase;
+        }
+        .mobile-panel-nav a:hover { color: #9c27b0; }
+        .mobile-panel-nav a.active-page { color: #9c27b0; }
+
+        .mobile-panel-cta {
+            display: block;
+            background: #9c27b0;
+            color: white;
+            text-align: center;
+            padding: 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            text-decoration: none;
+            margin-top: 32px;
+        }
+        .mobile-panel-auth {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .mobile-auth-login {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: rgba(255,255,255,0.07);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .mobile-auth-signup {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: #9c27b0;
+            color: white;
+        }
+        .mobile-panel-footer {
+            margin-top: auto;
+            padding-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="browse.html" class="logo">readysounds.</a>
+            <nav class="header-nav">
+                <a href="browse.html" class="nav-item">browse</a>
+                <a href="playlists.html" class="nav-item">playlists</a>
+                <a href="pricing.html" class="nav-item">pricing</a>
+                <a href="account.html" class="nav-item active">account</a>
+            </nav>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+        </div>
+    </header>
+
+    <!-- Mobile Panel Overlay -->
+    <div class="mobile-panel-overlay" id="mobilePanelOverlay" onclick="closeMobilePanel()"></div>
+    <!-- Mobile Slide Panel -->
+    <div class="mobile-panel" id="mobilePanel">
+        <button class="mobile-panel-close" onclick="closeMobilePanel()">✕</button>
+        <nav class="mobile-panel-nav">
+            <a href="browse.html">browse</a>
+            <a href="playlists.html">playlists</a>
+            <a href="pricing.html">pricing</a>
+            <a href="account.html" class="active-page">account</a>
+        </nav>
+        <a href="browse.html" class="mobile-panel-cta">browse music</a>
+        <div class="mobile-panel-footer">
+            <a href="terms.html" style="color: rgba(255,255,255,0.4); font-size: 12px; text-decoration: none;">terms & conditions</a>
+        </div>
+    </div>
+
+    <main class="main">
+        <h1 class="page-title">My Account</h1>
+        
+        <div id="loading" class="loading">Loading your account...</div>
+        
+        <div id="accountContent" style="display: none;">
+            <!-- Account Info -->
+            <div class="account-section">
+                <h2 class="section-title">Account Information</h2>
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value" id="userEmail">—</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Member Since</span>
+                    <span class="info-value" id="memberSince">—</span>
+                </div>
+            </div>
+
+            <!-- Subscription Info -->
+            <div class="account-section">
+                <h2 class="section-title">Subscription</h2>
+                
+                <div id="activeSubscription" style="display: none;">
+                    <div class="plan-card">
+                        <div class="plan-name" id="planName">Individual</div>
+                        <div class="plan-price" id="planPrice">$79</div>
+                        <div class="plan-period" id="planPeriod">per year</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="info-label">Status</span>
+                        <span class="info-value">
+                            <span class="status-badge status-active" id="subscriptionStatus">Active</span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Next Billing Date</span>
+                        <span class="info-value" id="nextBillingDate">—</span>
+                    </div>
+                    <div class="info-row" style="border-bottom: none; padding-top: 24px;">
+                        <button class="btn btn-secondary" id="billingBtn" onclick="openBillingPortal()">Manage Billing</button>
+                    </div>
+                </div>
+                
+                <div id="noSubscription" style="display: none;">
+                    <p style="color: rgba(255, 255, 255, 0.6); margin-bottom: 20px;">You don't have an active subscription.</p>
+                    <a href="pricing.html" class="btn btn-primary">View Plans</a>
+                </div>
+            </div>
+
+            <!-- Downloads -->
+            <div class="account-section">
+                <h2 class="section-title">Your Activity</h2>
+                <div class="info-row">
+                    <span class="info-label">Total Downloads</span>
+                    <span class="info-value" id="totalDownloads">—</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Liked Tracks</span>
+                    <span class="info-value" id="likedTracks">—</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function toggleMobileMenu() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel.classList.contains('open')) {
+                closeMobilePanel();
+            } else {
+                panel.classList.add('open');
+                overlay.classList.add('active');
+                if (toggle) toggle.textContent = '✕';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        function closeMobilePanel() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel) panel.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
+            if (toggle) toggle.textContent = '☰';
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobilePanel(); });
+
+        let supabaseClient;
+
+        async function initAccount() {
+            const SUPABASE_URL = 'https://pfqvrxfazumlydjepwib.supabase.co';
+            const SUPABASE_ANON_KEY = 'sb_publishable_1oBqgAQj0xzb5-eosyfcBg_9dKxNZfa';
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            // Check if user is logged in
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            
+            if (!session) {
+                // Redirect to login
+                window.location.href = 'signup.html';
+                return;
+            }
+
+            // Load account data
+            await loadAccountData(session.user);
+        }
+
+        async function loadAccountData(user) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('accountContent').style.display = 'block';
+
+            // Basic info
+            document.getElementById('userEmail').textContent = user.email;
+            const memberSince = new Date(user.created_at).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById('memberSince').textContent = memberSince;
+
+            // Get profile with subscription info
+            const { data: profile, error } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
+            if (profile && profile.subscription_status === 'active') {
+                // Show active subscription
+                document.getElementById('activeSubscription').style.display = 'block';
+                document.getElementById('noSubscription').style.display = 'none';
+
+                // Set plan details
+                const planNames = {
+                    'individual_yearly': 'Individual',
+                    'business_yearly': 'Business'
+                };
+                const planPrices = {
+                    'individual_yearly': '$79',
+                    'business_yearly': '$1,299'
+                };
+                const planPeriods = {
+                    'individual_yearly': 'per year',
+                    'business_yearly': 'per year'
+                };
+
+                document.getElementById('planName').textContent = planNames[profile.subscription_plan] || 'Subscription';
+                document.getElementById('planPrice').textContent = planPrices[profile.subscription_plan] || '—';
+                document.getElementById('planPeriod').textContent = planPeriods[profile.subscription_plan] || '';
+
+                // Next billing date
+                if (profile.subscription_end_date) {
+                    const nextDate = new Date(profile.subscription_end_date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    document.getElementById('nextBillingDate').textContent = nextDate;
+                }
+            } else {
+                // No subscription
+                document.getElementById('activeSubscription').style.display = 'none';
+                document.getElementById('noSubscription').style.display = 'block';
+            }
+
+            // Activity stats (from localStorage for now)
+            const likedTracks = JSON.parse(localStorage.getItem('likedTracks') || '[]');
+            document.getElementById('likedTracks').textContent = likedTracks.length;
+            document.getElementById('totalDownloads').textContent = localStorage.getItem('totalDownloads') || '0';
+        }
+
+        async function openBillingPortal() {
+            const btn = document.getElementById('billingBtn');
+            const original = btn.textContent;
+            btn.textContent = 'Loading…';
+            btn.disabled = true;
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) { window.location.href = 'signup.html'; return; }
+                const res = await fetch('/.netlify/functions/create-portal-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.access_token}`
+                    }
+                });
+                const json = await res.json();
+                if (json.url) {
+                    window.location.href = json.url;
+                } else {
+                    alert(json.error || 'Unable to open billing portal. Please try again.');
+                    btn.textContent = original;
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error('Billing portal error:', err);
+                alert('Something went wrong. Please try again.');
+                btn.textContent = original;
+                btn.disabled = false;
+            }
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', initAccount);
+    </script>
+</body>
+</html>

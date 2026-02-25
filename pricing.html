@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZJS68FCQ0Q"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-ZJS68FCQ0Q');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pricing - readysounds.</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='100' cy='100' r='95' fill='%231a1a1a' stroke='%239c27b0' stroke-width='4'/%3E%3Cpath d='M 40 100 Q 70 60 100 60 Q 130 60 160 100 Q 130 140 100 140 Q 70 140 40 100 Z' fill='%234a148c' stroke='%239c27b0' stroke-width='3'/%3E%3Ccircle cx='100' cy='100' r='25' fill='%239c27b0'/%3E%3Ccircle cx='100' cy='100' r='12' fill='%23ffffff'/%3E%3Ccircle cx='105' cy='95' r='4' fill='%23e0e0e0'/%3E%3Ccircle cx='100' cy='100' r='70' fill='none' stroke='%239c27b0' stroke-width='2' stroke-dasharray='8,8' opacity='0.4'/%3E%3Ccircle cx='100' cy='100' r='55' fill='none' stroke='%237b1fa2' stroke-width='1.5' stroke-dasharray='6,6' opacity='0.3'/%3E%3Cline x1='100' y1='20' x2='100' y2='50' stroke='%239c27b0' stroke-width='2' opacity='0.5'/%3E%3Cline x1='35' y1='65' x2='55' y2='75' stroke='%239c27b0' stroke-width='2' opacity='0.5'/%3E%3Cline x1='165' y1='65' x2='145' y2='75' stroke='%239c27b0' stroke-width='2' opacity='0.5'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 1000;
+            padding: 16px 0;
+        }
+        
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 22px;
+            font-weight: 600;
+            color: white;
+            text-transform: lowercase;
+            text-decoration: none;
+        }
+        
+        .header-nav {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        .nav-item {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+            text-transform: lowercase;
+        }
+        
+        .nav-item:hover {
+            color: #9c27b0;
+        }
+        
+        .nav-item.active {
+            color: white;
+        }
+        
+        .main {
+            margin-top: 64px;
+            padding: 40px 0 60px 0;
+            min-height: calc(100vh - 64px);
+            display: flex;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 32px;
+            width: 100%;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        
+        .hero-title {
+            font-size: 42px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+        }
+        
+        .hero-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+        
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 32px 24px;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(156, 39, 176, 0.4);
+            background: rgba(156, 39, 176, 0.05);
+        }
+        
+        .pricing-card.featured {
+            border-color: #9c27b0;
+            background: rgba(156, 39, 176, 0.08);
+        }
+        
+        .card-header {
+            margin-bottom: 24px;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .card-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .card-price {
+            margin-bottom: 24px;
+        }
+        
+        .price-amount {
+            font-size: 36px;
+            font-weight: 700;
+            color: #9c27b0;
+        }
+        
+        .price-period {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .card-features {
+            list-style: none;
+            margin-bottom: 32px;
+            flex-grow: 1;
+        }
+        
+        .card-features li {
+            padding: 8px 0;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .card-features li::before {
+            content: "✓";
+            color: #9c27b0;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .cta-button {
+            background: #9c27b0;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        
+        .cta-button:hover {
+            background: #7b1fa2;
+            transform: scale(1.02);
+        }
+        
+        .cta-button.secondary {
+            background: rgba(156, 39, 176, 0.1);
+            border: 1px solid rgba(156, 39, 176, 0.3);
+            color: #9c27b0;
+        }
+        
+        .cta-button.secondary:hover {
+            background: rgba(156, 39, 176, 0.2);
+            border-color: #9c27b0;
+        }
+        
+        @media (max-width: 1400px) {
+            .pricing-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-title {
+                font-size: 32px;
+            }
+        }
+
+        /* ── Mobile nav ── */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.8);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+        }
+
+        @media (max-width: 900px) {
+            .mobile-menu-toggle { display: block; }
+            .header-nav { display: none; }
+        }
+
+        .mobile-panel-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 1998;
+            display: none;
+        }
+        .mobile-panel-overlay.active { display: block; }
+
+        .mobile-panel {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 100%; height: 100%;
+            background: #111111;
+            z-index: 1999;
+            transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 28px;
+            overflow-y: auto;
+        }
+        .mobile-panel.open { right: 0; }
+
+        .mobile-panel-close {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.55);
+            font-size: 28px;
+            cursor: pointer;
+            margin-bottom: 32px;
+            line-height: 1;
+        }
+        .mobile-panel-nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: 700;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            text-transform: lowercase;
+        }
+        .mobile-panel-nav a:hover { color: #9c27b0; }
+        .mobile-panel-nav a.active-page { color: #9c27b0; }
+
+        .mobile-panel-cta {
+            display: block;
+            background: #9c27b0;
+            color: white;
+            text-align: center;
+            padding: 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            text-decoration: none;
+            margin-top: 32px;
+        }
+        .mobile-panel-auth {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .mobile-auth-login {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: rgba(255,255,255,0.07);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .mobile-auth-signup {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: #9c27b0;
+            color: white;
+        }
+        .mobile-panel-footer {
+            margin-top: auto;
+            padding-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">readysounds.</a>
+            <nav class="header-nav">
+                <a href="index.html" class="nav-item">browse</a>
+                <a href="playlists.html" class="nav-item">playlists</a>
+                <a href="pricing.html" class="nav-item active">pricing</a>
+                <a href="contact.html" class="nav-item">contact</a>
+            </nav>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+        </div>
+    </header>
+
+    <!-- Mobile Panel Overlay -->
+    <div class="mobile-panel-overlay" id="mobilePanelOverlay" onclick="closeMobilePanel()"></div>
+    <!-- Mobile Slide Panel -->
+    <div class="mobile-panel" id="mobilePanel">
+        <button class="mobile-panel-close" onclick="closeMobilePanel()">✕</button>
+        <nav class="mobile-panel-nav">
+            <a href="browse.html">browse</a>
+            <a href="playlists.html">playlists</a>
+            <a href="pricing.html" class="active-page">pricing</a>
+            <a href="contact.html">contact</a>
+        </nav>
+        <a href="pricing.html" class="mobile-panel-cta">Subscribe — $79/yr</a>
+        <div class="mobile-panel-auth">
+            <a href="signup.html" class="mobile-auth-login">log in</a>
+            <a href="signup.html" class="mobile-auth-signup">create free account</a>
+        </div>
+        <div class="mobile-panel-footer">
+            <a href="terms.html" style="color: rgba(255,255,255,0.4); font-size: 12px; text-decoration: none;">terms & conditions</a>
+        </div>
+    </div>
+
+    <main class="main">
+        <div class="container">
+            <div class="hero">
+                <h1 class="hero-title">Simple, Transparent Pricing</h1>
+                <p class="hero-subtitle">Choose the Plan That Works for You</p>
+            </div>
+
+            <div class="pricing-grid">
+                <!-- Individual Subscription - Yearly -->
+                <div class="pricing-card featured">
+                    <div class="card-header">
+                        <h2 class="card-title">Individual</h2>
+                        <p class="card-subtitle">Annual Plan</p>
+                    </div>
+                    <div class="card-price">
+                        <div class="price-amount">$79</div>
+                        <div class="price-period">Per Year</div>
+                    </div>
+                    <ul class="card-features">
+                        <li>Unlimited downloads</li>
+                        <li>All tracks + alternates + stems</li>
+                        <li>Individual license</li>
+                        <li>YouTube, podcasts, social</li>
+                        <li>Content monetization</li>
+                        <li>Perpetual license on downloaded tracks</li>
+                    </ul>
+                    <button class="cta-button" onclick="subscribeNow('individual', 'annual')">Subscribe Now</button>
+                </div>
+
+                <!-- Business Subscription -->
+                <div class="pricing-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Business</h2>
+                        <p class="card-subtitle">For Companies</p>
+                    </div>
+                    <div class="card-price">
+                        <div class="price-amount">$1,299</div>
+                        <div class="price-period">Per Year</div>
+                    </div>
+                    <ul class="card-features">
+                        <li>Unlimited downloads</li>
+                        <li>All tracks + alternates + stems</li>
+                        <li>Business license</li>
+                        <li>Commercial use (digital)</li>
+                        <li>Client projects</li>
+                        <li>Corporate videos</li>
+                    </ul>
+                    <button class="cta-button" onclick="subscribeNow('business')">Subscribe Now</button>
+                </div>
+
+                <!-- Agency/Custom -->
+                <div class="pricing-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Agency / Custom</h2>
+                        <p class="card-subtitle">Tailored Solutions</p>
+                    </div>
+                    <div class="card-price">
+                        <div class="price-amount">Custom</div>
+                        <div class="price-period">Quote</div>
+                    </div>
+                    <ul class="card-features">
+                        <li>Everything in Business</li>
+                        <li>Broadcast TV/radio rights</li>
+                        <li>Theatrical film rights</li>
+                        <li>Multi-territory licensing</li>
+                        <li>Priority support</li>
+                        <li>Custom terms</li>
+                    </ul>
+                    <a href="contact.html" class="cta-button secondary" style="display:block; text-align:center; text-decoration:none;">Get in Touch</a>
+                </div>
+
+                <!-- Exclusive Music -->
+                <div class="pricing-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Exclusive Music</h2>
+                        <p class="card-subtitle">Yours Alone</p>
+                    </div>
+                    <div class="card-price">
+                        <div class="price-amount">Custom</div>
+                        <div class="price-period">Quote</div>
+                    </div>
+                    <ul class="card-features">
+                        <li>Exclusive rights</li>
+                        <li>Music removed from catalog</li>
+                        <li>Full copyright transfer</li>
+                        <li>Stems & project files</li>
+                        <li>Custom compositions</li>
+                        <li>Work for hire available</li>
+                    </ul>
+                    <a href="contact.html" class="cta-button secondary" style="display:block; text-align:center; text-decoration:none;">Get in Touch</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background: rgba(255, 255, 255, 0.02); border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 0; margin-top: 80px;">
+        <div style="max-width: 1400px; margin: 0 auto; padding: 0 32px; text-align: center;">
+            <p style="color: rgba(255, 255, 255, 0.5); font-size: 14px; margin-bottom: 16px;">
+                © 2026 readysounds. all rights reserved.
+            </p>
+            <div style="display: flex; gap: 32px; justify-content: center; flex-wrap: wrap;">
+                <a href="index.html" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 14px; transition: color 0.2s;">browse</a>
+                <a href="pricing.html" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 14px; transition: color 0.2s;">pricing</a>
+                <a href="terms.html" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 14px; transition: color 0.2s;">terms & conditions</a>
+                <a href="/cdn-cgi/l/email-protection#64080d07010a170d0a0324160105001d170b110a00174a070b09" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 14px; transition: color 0.2s;">contact</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        function toggleMobileMenu() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel.classList.contains('open')) {
+                closeMobilePanel();
+            } else {
+                panel.classList.add('open');
+                overlay.classList.add('active');
+                if (toggle) toggle.textContent = '✕';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        function closeMobilePanel() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel) panel.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
+            if (toggle) toggle.textContent = '☰';
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobilePanel(); });
+
+        async function subscribeNow(planType, billingPeriod) {
+            try {
+                const response = await fetch('/api/create-checkout-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: 'subscription',
+                        planType: planType,
+                        billingPeriod: billingPeriod || 'annual'
+                    })
+                });
+                
+                const session = await response.json();
+                const stripe = Stripe('pk_live_51Ss8KQRzfMLCjnGKS8LlJqJNO3mlbehpSo19N1E6c8WhBqKCP5KvdbC8APag5Fp8jQ0pW6Bk9oSWaoXFdodwgS5X00HmOqYDwn');
+                await stripe.redirectToCheckout({ sessionId: session.id });
+            } catch (error) {
+                console.error('Checkout error:', error);
+                alert('Unable to start checkout. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>

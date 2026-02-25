@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZJS68FCQ0Q"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-ZJS68FCQ0Q');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ready Sounds - Human-Made Music for Content Creators</title>
+    <meta name="description" content="Royalty-free music from real producers. No AI. No middlemen. Just quality tracks for your content. $79/year unlimited.">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 1000;
+            padding: 20px 0;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #888;
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+        }
+
+        .nav-cta {
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            color: white !important;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .nav-signin {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.95em;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-signin:hover { color: #fff; }
+
+        .cta-signin {
+            display: inline-block;
+            color: rgba(255,255,255,0.85);
+            padding: 18px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-left: 16px;
+            border: 1px solid rgba(255,255,255,0.25);
+            transition: all 0.3s;
+        }
+        .cta-signin:hover {
+            color: white;
+            border-color: rgba(255,255,255,0.6);
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 180px 40px 120px;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 4em;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #ffffff, #9c27b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .subheadline {
+            font-size: 1.5em;
+            color: #888;
+            margin-bottom: 48px;
+            line-height: 1.4;
+        }
+
+        .cta-primary {
+            display: inline-block;
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            color: white;
+            padding: 18px 48px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 8px 24px rgba(156, 39, 176, 0.3);
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(156, 39, 176, 0.4);
+        }
+
+        .cta-secondary {
+            display: inline-block;
+            color: #9c27b0;
+            padding: 18px 48px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-left: 16px;
+            border: 1px solid rgba(156, 39, 176, 0.3);
+            transition: all 0.3s;
+        }
+
+        .cta-secondary:hover {
+            background: rgba(156, 39, 176, 0.1);
+            border-color: rgba(156, 39, 176, 0.5);
+        }
+
+        /* Section */
+        .section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 100px 40px;
+        }
+
+        .section-title {
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 1.2em;
+            margin-bottom: 60px;
+        }
+
+        /* Benefits Grid */
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .benefit-card {
+            background: rgba(26, 26, 26, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 40px;
+            transition: all 0.3s;
+        }
+
+        .benefit-card:hover {
+            background: rgba(156, 39, 176, 0.05);
+            border-color: rgba(156, 39, 176, 0.2);
+            transform: translateY(-4px);
+        }
+
+        .benefit-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .benefit-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 12px;
+            color: #9c27b0;
+        }
+
+        .benefit-card p {
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        /* Pricing Section */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: rgba(26, 26, 26, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 48px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .pricing-card:hover {
+            border-color: rgba(156, 39, 176, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .pricing-card.featured {
+            border-color: #9c27b0;
+            background: rgba(156, 39, 176, 0.05);
+        }
+
+        .plan-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .plan-price {
+            font-size: 3em;
+            font-weight: 700;
+            color: #9c27b0;
+            margin-bottom: 8px;
+        }
+
+        .plan-period {
+            color: #888;
+            margin-bottom: 32px;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+
+        .plan-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #aaa;
+        }
+
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+
+        .plan-features li::before {
+            content: "✓ ";
+            color: #9c27b0;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .plan-cta {
+            display: block;
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .plan-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.4);
+        }
+
+        /* Featured Tracks */
+        .tracks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .track-preview {
+            background: rgba(26, 26, 26, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .track-preview:hover {
+            border-color: rgba(156, 39, 176, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .track-preview img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+        }
+
+        .track-info {
+            padding: 20px;
+        }
+
+        .track-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .track-meta {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        /* FAQ */
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: rgba(26, 26, 26, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 20px;
+        }
+
+        .faq-item h3 {
+            font-size: 1.3em;
+            margin-bottom: 16px;
+            color: #9c27b0;
+        }
+
+        .faq-item p {
+            color: #aaa;
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(10, 10, 10, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 60px 40px 40px;
+            margin-top: 100px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 16px;
+            color: #9c27b0;
+        }
+
+        .footer-section a {
+            display: block;
+            color: #888;
+            text-decoration: none;
+            margin-bottom: 12px;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: #fff;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            color: #666;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+
+            .hero .subheadline {
+                font-size: 1.2em;
+            }
+
+            .cta-secondary {
+                display: block;
+                margin-left: 0;
+                margin-top: 16px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .section {
+                padding: 60px 20px;
+            }
+
+            .benefits-grid,
+            .pricing-grid,
+            .tracks-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ── Mobile nav ── */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.8);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle { display: block; }
+        }
+
+        .mobile-panel-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 1998;
+            display: none;
+        }
+        .mobile-panel-overlay.active { display: block; }
+
+        .mobile-panel {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 100%; height: 100%;
+            background: #111111;
+            z-index: 1999;
+            transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 28px;
+            overflow-y: auto;
+        }
+        .mobile-panel.open { right: 0; }
+
+        .mobile-panel-close {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.55);
+            font-size: 28px;
+            cursor: pointer;
+            margin-bottom: 32px;
+            line-height: 1;
+        }
+        .mobile-panel-nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: 700;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            text-transform: lowercase;
+        }
+        .mobile-panel-nav a:hover { color: #9c27b0; }
+
+        .mobile-panel-cta {
+            display: block;
+            background: #9c27b0;
+            color: white;
+            text-align: center;
+            padding: 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            text-decoration: none;
+            margin-top: 32px;
+        }
+        .mobile-panel-auth {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .mobile-auth-login {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: rgba(255,255,255,0.07);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .mobile-auth-signup {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: #9c27b0;
+            color: white;
+        }
+        .mobile-panel-footer {
+            margin-top: auto;
+            padding-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="logo">readysounds.</a>
+            <div class="nav-links">
+                <a href="browse.html">Browse</a>
+                <a href="playlists.html">Playlists</a>
+                <a href="pricing.html">Pricing</a>
+                <a href="signup.html?mode=signin" class="nav-signin">Sign In</a>
+                <a href="signup.html" class="nav-cta">Create Free Account</a>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+        </div>
+    </nav>
+
+    <!-- Mobile Panel Overlay -->
+    <div class="mobile-panel-overlay" id="mobilePanelOverlay" onclick="closeMobilePanel()"></div>
+    <!-- Mobile Slide Panel -->
+    <div class="mobile-panel" id="mobilePanel">
+        <button class="mobile-panel-close" onclick="closeMobilePanel()">✕</button>
+        <div class="mobile-panel-nav">
+            <a href="browse.html">browse</a>
+            <a href="playlists.html">playlists</a>
+            <a href="pricing.html">pricing</a>
+            <a href="contact.html">contact</a>
+        </div>
+        <a href="pricing.html" class="mobile-panel-cta">Subscribe — $79/yr</a>
+        <div class="mobile-panel-auth">
+            <a href="signup.html?mode=signin" class="mobile-auth-login">log in</a>
+            <a href="signup.html" class="mobile-auth-signup">create free account</a>
+        </div>
+        <div class="mobile-panel-footer">
+            <a href="terms.html" style="color: rgba(255,255,255,0.4); font-size: 12px; text-decoration: none;">terms & conditions</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Human-made music.<br>Producer-direct pricing.</h1>
+        <p class="subheadline">Cut out the middleman. License directly from the producer.</p>
+        <a href="signup.html" class="cta-primary">Create Free Account</a>
+        <a href="signup.html?mode=signin" class="cta-signin">Sign In</a>
+        <br><br>
+        <a href="browse.html" class="cta-secondary">Browse Music</a>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="section">
+        <h2 class="section-title">Why Choose Ready Sounds?</h2>
+        <p class="section-subtitle">Quality music from real producers, not algorithms</p>
+        
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <div class="benefit-icon">🎹</div>
+                <h3>Human-Made Music</h3>
+                <p>Every track is crafted by Buck Moon, an experienced music producer. No AI-generated filler. No generic loops. Just quality music.</p>
+            </div>
+
+            <div class="benefit-card">
+                <div class="benefit-icon">💰</div>
+                <h3>Producer-Direct Pricing</h3>
+                <p>No corporate middlemen taking a cut. License directly from the artist at fair, transparent prices. What you see is what you pay.</p>
+            </div>
+
+            <div class="benefit-card">
+                <div class="benefit-icon">📝</div>
+                <h3>Simple Licensing</h3>
+                <p>One subscription, unlimited downloads. Use tracks in any content, forever. Keep 100% of your revenue. No complicated tiers or restrictions.</p>
+            </div>
+
+            <div class="benefit-card">
+                <div class="benefit-icon">🎯</div>
+                <h3>Curated, Not Bloated</h3>
+                <p>Quality over quantity. A focused catalog of versatile tracks, not 50,000 mediocre options. Find what you need faster.</p>
+            </div>
+
+            <div class="benefit-card">
+                <div class="benefit-icon">⚡</div>
+                <h3>Instant Downloads</h3>
+                <p>Download high-quality WAV files, stems, and alternate versions instantly. No waiting, no approval process. Your music, your timeline.</p>
+            </div>
+
+            <div class="benefit-card">
+                <div class="benefit-icon">✅</div>
+                <h3>Made for Creators</h3>
+                <p>Perfect for YouTube, podcasts, real estate videos, wedding films, social media, and more. Metadata-tagged for easy searching.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="section" style="background: rgba(156, 39, 176, 0.02);">
+        <h2 class="section-title">Simple, Transparent Pricing</h2>
+        <p class="section-subtitle">Choose the plan that works for you</p>
+        
+        <div class="pricing-grid">
+            <div class="pricing-card featured">
+                <div class="plan-name">Individual</div>
+                <div class="plan-price">$79</div>
+                <div class="plan-period">per year</div>
+                <ul class="plan-features">
+                    <li>Unlimited downloads</li>
+                    <li>WAV files + stems</li>
+                    <li>All alternate versions</li>
+                    <li>YouTube, social, podcasts</li>
+                    <li>Keep 100% revenue</li>
+                    <li>Cancel anytime</li>
+                </ul>
+                <a href="signup.html" class="plan-cta">Get Started</a>
+            </div>
+
+            <div class="pricing-card">
+                <div class="plan-name">Business</div>
+                <div class="plan-price">$1,299</div>
+                <div class="plan-period">per year</div>
+                <ul class="plan-features">
+                    <li>Everything in Individual</li>
+                    <li>Use in client projects</li>
+                    <li>Commercial advertising</li>
+                    <li>Broadcast & streaming</li>
+                    <li>Film & TV productions</li>
+                    <li>Priority support</li>
+                </ul>
+                <a href="signup.html" class="plan-cta">Get Started</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Tracks -->
+    <section class="section">
+        <h2 class="section-title">Featured Tracks</h2>
+        <p class="section-subtitle">Listen to what's in the catalog</p>
+        
+        <div class="tracks-grid">
+            <div class="track-preview">
+                <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Buck Moon - My Love For You">
+                <div class="track-info">
+                    <div class="track-title">Buck Moon - "My Love For You"</div>
+                    <div class="track-meta">Electronic · 120 BPM · 3:30</div>
+                </div>
+            </div>
+
+            <div class="track-preview">
+                <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Buck Moon - Journey On The Radio">
+                <div class="track-info">
+                    <div class="track-title">Buck Moon - "Journey On The Radio"</div>
+                    <div class="track-meta">Indie Rock · 160 BPM · 2:48</div>
+                </div>
+            </div>
+
+            <div class="track-preview">
+                <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Buck Moon - Give Me Your Energy">
+                <div class="track-info">
+                    <div class="track-title">Buck Moon - "Give Me Your Energy"</div>
+                    <div class="track-meta">Electronic · 128 BPM · 2:22</div>
+                </div>
+            </div>
+
+            <div class="track-preview">
+                <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/afro-beats-vol-1-cover.jpg" alt="Crane Flight - I'll Be There">
+                <div class="track-info">
+                    <div class="track-title">Crane Flight - "I'll Be There"</div>
+                    <div class="track-meta">Afro Beats · 100 BPM · 2:21</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 48px;">
+            <a href="index.html" class="cta-primary">Browse Full Catalog</a>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section">
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        
+        <div class="faq-container">
+            <div class="faq-item">
+                <h3>What can I use these tracks for?</h3>
+                <p>Individual plan: YouTube videos, podcasts, social media content, wedding films, personal projects. Business plan: All of the above plus client work, TV/film, advertising, and commercial projects.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Do I need to credit the artist?</h3>
+                <p>No attribution required, but it's always appreciated! You're free to use the music without crediting Buck Moon or Ready Sounds.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>What happens if I cancel my subscription?</h3>
+                <p>You retain the license to use any tracks you downloaded while subscribed. You just won't be able to download new tracks until you resubscribe.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Can I download stems and alternate versions?</h3>
+                <p>Yes! Every track includes stems (individual instrument tracks) and alternate versions like intros, breakdowns, and beats. Perfect for customizing to your content.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>How is this different from Epidemic Sound or Artlist?</h3>
+                <p>Ready Sounds is run by an actual music producer (Buck Moon), not a corporation. You're licensing directly from the artist at fair prices. Plus, we focus on quality over quantity—curated tracks, not a bloated library.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>How many tracks are in the catalog?</h3>
+                <p>We're currently building our catalog with high-quality, versatile tracks. New music added regularly. Quality over quantity—every track is producer-made and carefully curated.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Product</h4>
+                <a href="index.html">Browse Music</a>
+                <a href="playlists.html">Playlists</a>
+                <a href="pricing.html">Pricing</a>
+            </div>
+
+            <div class="footer-section">
+                <h4>Account</h4>
+                <a href="signup.html">Sign Up</a>
+                <a href="signup.html">Log In</a>
+                <a href="settings.html">Settings</a>
+            </div>
+
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <a href="terms.html">Terms & Conditions</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="license.html">License Agreement</a>
+            </div>
+
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <a href="mailto:support@readysounds.com">support@readysounds.com</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Ready Sounds. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+        function toggleMobileMenu() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel.classList.contains('open')) {
+                closeMobilePanel();
+            } else {
+                panel.classList.add('open');
+                overlay.classList.add('active');
+                if (toggle) toggle.textContent = '✕';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        function closeMobilePanel() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel) panel.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
+            if (toggle) toggle.textContent = '☰';
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobilePanel(); });
+
+        // Redirect logged-in users to browse page
+        (async function() {
+            function waitForSupabase() {
+                return new Promise(resolve => {
+                    if (typeof window.supabase !== 'undefined') return resolve();
+                    const check = setInterval(() => {
+                        if (typeof window.supabase !== 'undefined') {
+                            clearInterval(check);
+                            resolve();
+                        }
+                    }, 100);
+                });
+            }
+
+            await waitForSupabase();
+
+            const supabaseClient = window.supabase.createClient(
+                'https://pfqvrxfazumlydjepwib.supabase.co',
+                'sb_publishable_1oBqgAQj0xzb5-eosyfcBg_9dKxNZfa'
+            );
+
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session && session.user) {
+                window.location.href = '/browse.html';
+            }
+        })();
+    </script>
+</body>
+</html>

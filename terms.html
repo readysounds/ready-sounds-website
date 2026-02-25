@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZJS68FCQ0Q"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-ZJS68FCQ0Q');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>terms & conditions - readysounds.</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='100' cy='100' r='95' fill='%231a1a1a' stroke='%239c27b0' stroke-width='4'/%3E%3Cpath d='M 40 100 Q 70 60 100 60 Q 130 60 160 100 Q 130 140 100 140 Q 70 140 40 100 Z' fill='%234a148c' stroke='%239c27b0' stroke-width='3'/%3E%3Ccircle cx='100' cy='100' r='25' fill='%239c27b0'/%3E%3Ccircle cx='100' cy='100' r='12' fill='%23ffffff'/%3E%3Ccircle cx='105' cy='95' r='4' fill='%23e0e0e0'/%3E%3Ccircle cx='100' cy='100' r='70' fill='none' stroke='%239c27b0' stroke-width='2' stroke-dasharray='8,8' opacity='0.4'/%3E%3Ccircle cx='100' cy='100' r='55' fill='none' stroke='%237b1fa2' stroke-width='1.5' stroke-dasharray='6,6' opacity='0.3'/%3E%3Cline x1='100' y1='20' x2='100' y2='50' stroke='%239c27b0' stroke-width='2' opacity='0.5'/%3E%3Cline x1='35' y1='65' x2='55' y2='75' stroke='%239c27b0' stroke-width='2' opacity='0.5'/%3E%3Cline x1='165' y1='65' x2='145' y2='75' stroke='%239c27b0' stroke-width='2' opacity='0.5'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 1000;
+            padding: 16px 0;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 22px;
+            font-weight: 600;
+            color: white;
+            text-transform: lowercase;
+            text-decoration: none;
+        }
+        
+        .header-nav {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        .nav-item {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+            text-transform: lowercase;
+        }
+        
+        .nav-item:hover {
+            color: #9c27b0;
+        }
+        
+        /* Main Content */
+        .main {
+            margin-top: 64px;
+            padding: 60px 0;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+        
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: white;
+        }
+        
+        .updated {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            font-size: 28px;
+            font-weight: 600;
+            margin: 48px 0 24px 0;
+            color: #9c27b0;
+        }
+        
+        h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 32px 0 16px 0;
+            color: white;
+        }
+        
+        p {
+            margin-bottom: 16px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        ul {
+            margin: 16px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+        
+        ul li {
+            padding: 8px 0 8px 28px;
+            position: relative;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        ul li::before {
+            position: absolute;
+            left: 0;
+            font-weight: 600;
+        }
+        
+        .permitted li::before {
+            content: "✅";
+        }
+        
+        .prohibited li::before {
+            content: "❌";
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 32px;
+            margin: 32px 0;
+        }
+        
+        .price-badge {
+            display: inline-block;
+            background: rgba(156, 39, 176, 0.2);
+            border: 1px solid rgba(156, 39, 176, 0.4);
+            color: #9c27b0;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+        
+        .faq-item {
+            margin: 24px 0;
+        }
+        
+        .faq-question {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .faq-answer {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        hr {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin: 48px 0;
+        }
+        
+        .contact {
+            background: rgba(156, 39, 176, 0.1);
+            border: 1px solid rgba(156, 39, 176, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+            margin: 32px 0;
+        }
+        
+        .contact a {
+            color: #9c27b0;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .contact a:hover {
+            color: #7b1fa2;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            .section {
+                padding: 24px;
+            }
+        }
+
+        /* ── Mobile nav ── */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.8);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+        }
+
+        @media (max-width: 900px) {
+            .mobile-menu-toggle { display: block; }
+            .header-nav { display: none; }
+        }
+
+        .mobile-panel-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 1998;
+            display: none;
+        }
+        .mobile-panel-overlay.active { display: block; }
+
+        .mobile-panel {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 100%; height: 100%;
+            background: #111111;
+            z-index: 1999;
+            transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 28px;
+            overflow-y: auto;
+        }
+        .mobile-panel.open { right: 0; }
+
+        .mobile-panel-close {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.55);
+            font-size: 28px;
+            cursor: pointer;
+            margin-bottom: 32px;
+            line-height: 1;
+        }
+        .mobile-panel-nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: 700;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            text-transform: lowercase;
+        }
+        .mobile-panel-nav a:hover { color: #9c27b0; }
+
+        .mobile-panel-cta {
+            display: block;
+            background: #9c27b0;
+            color: white;
+            text-align: center;
+            padding: 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            text-decoration: none;
+            margin-top: 32px;
+        }
+        .mobile-panel-auth {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .mobile-auth-login {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: rgba(255,255,255,0.07);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .mobile-auth-signup {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: #9c27b0;
+            color: white;
+        }
+        .mobile-panel-footer {
+            margin-top: auto;
+            padding-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">readysounds.</a>
+            <nav class="header-nav">
+                <a href="browse.html" class="nav-item">browse</a>
+                <a href="playlists.html" class="nav-item">playlists</a>
+                <a href="pricing.html" class="nav-item">pricing</a>
+                <a href="contact.html" class="nav-item">contact</a>
+            </nav>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+        </div>
+    </header>
+
+    <!-- Mobile Panel Overlay -->
+    <div class="mobile-panel-overlay" id="mobilePanelOverlay" onclick="closeMobilePanel()"></div>
+    <!-- Mobile Slide Panel -->
+    <div class="mobile-panel" id="mobilePanel">
+        <button class="mobile-panel-close" onclick="closeMobilePanel()">✕</button>
+        <nav class="mobile-panel-nav">
+            <a href="browse.html">browse</a>
+            <a href="playlists.html">playlists</a>
+            <a href="pricing.html">pricing</a>
+            <a href="contact.html">contact</a>
+        </nav>
+        <a href="pricing.html" class="mobile-panel-cta">Subscribe — $79/yr</a>
+        <div class="mobile-panel-auth">
+            <a href="signup.html" class="mobile-auth-login">log in</a>
+            <a href="signup.html" class="mobile-auth-signup">create free account</a>
+        </div>
+        <div class="mobile-panel-footer">
+            <a href="terms.html" style="color: rgba(255,255,255,0.4); font-size: 12px; text-decoration: none;">terms & conditions</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <h1>Terms & Conditions of Use</h1>
+            <p class="updated">Last Updated: January 21, 2026</p>
+
+            <!-- Individual License -->
+            <div class="section">
+                <h2>Individual License <span class="price-badge">$10/song or $79/year</span></h2>
+                
+                <h3>What You Get:</h3>
+                <ul>
+                    <li>Full track in WAV format</li>
+                    <li>All alternate versions in WAV format</li>
+                    <li>All stems in WAV format</li>
+                </ul>
+
+                <h3>Permitted Uses:</h3>
+                <p>You may use the licensed music for:</p>
+                <ul class="permitted">
+                    <li>YouTube videos (monetized or non-monetized)</li>
+                    <li>Podcasts (monetized or non-monetized)</li>
+                    <li>Social media content (Instagram, TikTok, Facebook, etc.)</li>
+                    <li>Personal creative projects</li>
+                    <li>Content monetization (ads, sponsorships, affiliate links)</li>
+                </ul>
+
+                <h3>Prohibited Uses:</h3>
+                <p>You may not:</p>
+                <ul class="prohibited">
+                    <li>Use for paid client work or commercial projects for businesses</li>
+                    <li>Use in broadcast television or radio</li>
+                    <li>Use in theatrical film releases</li>
+                    <li>Resell, redistribute, or share the music files</li>
+                    <li>Claim you created the music</li>
+                    <li>Use as part of any music library or competing service</li>
+                </ul>
+
+                <h3>Key Terms:</h3>
+                <ul>
+                    <li><strong>Geographic Rights:</strong> Worldwide usage permitted</li>
+                    <li><strong>Attribution:</strong> Not required (but appreciated!)</li>
+                    <li><strong>Perpetual License:</strong> Content created while subscribed remains licensed forever, even after cancellation</li>
+                </ul>
+            </div>
+
+            <!-- Business License -->
+            <div class="section">
+                <h2>Business License <span class="price-badge">$125/song or $1,299/year</span></h2>
+                
+                <h3>What You Get:</h3>
+                <ul>
+                    <li>Full track in WAV format</li>
+                    <li>All alternate versions in WAV format</li>
+                    <li>All stems in WAV format</li>
+                    <li>Extended commercial usage rights</li>
+                </ul>
+
+                <h3>Permitted Uses:</h3>
+                <p>You may use the licensed music for:</p>
+                <ul class="permitted">
+                    <li>Commercial advertisements (digital only - web, social media, streaming)</li>
+                    <li>Corporate videos and presentations</li>
+                    <li>Business websites and digital marketing</li>
+                    <li>Internal business training and communications</li>
+                    <li>Client projects and deliverables (digital distribution only)</li>
+                    <li>Product demonstrations and promotional content</li>
+                    <li>All uses included in Individual License</li>
+                </ul>
+
+                <h3>Prohibited Uses:</h3>
+                <p>You may not:</p>
+                <ul class="prohibited">
+                    <li>Use in broadcast television or radio commercials</li>
+                    <li>Use in theatrical film releases</li>
+                    <li>Transfer or sublicense to other businesses</li>
+                    <li>Resell, redistribute, or share the music files</li>
+                    <li>Claim you created the music</li>
+                </ul>
+
+                <h3>License Scope:</h3>
+                <ul>
+                    <li>License granted to the purchasing business/organization only</li>
+                    <li>Non-transferable between businesses</li>
+                    <li>Multi-user access permitted within licensed organization</li>
+                    <li>Worldwide usage (digital distribution only)</li>
+                </ul>
+            </div>
+
+            <!-- Refund Policy -->
+            <div class="section">
+                <h2>Refund Policy</h2>
+                
+                <h3>Individual Song Purchases:</h3>
+                <p><strong>All individual song purchases are final.</strong> No refunds are available for à la carte licenses ($10 Individual or $125 Business per song).</p>
+                
+                <h3>Subscription Purchases:</h3>
+                <p>Refunds available within <strong>30 days of purchase</strong> OR before <strong>10 downloads</strong> (whichever comes first).</p>
+                <p>After 30 days or 10 downloads, subscription sales are final.</p>
+                <p><strong>Renewal Refunds:</strong> First payment refundable within 30 days, subsequent renewals are non-refundable.</p>
+            </div>
+
+            <!-- General Terms -->
+            <h2>General Terms</h2>
+            
+            <h3>Copyright and Ownership:</h3>
+            <p>All music remains the property of Ready Sounds. Licensee receives usage rights only, not ownership.</p>
+
+            <h3>Delivery:</h3>
+            <p>Digital downloads provided immediately upon payment confirmation. Customer responsible for backing up downloaded files.</p>
+
+            <h3>Modifications:</h3>
+            <p>You may edit, remix, and modify the music and stems for your licensed projects.</p>
+
+            <h3>Liability:</h3>
+            <p>Music provided "as is" without warranty. Maximum liability limited to amount paid for license.</p>
+
+            <!-- Need More? -->
+            <div class="contact">
+                <h3>Need Extended Licensing?</h3>
+                <p>Need broadcast TV/radio rights? Theatrical film rights? Exclusive rights?</p>
+                <p>Contact us for custom licensing: <a href="mailto:licensing@readysounds.com">licensing@readysounds.com</a></p>
+            </div>
+
+            <hr>
+
+            <!-- FAQ -->
+            <h2>Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">Can I use the music after my subscription ends?</div>
+                <div class="faq-answer">Yes! Any content you created while subscribed remains licensed forever. You just can't download new tracks after cancellation.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What's the difference between Individual and Business licenses?</div>
+                <div class="faq-answer">Individual is for personal content creators (YouTube, podcasts, social media). Business is for companies using music in commercial projects, ads, and client work.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Do I need to credit Ready Sounds?</div>
+                <div class="faq-answer">No, attribution is not required (but we appreciate it!).</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I modify the music or stems?</div>
+                <div class="faq-answer">Yes! You can edit, remix, and modify the music and stems for your licensed projects.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I use the same song in multiple projects?</div>
+                <div class="faq-answer">Yes! Once licensed, you can use it in unlimited projects within your license scope.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What if I need broadcast TV or film rights?</div>
+                <div class="faq-answer">Contact us for custom licensing at licensing@readysounds.com</div>
+            </div>
+
+            <hr>
+
+            <p style="text-align: center; color: rgba(255, 255, 255, 0.5); margin-top: 48px;">
+                By purchasing or subscribing, you agree to these Terms and Conditions.<br>
+                readysounds | Last Updated: January 21, 2026
+            </p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background: rgba(255, 255, 255, 0.02); border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 0; margin-top: 80px;">
+        <div style="max-width: 1400px; margin: 0 auto; padding: 0 32px; text-align: center;">
+            <p style="color: rgba(255, 255, 255, 0.5); font-size: 14px; margin-bottom: 16px;">
+                © 2026 readysounds. all rights reserved.
+            </p>
+            <div style="display: flex; gap: 32px; justify-content: center; flex-wrap: wrap;">
+                <a href="index.html" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 14px; transition: color 0.2s;">browse</a>
+                <a href="pricing.html" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 14px; transition: color 0.2s;">pricing</a>
+                <a href="terms.html" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 14px; transition: color 0.2s;">terms & conditions</a>
+                <a href="mailto:licensing@readysounds.com" style="color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 14px; transition: color 0.2s;">contact</a>
+            </div>
+        </div>
+    </footer>
+    <script>
+        function toggleMobileMenu() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel.classList.contains('open')) {
+                closeMobilePanel();
+            } else {
+                panel.classList.add('open');
+                overlay.classList.add('active');
+                if (toggle) toggle.textContent = '✕';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        function closeMobilePanel() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel) panel.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
+            if (toggle) toggle.textContent = '☰';
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobilePanel(); });
+    </script>
+</body>
+</html>

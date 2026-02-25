@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZJS68FCQ0Q"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-ZJS68FCQ0Q');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>contact - readysounds.</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='100' cy='100' r='95' fill='%231a1a1a' stroke='%239c27b0' stroke-width='4'/%3E%3Cpath d='M 40 100 Q 70 60 100 60 Q 130 60 160 100 Q 130 140 100 140 Q 70 140 40 100 Z' fill='%234a148c' stroke='%239c27b0' stroke-width='3'/%3E%3Ccircle cx='100' cy='100' r='25' fill='%239c27b0'/%3E%3Ccircle cx='100' cy='100' r='12' fill='%23ffffff'/%3E%3Ccircle cx='105' cy='95' r='4' fill='%23e0e0e0'/%3E%3Ccircle cx='100' cy='100' r='70' fill='none' stroke='%239c27b0' stroke-width='2' stroke-dasharray='8,8' opacity='0.4'/%3E%3Ccircle cx='100' cy='100' r='55' fill='none' stroke='%237b1fa2' stroke-width='1.5' stroke-dasharray='6,6' opacity='0.3'/%3E%3Cline x1='100' y1='20' x2='100' y2='50' stroke='%239c27b0' stroke-width='2' opacity='0.5'/%3E%3Cline x1='35' y1='65' x2='55' y2='75' stroke='%239c27b0' stroke-width='2' opacity='0.5'/%3E%3Cline x1='165' y1='65' x2='145' y2='75' stroke='%239c27b0' stroke-width='2' opacity='0.5'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ── Header ── */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 1000;
+            padding: 16px 0;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 600;
+            color: white;
+            text-transform: lowercase;
+            text-decoration: none;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            color: #9c27b0;
+            background: rgba(156, 39, 176, 0.1);
+            border-color: rgba(156, 39, 176, 0.3);
+        }
+
+        .nav-item.active {
+            color: white;
+            background: rgba(156, 39, 176, 0.15);
+            border-color: rgba(156, 39, 176, 0.5);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-left: 16px;
+        }
+
+        .auth-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .auth-btn-login {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .auth-btn-login:hover {
+            color: #9c27b0;
+            background: rgba(156, 39, 176, 0.1);
+            border-color: rgba(156, 39, 176, 0.3);
+        }
+
+        .auth-btn-signup {
+            color: white;
+            background: #9c27b0;
+            border-color: #9c27b0;
+        }
+
+        .auth-btn-signup:hover {
+            background: #7b1fa2;
+        }
+
+        /* Mobile nav toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        /* ── Main ── */
+        .main {
+            margin-top: 64px;
+            padding: 80px 0 120px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        /* ── Hero ── */
+        .hero {
+            text-align: center;
+            margin-bottom: 72px;
+        }
+
+        .hero-label {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #9c27b0;
+            margin-bottom: 16px;
+        }
+
+        .hero-title {
+            font-size: 52px;
+            font-weight: 700;
+            letter-spacing: -1.5px;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.5);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* ── Two-column layout ── */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 64px;
+            align-items: start;
+        }
+
+        /* ── Left: contact info ── */
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .contact-block {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .contact-block-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .contact-block-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .contact-block-value {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.55);
+            line-height: 1.6;
+        }
+
+        .contact-block-value a {
+            color: #9c27b0;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .contact-block-value a:hover {
+            color: #ce93d8;
+        }
+
+        .contact-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        /* ── Right: form ── */
+        .contact-form-wrap {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 48px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: white;
+            font-family: inherit;
+            font-size: 15px;
+            transition: border-color 0.2s, background 0.2s;
+            outline: none;
+            appearance: none;
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: rgba(156, 39, 176, 0.6);
+            background: rgba(156, 39, 176, 0.05);
+        }
+
+        .form-select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        .form-select option {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 140px;
+            line-height: 1.6;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: #9c27b0;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            margin-top: 8px;
+            font-family: inherit;
+        }
+
+        .submit-btn:hover {
+            background: #7b1fa2;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.99);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Success / error states */
+        .form-message {
+            display: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .form-message.success {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #81c784;
+        }
+
+        .form-message.error {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            color: #e57373;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 32px 0;
+        }
+
+        .footer-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            text-align: center;
+        }
+
+        .footer-copy {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 32px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* ── Mobile ── */
+        @media (max-width: 900px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 48px;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .header-nav .nav-item,
+            .auth-buttons {
+                display: none;
+            }
+        }
+
+        .mobile-panel-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 1998;
+            display: none;
+        }
+        .mobile-panel-overlay.active { display: block; }
+
+        .mobile-panel {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 100%; height: 100%;
+            background: #111111;
+            z-index: 1999;
+            transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 28px;
+            overflow-y: auto;
+        }
+        .mobile-panel.open { right: 0; }
+
+        .mobile-panel-close {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.55);
+            font-size: 28px;
+            cursor: pointer;
+            margin-bottom: 32px;
+            line-height: 1;
+        }
+        .mobile-panel-nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: 700;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            text-transform: lowercase;
+        }
+        .mobile-panel-nav a:hover { color: #9c27b0; }
+        .mobile-panel-nav a.active-page { color: #9c27b0; }
+
+        .mobile-panel-cta {
+            display: block;
+            background: #9c27b0;
+            color: white;
+            text-align: center;
+            padding: 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            text-decoration: none;
+            margin-top: 32px;
+        }
+        .mobile-panel-auth {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .mobile-auth-login {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: rgba(255,255,255,0.07);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .mobile-auth-signup {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: #9c27b0;
+            color: white;
+        }
+        .mobile-panel-footer {
+            margin-top: auto;
+            padding-top: 40px;
+        }
+
+        @media (max-width: 640px) {
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .contact-form-wrap {
+                padding: 28px 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">readysounds.</a>
+            <nav class="header-nav" id="headerNav">
+                <a href="browse.html" class="nav-item">Browse</a>
+                <a href="playlists.html" class="nav-item">Playlists</a>
+                <a href="pricing.html" class="nav-item">Pricing</a>
+                <a href="contact.html" class="nav-item active">Contact</a>
+                <div class="auth-buttons" id="authButtons">
+                    <a href="signup.html" class="auth-btn auth-btn-login">Log In</a>
+                    <a href="signup.html" class="auth-btn auth-btn-signup">Get Started</a>
+                </div>
+            </nav>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()">☰</button>
+        </div>
+    </header>
+
+    <!-- Mobile Panel Overlay -->
+    <div class="mobile-panel-overlay" id="mobilePanelOverlay" onclick="closeMobilePanel()"></div>
+    <!-- Mobile Slide Panel -->
+    <div class="mobile-panel" id="mobilePanel">
+        <button class="mobile-panel-close" onclick="closeMobilePanel()">✕</button>
+        <nav class="mobile-panel-nav">
+            <a href="browse.html">browse</a>
+            <a href="playlists.html">playlists</a>
+            <a href="pricing.html">pricing</a>
+            <a href="contact.html" class="active-page">contact</a>
+        </nav>
+        <a href="pricing.html" class="mobile-panel-cta">Subscribe — $79/yr</a>
+        <div class="mobile-panel-auth" id="mobilePanelAuthBtns">
+            <a href="signup.html" class="mobile-auth-login">log in</a>
+            <a href="signup.html" class="mobile-auth-signup">create free account</a>
+        </div>
+        <div class="mobile-panel-footer">
+            <a href="terms.html" style="color: rgba(255,255,255,0.4); font-size: 12px; text-decoration: none;">terms & conditions</a>
+        </div>
+    </div>
+
+    <main class="main">
+        <div class="container">
+
+            <div class="hero">
+                <p class="hero-label">Get in Touch</p>
+                <h1 class="hero-title">We'd love to hear<br>from you.</h1>
+                <p class="hero-subtitle">Licensing questions, custom music, or just want to say hi — we're here.</p>
+            </div>
+
+            <div class="contact-grid">
+
+                <!-- Left: contact details -->
+                <div class="contact-info">
+
+                    <div class="contact-block">
+                        <span class="contact-block-label">General Inquiries</span>
+                        <span class="contact-block-title">Say Hello</span>
+                        <p class="contact-block-value">
+                            Questions about the catalog, licensing terms, or anything else.<br><br>
+                            <a href="mailto:josh@readysounds.com">josh@readysounds.com</a>
+                        </p>
+                    </div>
+
+                    <div class="contact-divider"></div>
+
+                    <div class="contact-block">
+                        <span class="contact-block-label">Custom &amp; Exclusive Music</span>
+                        <span class="contact-block-title">Commission a Track</span>
+                        <p class="contact-block-value">
+                            Need something made just for you? Tell us about your project and we'll put together a custom quote.
+                        </p>
+                    </div>
+
+                    <div class="contact-divider"></div>
+
+                    <div class="contact-block">
+                        <span class="contact-block-label">Business &amp; Agency</span>
+                        <span class="contact-block-title">Enterprise Licensing</span>
+                        <p class="contact-block-value">
+                            Need broadcast rights, multi-territory licensing, or a team plan? We'll work out the details.
+                        </p>
+                    </div>
+
+                    <div class="contact-divider"></div>
+
+                    <div class="contact-block">
+                        <span class="contact-block-label">Response Time</span>
+                        <span class="contact-block-title">Usually within 24 hours</span>
+                        <p class="contact-block-value">We're a small team — we read every message and reply quickly.</p>
+                    </div>
+
+                </div>
+
+                <!-- Right: form -->
+                <div class="contact-form-wrap">
+                    <form id="contactForm" onsubmit="handleSubmit(event)">
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="firstName">First Name</label>
+                                <input class="form-input" type="text" id="firstName" name="firstName" placeholder="Jane" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="lastName">Last Name</label>
+                                <input class="form-input" type="text" id="lastName" name="lastName" placeholder="Smith" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email</label>
+                            <input class="form-input" type="email" id="email" name="email" placeholder="jane@example.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="subject">What's this about?</label>
+                            <select class="form-select" id="subject" name="subject" required>
+                                <option value="" disabled selected>Select a topic</option>
+                                <option value="licensing">Licensing question</option>
+                                <option value="custom">Custom / exclusive music</option>
+                                <option value="business">Business / agency plan</option>
+                                <option value="billing">Billing or account</option>
+                                <option value="other">Something else</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="message">Message</label>
+                            <textarea class="form-textarea" id="message" name="message" placeholder="Tell us what you need..." required></textarea>
+                        </div>
+
+                        <button class="submit-btn" type="submit" id="submitBtn">Send Message</button>
+
+                        <div class="form-message" id="formMessage"></div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <p class="footer-copy">© 2026 readysounds. all rights reserved.</p>
+            <div class="footer-links">
+                <a href="browse.html">browse</a>
+                <a href="pricing.html">pricing</a>
+                <a href="terms.html">terms &amp; conditions</a>
+                <a href="contact.html">contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ── Form submission ──
+        async function handleSubmit(event) {
+            event.preventDefault();
+
+            const btn = document.getElementById('submitBtn');
+            const msg = document.getElementById('formMessage');
+
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            msg.style.display = 'none';
+
+            const data = {
+                firstName: document.getElementById('firstName').value.trim(),
+                lastName:  document.getElementById('lastName').value.trim(),
+                email:     document.getElementById('email').value.trim(),
+                subject:   document.getElementById('subject').value,
+                message:   document.getElementById('message').value.trim(),
+            };
+
+            try {
+                // Send via mailto as a reliable fallback (works without a backend)
+                const body = encodeURIComponent(
+                    `Name: ${data.firstName} ${data.lastName}\nEmail: ${data.email}\nTopic: ${data.subject}\n\n${data.message}`
+                );
+                const mailtoLink = `mailto:josh@readysounds.com?subject=Contact Form: ${encodeURIComponent(data.subject)}&body=${body}`;
+
+                // Show success and open mail client
+                msg.className = 'form-message success';
+                msg.textContent = 'Opening your email client… if nothing opens, email us directly at josh@readysounds.com';
+                msg.style.display = 'block';
+                btn.textContent = 'Message Sent';
+
+                setTimeout(() => {
+                    window.location.href = mailtoLink;
+                }, 300);
+
+            } catch (err) {
+                msg.className = 'form-message error';
+                msg.textContent = 'Something went wrong. Please email us directly at josh@readysounds.com';
+                msg.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Send Message';
+            }
+        }
+
+        // ── Mobile menu ──
+        function toggleMobileMenu() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel.classList.contains('open')) {
+                closeMobilePanel();
+            } else {
+                panel.classList.add('open');
+                overlay.classList.add('active');
+                if (toggle) toggle.textContent = '✕';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        function closeMobilePanel() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel) panel.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
+            if (toggle) toggle.textContent = '☰';
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobilePanel(); });
+
+        // ── Auth state ──
+        const SUPABASE_URL = 'https://pfqvrxfazumlydjepwib.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_1oBqgAQj0xzb5-eosyfcBg_9dKxNZfa';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                const { data: { session } } = await client.auth.getSession();
+                if (session && session.user) {
+                    const authButtons = document.getElementById('authButtons');
+                    if (authButtons) authButtons.innerHTML = `
+                        <a href="browse.html" class="auth-btn auth-btn-login">Browse</a>
+                        <a href="account.html" class="auth-btn auth-btn-signup">My Account</a>
+                    `;
+                    // Hide mobile panel sign-in buttons when logged in
+                    const mobilePanelAuth = document.getElementById('mobilePanelAuthBtns');
+                    if (mobilePanelAuth) mobilePanelAuth.style.display = 'none';
+                    // Pre-fill email if logged in
+                    const emailField = document.getElementById('email');
+                    if (emailField) emailField.value = session.user.email;
+                }
+            } catch (e) {
+                // Supabase not critical for contact page
+            }
+        });
+    </script>
+
+</body>
+</html>

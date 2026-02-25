@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZJS68FCQ0Q"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-ZJS68FCQ0Q');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Playlists - Ready Sounds</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 80px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 30px;
+            color: #9c27b0;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #ba68c8;
+        }
+
+        header {
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #888;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state-text {
+            font-size: 1.5em;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .playlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .playlist-card {
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .playlist-card:hover {
+            background: rgba(156, 39, 176, 0.1);
+            border-color: rgba(156, 39, 176, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .playlist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .playlist-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .playlist-count {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .playlist-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            background: rgba(156, 39, 176, 0.3);
+            border-color: rgba(156, 39, 176, 0.5);
+        }
+
+        .delete-btn:hover {
+            background: rgba(244, 67, 54, 0.3);
+            border-color: rgba(244, 67, 54, 0.5);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+            font-size: 1.2em;
+        }
+
+        .create-btn {
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            border: none;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-bottom: 24px;
+        }
+
+        .create-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.4);
+        }
+
+        /* ── Site nav ── */
+        .rs-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: rgba(10,10,10,0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            z-index: 1000;
+            padding: 16px 0;
+        }
+        .rs-nav-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .rs-logo {
+            font-size: 22px;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            text-transform: lowercase;
+        }
+        .rs-nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        .rs-nav-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: lowercase;
+            transition: color 0.2s;
+        }
+        .rs-nav-links a:hover { color: #9c27b0; }
+        .rs-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.8);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+        }
+        @media (max-width: 768px) {
+            .rs-nav-links { display: none; }
+            .rs-menu-toggle { display: block; }
+        }
+        .mobile-panel-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 1998;
+            display: none;
+        }
+        .mobile-panel-overlay.active { display: block; }
+        .mobile-panel {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 100%; height: 100%;
+            background: #111111;
+            z-index: 1999;
+            transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 28px;
+            overflow-y: auto;
+        }
+        .mobile-panel.open { right: 0; }
+        .mobile-panel-close {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.55);
+            font-size: 28px;
+            cursor: pointer;
+            margin-bottom: 32px;
+            line-height: 1;
+        }
+        .mobile-panel-nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: 700;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            text-transform: lowercase;
+        }
+        .mobile-panel-nav a:hover { color: #9c27b0; }
+        .mobile-panel-cta {
+            display: block;
+            background: #9c27b0;
+            color: white;
+            text-align: center;
+            padding: 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            text-decoration: none;
+            margin-top: 32px;
+        }
+        .mobile-panel-auth {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .mobile-auth-login {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: rgba(255,255,255,0.07);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .mobile-auth-signup {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: #9c27b0;
+            color: white;
+        }
+        .mobile-panel-footer {
+            margin-top: auto;
+            padding-top: 40px;
+        }
+
+        /* ── Modals ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: #1c1c1c;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 32px;
+            width: 100%;
+            max-width: 420px;
+            margin: 20px;
+        }
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: white;
+        }
+        .modal-input {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: white;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            margin-bottom: 8px;
+        }
+        .modal-input:focus { border-color: rgba(156,39,176,0.6); }
+        .modal-input::placeholder { color: rgba(255,255,255,0.3); }
+        .modal-body {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .modal-error {
+            color: #e57373;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        .modal-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .modal-btn-cancel {
+            background: rgba(255,255,255,0.08);
+            color: white;
+        }
+        .modal-btn-cancel:hover { background: rgba(255,255,255,0.13); }
+        .modal-btn-confirm {
+            background: #9c27b0;
+            color: white;
+        }
+        .modal-btn-confirm:hover { background: #7b1fa2; }
+        .modal-btn-danger {
+            background: #c62828;
+            color: white;
+        }
+        .modal-btn-danger:hover { background: #b71c1c; }
+
+        /* ── Toast ── */
+        @keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(8px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+    </style>
+</head>
+<body>
+    <!-- Site Navigation -->
+    <nav class="rs-nav">
+        <div class="rs-nav-inner">
+            <a href="browse.html" class="rs-logo">readysounds.</a>
+            <div class="rs-nav-links">
+                <a href="browse.html">browse</a>
+                <a href="playlists.html">playlists</a>
+                <a href="pricing.html">pricing</a>
+                <a href="contact.html">contact</a>
+            </div>
+            <button class="rs-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+        </div>
+    </nav>
+    <!-- Mobile Panel Overlay -->
+    <div class="mobile-panel-overlay" id="mobilePanelOverlay" onclick="closeMobilePanel()"></div>
+    <!-- Mobile Slide Panel -->
+    <div class="mobile-panel" id="mobilePanel">
+        <button class="mobile-panel-close" onclick="closeMobilePanel()">✕</button>
+        <nav class="mobile-panel-nav">
+            <a href="browse.html">browse</a>
+            <a href="playlists.html">playlists</a>
+            <a href="pricing.html">pricing</a>
+            <a href="contact.html">contact</a>
+        </nav>
+        <a href="pricing.html" class="mobile-panel-cta">Subscribe — $79/yr</a>
+        <div class="mobile-panel-auth">
+            <a href="signup.html" class="mobile-auth-login">log in</a>
+            <a href="signup.html" class="mobile-auth-signup">create free account</a>
+        </div>
+        <div class="mobile-panel-footer">
+            <a href="terms.html" style="color: rgba(255,255,255,0.4); font-size: 12px; text-decoration: none;">terms & conditions</a>
+        </div>
+    </div>
+
+    <!-- Create Playlist Modal -->
+    <div class="modal-overlay" id="createModal" onclick="if(event.target===this)closeCreateModal()">
+        <div class="modal-box">
+            <div class="modal-title">New Playlist</div>
+            <input class="modal-input" type="text" id="createModalInput" placeholder="e.g. Sunday Vibes" maxlength="60">
+            <div class="modal-error" id="createModalError">Please enter a name.</div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeCreateModal()">Cancel</button>
+                <button class="modal-btn modal-btn-confirm" onclick="submitCreatePlaylist()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div class="modal-overlay" id="deleteModal" onclick="if(event.target===this)closeDeleteModal()">
+        <div class="modal-box">
+            <div class="modal-title">Delete Playlist</div>
+            <div class="modal-body" id="deleteModalBody">Are you sure you want to delete this playlist?</div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="modal-btn modal-btn-danger" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="browse.html" class="back-link">← Back to Music Library</a>
+
+        <header>
+            <h1>📝 My Playlists</h1>
+            <p class="subtitle">Your custom collections</p>
+        </header>
+
+        <button class="create-btn" onclick="createPlaylist()">+ Create New Playlist</button>
+
+        <div id="playlistsContainer">
+            <div class="loading">Loading your playlists...</div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://pfqvrxfazumlydjepwib.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_1oBqgAQj0xzb5-eosyfcBg_9dKxNZfa';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let userPlaylists = [];
+
+        async function loadPlaylists() {
+            const container = document.getElementById('playlistsContainer');
+            
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                
+                if (!user) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🔒</div>
+                            <div class="empty-state-text">Please log in to view your playlists</div>
+                            <a href="signup.html" style="background: linear-gradient(135deg, #9c27b0, #4a148c); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600;">Log In</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const { data, error } = await supabaseClient
+                    .from('user_playlists')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Error loading playlists:', error);
+                    container.innerHTML = '<div class="empty-state-text">Error loading playlists</div>';
+                    return;
+                }
+
+                userPlaylists = data || [];
+
+                if (userPlaylists.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📝</div>
+                            <div class="empty-state-text">You haven't created any playlists yet!</div>
+                            <button onclick="createPlaylist()" style="background: linear-gradient(135deg, #9c27b0, #4a148c); color: white; padding: 14px 28px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600;">Create Your First Playlist</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '<div class="playlist-grid">';
+                userPlaylists.forEach(playlist => {
+                    const trackCount = (playlist.track_ids || []).length;
+                    html += `
+                        <div class="playlist-card" onclick="viewPlaylist('${playlist.id}')">
+                            <div class="playlist-header">
+                                <div>
+                                    <div class="playlist-name">${escapeHtml(playlist.name)}</div>
+                                    <div class="playlist-count">${trackCount} track${trackCount !== 1 ? 's' : ''}</div>
+                                </div>
+                                <div class="playlist-actions">
+                                    <button class="icon-btn delete-btn" onclick="event.stopPropagation(); deletePlaylist('${playlist.id}', '${escapeHtml(playlist.name)}')">🗑️</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                
+                container.innerHTML = html;
+
+            } catch (err) {
+                console.error('Error:', err);
+                container.innerHTML = '<div class="empty-state-text">Error loading playlists</div>';
+            }
+        }
+
+        // ── Create modal ──
+        function createPlaylist() {
+            const input = document.getElementById('createModalInput');
+            const err   = document.getElementById('createModalError');
+            input.value = '';
+            err.style.display = 'none';
+            document.getElementById('createModal').classList.add('active');
+            setTimeout(() => input.focus(), 80);
+        }
+
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.remove('active');
+        }
+
+        async function submitCreatePlaylist() {
+            const input = document.getElementById('createModalInput');
+            const err   = document.getElementById('createModalError');
+            const name  = input.value.trim();
+            if (!name) { err.style.display = 'block'; return; }
+            err.style.display = 'none';
+            closeCreateModal();
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) { showToast('Please log in to create playlists', 'error'); return; }
+
+                const { error } = await supabaseClient
+                    .from('user_playlists')
+                    .insert([{ user_id: user.id, name, track_ids: [] }]);
+
+                if (error) { showToast('Failed to create playlist', 'error'); return; }
+                showToast(`Created "${name}"!`);
+                loadPlaylists();
+            } catch (e) {
+                showToast('Failed to create playlist', 'error');
+            }
+        }
+
+        // ── Delete modal ──
+        let _deleteId = null;
+
+        function deletePlaylist(playlistId, playlistName) {
+            _deleteId = playlistId;
+            document.getElementById('deleteModalBody').textContent =
+                `Delete "${playlistName}"? This can't be undone.`;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            _deleteId = null;
+        }
+
+        async function confirmDelete() {
+            if (!_deleteId) return;
+            const id = _deleteId;
+            closeDeleteModal();
+
+            try {
+                const { error } = await supabaseClient
+                    .from('user_playlists')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) { showToast('Failed to delete playlist', 'error'); return; }
+                showToast('Playlist deleted');
+                loadPlaylists();
+            } catch (e) {
+                showToast('Failed to delete playlist', 'error');
+            }
+        }
+
+        // ── Toast ──
+        function showToast(msg, type = 'success') {
+            const t = document.createElement('div');
+            t.style.cssText = `position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:${type === 'error' ? '#c62828' : '#2e7d32'};color:white;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:500;z-index:3000;animation:toastIn .2s;pointer-events:none;white-space:nowrap;`;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function viewPlaylist(playlistId) {
+            window.location.href = `index.html?playlist=${playlistId}`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Enter key submits create modal
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                closeCreateModal();
+                closeDeleteModal();
+                closeMobilePanel();
+            }
+            if (e.key === 'Enter' && document.getElementById('createModal').classList.contains('active')) {
+                submitCreatePlaylist();
+            }
+        });
+
+        // Load playlists on page load
+        loadPlaylists();
+
+        function toggleMobileMenu() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel.classList.contains('open')) {
+                closeMobilePanel();
+            } else {
+                panel.classList.add('open');
+                overlay.classList.add('active');
+                if (toggle) toggle.textContent = '✕';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        function closeMobilePanel() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel) panel.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
+            if (toggle) toggle.textContent = '☰';
+            document.body.style.overflow = '';
+        }
+    </script>
+</body>
+</html>

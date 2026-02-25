@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZJS68FCQ0Q"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-ZJS68FCQ0Q');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorites - Ready Sounds</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 80px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 30px;
+            color: #9c27b0;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #ba68c8;
+        }
+
+        header {
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #888;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state-text {
+            font-size: 1.5em;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .browse-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .browse-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.4);
+        }
+
+        .track-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .track-item {
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s;
+        }
+
+        .track-item:hover {
+            background: rgba(156, 39, 176, 0.1);
+            border-color: rgba(156, 39, 176, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .track-artwork {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: rgba(156, 39, 176, 0.2);
+        }
+
+        .track-artwork img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.4);
+        }
+
+        .track-info {
+            flex: 1;
+        }
+
+        .track-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .track-meta {
+            color: #888;
+            font-size: 0.95em;
+        }
+
+        .track-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn:hover {
+            background: rgba(156, 39, 176, 0.2);
+            border-color: rgba(156, 39, 176, 0.3);
+        }
+
+        .unfavorite-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 0;
+        }
+
+        .unfavorite-btn:hover {
+            transform: scale(1.2);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .track-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .track-actions {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* ── Site nav ── */
+        .rs-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: rgba(10,10,10,0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            z-index: 1000;
+            padding: 16px 0;
+        }
+        .rs-nav-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .rs-logo {
+            font-size: 22px;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            text-transform: lowercase;
+        }
+        .rs-nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        .rs-nav-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: lowercase;
+            transition: color 0.2s;
+        }
+        .rs-nav-links a:hover { color: #9c27b0; }
+        .rs-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.8);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+        }
+        @media (max-width: 768px) {
+            .rs-nav-links { display: none; }
+            .rs-menu-toggle { display: block; }
+        }
+        .mobile-panel-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 1998;
+            display: none;
+        }
+        .mobile-panel-overlay.active { display: block; }
+        .mobile-panel {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 100%; height: 100%;
+            background: #111111;
+            z-index: 1999;
+            transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 28px;
+            overflow-y: auto;
+        }
+        .mobile-panel.open { right: 0; }
+        .mobile-panel-close {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.55);
+            font-size: 28px;
+            cursor: pointer;
+            margin-bottom: 32px;
+            line-height: 1;
+        }
+        .mobile-panel-nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: 700;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            text-transform: lowercase;
+        }
+        .mobile-panel-nav a:hover { color: #9c27b0; }
+        .mobile-panel-cta {
+            display: block;
+            background: #9c27b0;
+            color: white;
+            text-align: center;
+            padding: 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            text-decoration: none;
+            margin-top: 32px;
+        }
+        .mobile-panel-auth {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .mobile-auth-login {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: rgba(255,255,255,0.07);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .mobile-auth-signup {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: #9c27b0;
+            color: white;
+        }
+        .mobile-panel-footer {
+            margin-top: auto;
+            padding-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Site Navigation -->
+    <nav class="rs-nav">
+        <div class="rs-nav-inner">
+            <a href="browse.html" class="rs-logo">readysounds.</a>
+            <div class="rs-nav-links">
+                <a href="browse.html">browse</a>
+                <a href="playlists.html">playlists</a>
+                <a href="pricing.html">pricing</a>
+                <a href="contact.html">contact</a>
+            </div>
+            <button class="rs-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+        </div>
+    </nav>
+    <!-- Mobile Panel Overlay -->
+    <div class="mobile-panel-overlay" id="mobilePanelOverlay" onclick="closeMobilePanel()"></div>
+    <!-- Mobile Slide Panel -->
+    <div class="mobile-panel" id="mobilePanel">
+        <button class="mobile-panel-close" onclick="closeMobilePanel()">✕</button>
+        <nav class="mobile-panel-nav">
+            <a href="browse.html">browse</a>
+            <a href="playlists.html">playlists</a>
+            <a href="pricing.html">pricing</a>
+            <a href="contact.html">contact</a>
+        </nav>
+        <a href="pricing.html" class="mobile-panel-cta">Subscribe — $79/yr</a>
+        <div class="mobile-panel-auth">
+            <a href="signup.html" class="mobile-auth-login">log in</a>
+            <a href="signup.html" class="mobile-auth-signup">create free account</a>
+        </div>
+        <div class="mobile-panel-footer">
+            <a href="terms.html" style="color: rgba(255,255,255,0.4); font-size: 12px; text-decoration: none;">terms & conditions</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="browse.html" class="back-link">← Back to Browse</a>
+        
+        <header>
+            <h1>❤️ My Favorites</h1>
+            <p class="subtitle">Tracks you've loved</p>
+        </header>
+
+        <div id="favoritesContainer"></div>
+    </div>
+
+    <script>
+        // Load favorites from localStorage
+        function loadFavorites() {
+            const favorites = JSON.parse(localStorage.getItem('readysounds_favorites') || '[]');
+            const container = document.getElementById('favoritesContainer');
+            
+            if (favorites.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🤍</div>
+                        <div class="empty-state-text">You haven't favorited any tracks yet!</div>
+                        <a href="browse.html" class="browse-btn">Browse Music</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Track data — mirrors all main tracks in browse.html
+            const R2 = 'https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/';
+            const trackData = {
+                1:  { title: 'Buck Moon - "Go, Now"',             genre: 'Dance, Electronic, Hip Hop',              bpm: 90,  duration: '1:09', image: R2 + 'primum-electronic-cover.jpg' },
+                4:  { title: 'Buck Moon - "Super Things"',         genre: 'Electronic, Hip Hop, Trap, Dub',          bpm: 152, duration: '4:00', image: R2 + 'primum-electronic-cover.jpg' },
+                6:  { title: 'Buck Moon - "My Love For You"',      genre: 'Dance, EDM, House, Pop, Indie Pop',       bpm: 95,  duration: '3:20', image: R2 + 'primum-electronic-cover.jpg' },
+                7:  { title: 'Buck Moon - "Journey On The Radio"', genre: 'Indie Rock, Electronic, Nu Wave, Pop',    bpm: 160, duration: '2:48', image: R2 + 'primum-electronic-cover.jpg' },
+                8:  { title: 'Buck Moon - "His & Hers"',           genre: 'Electronic, Indie, Pop',                  bpm: 120, duration: '3:00', image: R2 + 'primum-electronic-cover.jpg' },
+                9:  { title: 'Buck Moon - "Give Me Your Energy"',  genre: 'Electronic, Dance, Energetic, Retro',     bpm: 95,  duration: '3:12', image: R2 + 'primum-electronic-cover.jpg' },
+                12: { title: 'Buck Moon - "Snow"',                 genre: 'Electronic, Dance, House, Progressive',   bpm: 120, duration: '5:18', image: R2 + 'primum-electronic-cover.jpg' },
+                17: { title: 'Buck Moon - "Swell"',                genre: 'Electronic, Hip Hop, Trap, Dub',          bpm: 100, duration: '3:36', image: R2 + 'primum-electronic-cover.jpg' },
+                22: { title: 'Crane Flight - "I\'ll Be There"',    genre: 'Afro Beats, Fun, Dance, Electro',         bpm: 100, duration: '2:21', image: R2 + 'afro-beats-vol-1-cover.jpg' },
+                23: { title: 'Buck Moon - "Airborne"',             genre: 'Funk, House, Pop, EDM, Dance',            bpm: 95,  duration: '2:45', image: R2 + 'primum-electronic-cover.jpg' },
+                24: { title: 'Buck Moon - "Spin My World"',        genre: 'Indie, Electronic, Lofi, Pop',            bpm: 95,  duration: '3:40', image: R2 + 'primum-electronic-cover.jpg' },
+                39: { title: 'MallFlex - "Ice Skatin\'"',          genre: 'Funk, Dance, Pop',                        bpm: 95,  duration: '2:22', image: R2 + 'funky-munky.jpg' }
+            };
+
+            let html = '<div class="track-grid">';
+            
+            favorites.forEach(trackId => {
+                const track = trackData[trackId];
+                if (track) {
+                    html += `
+                        <div class="track-item">
+                            <div class="track-artwork">
+                                <img src="${track.image}" alt="${track.title}">
+                            </div>
+                            <button class="play-btn" onclick="playTrack(${trackId})">▶</button>
+                            <div class="track-info">
+                                <div class="track-title">${track.title}</div>
+                                <div class="track-meta">${track.genre} · ${track.bpm} BPM · ${track.duration}</div>
+                            </div>
+                            <div class="track-actions">
+                                <a href="browse.html#track-${trackId}" class="action-btn">View Track</a>
+                                <button class="unfavorite-btn" onclick="removeFavorite(${trackId})">❤️</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function removeFavorite(trackId) {
+            let favorites = JSON.parse(localStorage.getItem('readysounds_favorites') || '[]');
+            favorites = favorites.filter(id => id !== trackId);
+            localStorage.setItem('readysounds_favorites', JSON.stringify(favorites));
+            loadFavorites(); // Reload the page
+        }
+
+        function playTrack(trackId) {
+            // Redirect to main page with track ID
+            window.location.href = `browse.html?play=${trackId}`;
+        }
+
+        // Load favorites on page load
+        loadFavorites();
+
+        function toggleMobileMenu() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel.classList.contains('open')) {
+                closeMobilePanel();
+            } else {
+                panel.classList.add('open');
+                overlay.classList.add('active');
+                if (toggle) toggle.textContent = '✕';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        function closeMobilePanel() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel) panel.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
+            if (toggle) toggle.textContent = '☰';
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobilePanel(); });
+    </script>
+</body>
+</html>

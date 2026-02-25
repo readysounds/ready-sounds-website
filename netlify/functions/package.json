@@ -1,0 +1,11 @@
+{
+  "name": "readysounds-netlify-functions",
+  "version": "1.0.0",
+  "description": "Netlify serverless functions for Ready Sounds",
+  "dependencies": {
+    "stripe": "^14.0.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "@aws-sdk/client-s3": "^3.450.0",
+    "@aws-sdk/s3-request-presigner": "^3.450.0"
+  }
+}

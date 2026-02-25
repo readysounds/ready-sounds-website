@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZJS68FCQ0Q"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-ZJS68FCQ0Q');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings - Ready Sounds</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding-top: 80px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 30px;
+            color: #9c27b0;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #ba68c8;
+        }
+
+        header {
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #888;
+        }
+
+        .section {
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 24px;
+            color: #9c27b0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #888;
+            font-size: 0.95em;
+        }
+
+        .info-value {
+            font-weight: 600;
+            font-size: 1.05em;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+
+        .status-cancelled {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 8px 20px rgba(244, 67, 54, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(156, 39, 176, 0.2);
+            border-color: rgba(156, 39, 176, 0.3);
+            box-shadow: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+            font-size: 1.2em;
+        }
+
+        .error {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            color: #f44336;
+        }
+
+        .no-subscription {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .no-subscription a {
+            color: #9c27b0;
+            text-decoration: none;
+        }
+
+        .no-subscription a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+
+        /* ── Site nav ── */
+        .rs-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: rgba(10,10,10,0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            z-index: 1000;
+            padding: 16px 0;
+        }
+        .rs-nav-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .rs-logo {
+            font-size: 22px;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            text-transform: lowercase;
+        }
+        .rs-nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        .rs-nav-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: lowercase;
+            transition: color 0.2s;
+        }
+        .rs-nav-links a:hover { color: #9c27b0; }
+        .rs-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.8);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+        }
+        @media (max-width: 768px) {
+            .rs-nav-links { display: none; }
+            .rs-menu-toggle { display: block; }
+        }
+        .mobile-panel-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 1998;
+            display: none;
+        }
+        .mobile-panel-overlay.active { display: block; }
+        .mobile-panel {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 100%; height: 100%;
+            background: #111111;
+            z-index: 1999;
+            transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 28px;
+            overflow-y: auto;
+        }
+        .mobile-panel.open { right: 0; }
+        .mobile-panel-close {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.55);
+            font-size: 28px;
+            cursor: pointer;
+            margin-bottom: 32px;
+            line-height: 1;
+        }
+        .mobile-panel-nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: 700;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            text-transform: lowercase;
+        }
+        .mobile-panel-nav a:hover { color: #9c27b0; }
+        .mobile-panel-cta {
+            display: block;
+            background: #9c27b0;
+            color: white;
+            text-align: center;
+            padding: 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            text-decoration: none;
+            margin-top: 32px;
+        }
+        .mobile-panel-auth {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .mobile-auth-login {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: rgba(255,255,255,0.07);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .mobile-auth-signup {
+            display: block;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            background: #9c27b0;
+            color: white;
+        }
+        .mobile-panel-footer {
+            margin-top: auto;
+            padding-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Site Navigation -->
+    <nav class="rs-nav">
+        <div class="rs-nav-inner">
+            <a href="browse.html" class="rs-logo">readysounds.</a>
+            <div class="rs-nav-links">
+                <a href="browse.html">browse</a>
+                <a href="playlists.html">playlists</a>
+                <a href="pricing.html">pricing</a>
+                <a href="contact.html">contact</a>
+            </div>
+            <button class="rs-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+        </div>
+    </nav>
+    <!-- Mobile Panel Overlay -->
+    <div class="mobile-panel-overlay" id="mobilePanelOverlay" onclick="closeMobilePanel()"></div>
+    <!-- Mobile Slide Panel -->
+    <div class="mobile-panel" id="mobilePanel">
+        <button class="mobile-panel-close" onclick="closeMobilePanel()">✕</button>
+        <nav class="mobile-panel-nav">
+            <a href="browse.html">browse</a>
+            <a href="playlists.html">playlists</a>
+            <a href="pricing.html">pricing</a>
+            <a href="contact.html">contact</a>
+        </nav>
+        <a href="pricing.html" class="mobile-panel-cta">Subscribe — $79/yr</a>
+        <div class="mobile-panel-auth">
+            <a href="signup.html" class="mobile-auth-login">log in</a>
+            <a href="signup.html" class="mobile-auth-signup">create free account</a>
+        </div>
+        <div class="mobile-panel-footer">
+            <a href="terms.html" style="color: rgba(255,255,255,0.4); font-size: 12px; text-decoration: none;">terms & conditions</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="browse.html" class="back-link">← Back to Music Library</a>
+        
+        <header>
+            <h1>⚙️ Account Settings</h1>
+            <p class="subtitle">Manage your subscription and account details</p>
+        </header>
+
+        <div id="content">
+            <div class="loading">Loading your account...</div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://pfqvrxfazumlydjepwib.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_1oBqgAQj0xzb5-eosyfcBg_9dKxNZfa';
+        let supabaseClient = null;
+
+        async function initPage() {
+            if (typeof window.supabase === 'undefined') {
+                setTimeout(initPage, 100);
+                return;
+            }
+
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            await loadAccountInfo();
+        }
+
+        async function loadAccountInfo() {
+            const content = document.getElementById('content');
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+
+                if (!user) {
+                    content.innerHTML = `
+                        <div class="no-subscription">
+                            <p>Please <a href="signup.html">log in</a> to view your account settings.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Get user profile with subscription info
+                const { data: profile, error } = await supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('email', user.email)
+                    .single();
+
+                if (error) {
+                    console.error('Error loading profile:', error);
+                    content.innerHTML = '<div class="error">Error loading account information</div>';
+                    return;
+                }
+
+                renderAccountInfo(user, profile);
+
+            } catch (err) {
+                console.error('Error:', err);
+                content.innerHTML = '<div class="error">Error loading account information</div>';
+            }
+        }
+
+        function renderAccountInfo(user, profile) {
+            const hasSubscription = profile.subscription_status === 'active' || profile.subscription_status === 'cancelled';
+            const isCancelled = profile.subscription_status === 'cancelled';
+            const subscriptionPlan = profile.subscription_plan || 'none';
+            const planName = subscriptionPlan === 'individual_yearly' ? 'Individual (Annual)' :
+                            subscriptionPlan === 'business_yearly' ? 'Business (Annual)' : 'None';
+            const planPrice = subscriptionPlan === 'individual_yearly' ? '$79/year' :
+                             subscriptionPlan === 'business_yearly' ? '$1,299/year' : '$0';
+
+            let html = `
+                <!-- Profile Section -->
+                <div class="section">
+                    <h2 class="section-title">Profile Information</h2>
+                    <div class="info-row">
+                        <span class="info-label">Email</span>
+                        <span class="info-value">${user.email}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Account Created</span>
+                        <span class="info-value">${new Date(user.created_at).toLocaleDateString()}</span>
+                    </div>
+                </div>
+            `;
+
+            if (hasSubscription) {
+                html += `
+                    <!-- Subscription Section -->
+                    <div class="section">
+                        <h2 class="section-title">Subscription</h2>
+                        <div class="info-row">
+                            <span class="info-label">Plan</span>
+                            <span class="info-value">${planName}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Price</span>
+                            <span class="info-value">${planPrice}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Status</span>
+                            ${isCancelled ? 
+                                '<span class="status-badge status-cancelled">Cancelled - Access until period end</span>' :
+                                '<span class="status-badge status-active">Active</span>'
+                            }
+                        </div>
+                        ${!isCancelled ? `
+                        <div class="info-row">
+                            <span class="info-label">Cancel Auto-Renewal</span>
+                            <button class="btn btn-danger" onclick="cancelSubscription()">Cancel Subscription</button>
+                        </div>
+                        ` : ''}
+                        ${isCancelled ? `
+                        <div class="info-row">
+                            <span class="info-label">Reactivate</span>
+                            <button class="btn" onclick="reactivateSubscription()">Resume Subscription</button>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="section">
+                        <h2 class="section-title">Subscription</h2>
+                        <div class="no-subscription">
+                            <p>You don't have an active subscription.</p>
+                            <p><a href="pricing.html">View pricing plans</a></p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('content').innerHTML = html;
+        }
+
+        async function cancelSubscription() {
+            if (!confirm('Are you sure you want to cancel auto-renewal?\n\nYou will retain access until the end of your current billing period, but your subscription will not renew.')) {
+                return;
+            }
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) return;
+
+                // Update subscription_status to indicate cancellation
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .update({ 
+                        subscription_status: 'cancelled',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('email', user.email);
+
+                if (error) {
+                    console.error('Error cancelling subscription:', error);
+                    alert('Error cancelling subscription. Please try again or contact support.');
+                    return;
+                }
+
+                alert('Subscription cancelled. You will retain access until the end of your current billing period.');
+                
+                // Reload the page to show updated status
+                window.location.reload();
+                
+            } catch (err) {
+                console.error('Error canceling subscription:', err);
+                alert('Error cancelling subscription. Please contact support at support@readysounds.com');
+            }
+        }
+
+        async function manageSubscription() {
+            // Redirect to Stripe customer portal
+            alert('To update your payment method, please contact support at support@readysounds.com or use the Stripe customer portal.');
+            
+            // TODO: Implement Stripe customer portal redirect
+            // This would typically redirect to: https://billing.stripe.com/p/login/...
+        }
+
+        async function reactivateSubscription() {
+            if (!confirm('Reactivate your subscription? Auto-renewal will resume.')) {
+                return;
+            }
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) return;
+
+                // Update subscription_status back to active
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .update({ 
+                        subscription_status: 'active',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('email', user.email);
+
+                if (error) {
+                    console.error('Error reactivating subscription:', error);
+                    alert('Error reactivating subscription. Please try again or contact support.');
+                    return;
+                }
+
+                alert('Subscription reactivated! Auto-renewal has resumed.');
+                
+                // Reload the page to show updated status
+                window.location.reload();
+                
+            } catch (err) {
+                console.error('Error reactivating subscription:', err);
+                alert('Error reactivating subscription. Please contact support.');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initPage);
+
+        function toggleMobileMenu() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel.classList.contains('open')) {
+                closeMobilePanel();
+            } else {
+                panel.classList.add('open');
+                overlay.classList.add('active');
+                if (toggle) toggle.textContent = '✕';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        function closeMobilePanel() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel) panel.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
+            if (toggle) toggle.textContent = '☰';
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobilePanel(); });
+    </script>
+</body>
+</html>
