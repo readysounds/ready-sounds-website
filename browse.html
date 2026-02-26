@@ -4691,24 +4691,22 @@
             mp3Btn.className = 'download-option-btn';
             mp3Btn.textContent = '🎵 Download MP3';
             mp3Btn.onclick = () => {
-                // Use downloads folder and remove -preview from filename
-                const mp3Url = fixAlbum(streamUrl.replace('/audio/', '/downloads/').replace('-preview', ''));
-                const mp3Filename = filename.replace('-preview', '');
+                const mp3Url = fixAlbum(streamUrl.replace('/audio/', '/downloads/'));
+                const mp3Filename = filename;
                 downloadFile(mp3Url, mp3Filename);
             };
             mainSection.appendChild(mp3Btn);
-            
+
             // WAV option (full quality from /downloads/)
             const wavBtn = document.createElement('button');
             wavBtn.className = 'download-option-btn';
             wavBtn.textContent = '🎧 Download WAV (High Quality)';
             wavBtn.onclick = () => {
-                // Convert MP3 URL to WAV URL: 
+                // Convert MP3 URL to WAV URL:
                 // 1. Change /audio/ to /downloads/
-                // 2. Remove -preview from filename
-                // 3. Change .mp3 to .wav
-                const wavUrl = fixAlbum(streamUrl.replace('/audio/', '/downloads/').replace('-preview', '').replace('.mp3', '.wav'));
-                const wavFilename = filename.replace('-preview', '').replace('.mp3', '.wav');
+                // 2. Change .mp3 to .wav (filename keeps -preview as that's how files are named in R2)
+                const wavUrl = fixAlbum(streamUrl.replace('/audio/', '/downloads/').replace('.mp3', '.wav'));
+                const wavFilename = filename.replace('.mp3', '.wav');
                 downloadFile(wavUrl, wavFilename);
             };
             mainSection.appendChild(wavBtn);
