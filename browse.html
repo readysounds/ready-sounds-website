@@ -3508,7 +3508,7 @@
         function renderTrackGroup(track) {
             const alts = (track.alternates || []).slice().sort((a, b) => a.sort_order - b.sort_order);
             const hasAlts = alts.length > 0;
-            const versionsCount = alts.length + 1;
+            const versionsCount = alts.length;
             const downloadAttr = track.download_album ? `data-download-album="${track.download_album}"` : '';
             const toggleAttr = hasAlts ? `onclick="toggleAlternates(event, 'alternates-${track.id}')"` : '';
 
