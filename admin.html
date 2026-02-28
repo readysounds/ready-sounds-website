@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>readysounds. — admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            min-height: 100vh;
+            padding: 40px 24px;
+        }
+
+        #authGate {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: -40px -24px;
+        }
+
+        .auth-box {
+            background: #111;
+            border: 1px solid rgba(156,39,176,0.3);
+            border-radius: 14px;
+            padding: 40px 36px;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+        }
+
+        .auth-box .logo {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 28px;
+            display: block;
+        }
+
+        .auth-box input {
+            width: 100%;
+            background: #1a1a1a;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            padding: 12px 14px;
+            outline: none;
+            margin-bottom: 12px;
+            text-align: center;
+            letter-spacing: 0.1em;
+        }
+
+        .auth-box input:focus { border-color: rgba(156,39,176,0.6); }
+
+        .auth-error {
+            font-size: 13px;
+            color: #ef9a9a;
+            margin-top: 8px;
+            min-height: 18px;
+        }
+
+        #adminContent { display: none; }
+
+        a { color: inherit; text-decoration: none; }
+
+        .page-header {
+            max-width: 860px;
+            margin: 0 auto 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .logo span {
+            color: #9c27b0;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 8px;
+            background: rgba(156,39,176,0.15);
+            border: 1px solid rgba(156,39,176,0.4);
+            border-radius: 4px;
+            padding: 2px 8px;
+            vertical-align: middle;
+        }
+
+        .browse-link {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            transition: color 0.2s;
+        }
+        .browse-link:hover { color: #9c27b0; }
+
+        /* Key section */
+        .key-section {
+            max-width: 860px;
+            margin: 0 auto 32px;
+            background: #111;
+            border: 1px solid rgba(156,39,176,0.25);
+            border-radius: 12px;
+            padding: 20px 24px;
+        }
+
+        .key-section.locked {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+        }
+
+        .key-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .key-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4caf50;
+        }
+
+        .key-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 12px;
+        }
+
+        .key-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Form */
+        .card {
+            max-width: 860px;
+            margin: 0 auto 32px;
+            background: #111;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 28px 28px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #fff;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-field.full { grid-column: 1 / -1; }
+
+        label {
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input, select, textarea {
+            background: #1a1a1a;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            padding: 10px 14px;
+            transition: border-color 0.2s;
+            outline: none;
+            width: 100%;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: rgba(156,39,176,0.6);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: rgba(255,255,255,0.2);
+        }
+
+        select option { background: #1a1a1a; }
+
+        textarea { resize: vertical; min-height: 70px; }
+
+        .input-with-btn {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-with-btn input { flex: 1; }
+
+        /* Buttons */
+        .btn {
+            background: #9c27b0;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background 0.2s, opacity 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn:hover { background: #7b1fa2; }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.6);
+            font-size: 12px;
+            padding: 6px 14px;
+        }
+
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.3);
+            color: #fff;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+            margin-top: 8px;
+            border-radius: 10px;
+        }
+
+        /* Auto-fill indicator */
+        .autofill-bar {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #4caf50;
+            margin-top: 8px;
+        }
+        .autofill-bar.visible { display: flex; }
+
+        .spinner {
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(156,39,176,0.3);
+            border-top-color: #9c27b0;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Active toggle */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle {
+            position: relative;
+            width: 40px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        .toggle input { opacity: 0; width: 0; height: 0; }
+
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: #333;
+            border-radius: 22px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .toggle-slider:before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            left: 3px;
+            top: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .toggle input:checked + .toggle-slider { background: #9c27b0; }
+        .toggle input:checked + .toggle-slider:before { transform: translateX(18px); }
+
+        .toggle-label { font-size: 14px; color: rgba(255,255,255,0.8); }
+
+        /* Alert */
+        .alert {
+            display: none;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        .alert.success {
+            display: block;
+            background: rgba(76,175,80,0.15);
+            border: 1px solid rgba(76,175,80,0.4);
+            color: #81c784;
+        }
+
+        .alert.error {
+            display: block;
+            background: rgba(244,67,54,0.15);
+            border: 1px solid rgba(244,67,54,0.4);
+            color: #ef9a9a;
+        }
+
+        /* Track list */
+        .track-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .track-table th {
+            text-align: left;
+            padding: 10px 12px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgba(255,255,255,0.35);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .track-table td {
+            padding: 12px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.8);
+            vertical-align: middle;
+        }
+
+        .track-table tr:last-child td { border-bottom: none; }
+        .track-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .track-id {
+            color: rgba(255,255,255,0.25);
+            font-size: 11px;
+            width: 36px;
+        }
+
+        .sort-input {
+            width: 56px;
+            padding: 5px 8px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .inactive-row td { opacity: 0.4; }
+
+        .empty-list {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255,255,255,0.3);
+            font-size: 14px;
+        }
+
+        .section-divider {
+            max-width: 860px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-divider h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            white-space: nowrap;
+        }
+
+        .section-divider hr {
+            flex: 1;
+            border: none;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Auth gate -->
+<div id="authGate">
+    <div class="auth-box">
+        <span class="logo">readysounds.</span>
+        <input type="password" id="authInput" placeholder="password" autocomplete="off" onkeydown="if(event.key==='Enter') checkAuth()">
+        <button class="btn" style="width:100%" onclick="checkAuth()">Enter</button>
+        <div class="auth-error" id="authError"></div>
+    </div>
+</div>
+
+<!-- Admin content (hidden until authenticated) -->
+<div id="adminContent">
+
+<div class="page-header">
+    <div class="logo">readysounds.<span>admin</span></div>
+    <a href="browse.html" class="browse-link">← browse</a>
+</div>
+
+<!-- API Key -->
+<div class="key-section" id="keySection">
+    <div class="key-label">Admin Key</div>
+    <div class="key-row">
+        <input type="password" id="serviceKeyInput" placeholder="your ADMIN_KEY from Netlify env vars" autocomplete="off">
+        <button class="btn" onclick="saveKey()">Save</button>
+    </div>
+</div>
+
+<!-- Add Track Form -->
+<div class="card" id="formCard">
+    <div class="card-title">Add Track</div>
+
+    <div class="form-grid">
+
+        <!-- Stream URL -->
+        <div class="form-field full">
+            <label>Stream URL (R2)</label>
+            <input type="url" id="f_stream_url" placeholder="https://pub-xxx.r2.dev/audio/album/track/track-full-preview.mp3" oninput="onStreamUrlChange(this.value)">
+            <div class="autofill-bar" id="autofillBar">
+                <div class="spinner" id="autofillSpinner" style="display:none"></div>
+                <span id="autofillMsg"></span>
+            </div>
+        </div>
+
+        <!-- Artist + Title -->
+        <div class="form-field">
+            <label>Artist</label>
+            <input type="text" id="f_artist" placeholder="mallflex">
+        </div>
+        <div class="form-field">
+            <label>Title</label>
+            <input type="text" id="f_title" placeholder="Working Overtime">
+        </div>
+
+        <!-- Genre + BPM -->
+        <div class="form-field">
+            <label>Genre</label>
+            <input type="text" id="f_genre" placeholder="Funk Rock">
+        </div>
+        <div class="form-field">
+            <label>BPM</label>
+            <input type="number" id="f_bpm" placeholder="140" min="40" max="300">
+        </div>
+
+        <!-- Duration + Artwork -->
+        <div class="form-field">
+            <label>Duration</label>
+            <div class="input-with-btn">
+                <input type="text" id="f_duration" placeholder="0:54">
+                <button class="btn btn-ghost" onclick="fetchDuration()" id="fetchDurBtn">fetch</button>
+            </div>
+        </div>
+        <div class="form-field">
+            <label>Artwork URL</label>
+            <input type="url" id="f_artwork_url" placeholder="https://pub-xxx.r2.dev/images/album-cover.jpg">
+        </div>
+
+        <!-- Moods + Use Cases -->
+        <div class="form-field">
+            <label>Moods</label>
+            <textarea id="f_moods" placeholder="funky, upbeat, groovy, energetic"></textarea>
+        </div>
+        <div class="form-field">
+            <label>Use Cases</label>
+            <textarea id="f_use_cases" placeholder="vlogs, montages, workout, travel"></textarea>
+        </div>
+
+        <!-- Similar Artists + Energy -->
+        <div class="form-field">
+            <label>Similar Artists</label>
+            <input type="text" id="f_similar_artists" placeholder="Deer Tick, Red Hot Chili Peppers">
+        </div>
+        <div class="form-field">
+            <label>Energy</label>
+            <select id="f_energy">
+                <option value="">— select —</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="very high">Very High</option>
+            </select>
+        </div>
+
+        <!-- Best Moments -->
+        <div class="form-field full">
+            <label>Best Moments</label>
+            <textarea id="f_best_moments" placeholder="scoring a goal, gym montage, Friday hustle, working late, hype intro"></textarea>
+        </div>
+
+        <!-- Sort Order + Active -->
+        <div class="form-field">
+            <label>Sort Order</label>
+            <input type="number" id="f_sort_order" placeholder="1" min="0">
+        </div>
+        <div class="form-field" style="justify-content: flex-end; padding-bottom: 4px;">
+            <label>Visibility</label>
+            <div class="toggle-row">
+                <label class="toggle">
+                    <input type="checkbox" id="f_is_active" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label">Active (visible on browse)</span>
+            </div>
+        </div>
+
+    </div>
+
+    <button class="btn btn-submit" onclick="submitTrack()" id="submitBtn">Add Track</button>
+    <div class="alert" id="formAlert"></div>
+</div>
+
+<!-- Track List -->
+<div class="section-divider">
+    <h2>Catalog</h2>
+    <hr>
+</div>
+
+<div class="card">
+    <div id="trackList"><div class="empty-list">Enter your service role key above to load tracks.</div></div>
+</div>
+
+</div> <!-- /adminContent -->
+
+<script>
+    const ADMIN_FN = '/.netlify/functions/admin-track';
+    const SESSION_KEY = 'rs_admin_key';
+
+    // ── Key management ─────────────────────────────────────────────
+    function getKey() {
+        return sessionStorage.getItem(SESSION_KEY) || '';
+    }
+
+    function saveKey() {
+        const val = document.getElementById('serviceKeyInput').value.trim();
+        if (!val) return;
+        sessionStorage.setItem(SESSION_KEY, val);
+        lockKeySection();
+        loadTrackList();
+        fetchNextSortOrder();
+    }
+
+    function lockKeySection() {
+        const sec = document.getElementById('keySection');
+        sec.classList.add('locked');
+        sec.innerHTML = `
+            <div class="key-status">
+                <div class="key-dot"></div>
+                Admin key saved for this session
+            </div>
+            <button class="btn btn-ghost" onclick="clearKey()">Change</button>
+        `;
+    }
+
+    function clearKey() {
+        sessionStorage.removeItem(SESSION_KEY);
+        location.reload();
+    }
+
+    function adminFetch(method, body) {
+        const key = getKey();
+        return fetch(ADMIN_FN, {
+            method,
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': key },
+            body: body ? JSON.stringify(body) : undefined
+        }).then(r => r.json());
+    }
+
+    // ── URL auto-parse ──────────────────────────────────────────────
+    let parseTimer = null;
+
+    function onStreamUrlChange(val) {
+        clearTimeout(parseTimer);
+        parseTimer = setTimeout(() => parseStreamUrl(val), 400);
+    }
+
+    function parseStreamUrl(url) {
+        if (!url || !url.includes('/audio/')) return;
+        try {
+            const parts = url.split('/');
+            const filename = parts[parts.length - 1];           // track-full-preview.mp3
+            const folder   = parts[parts.length - 2];           // mallflex-working-overtime
+            const album    = parts[parts.length - 3];           // mallflex-funky-mondays
+            const baseUrl  = parts.slice(0, parts.indexOf('audio')).join('/'); // https://pub-xxx.r2.dev
+
+            // Artist = first hyphen-segment; title = rest, title-cased
+            const segments = folder.split('-');
+            const artist = segments[0];
+            const title  = segments.slice(1).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+            // Artwork
+            const artworkUrl = `${baseUrl}/images/${album}-cover.jpg`;
+
+            setValue('f_artist', artist);
+            setValue('f_title', title);
+            setValue('f_artwork_url', artworkUrl);
+
+            showAutofill('Artist, title & artwork filled — fetching duration…');
+            fetchDurationFromUrl(url);
+        } catch(e) {
+            // silently ignore malformed URLs
+        }
+    }
+
+    function setValue(id, val) {
+        const el = document.getElementById(id);
+        if (el && !el.value) el.value = val;
+    }
+
+    function showAutofill(msg, done = false) {
+        const bar = document.getElementById('autofillBar');
+        const spinner = document.getElementById('autofillSpinner');
+        const msgEl = document.getElementById('autofillMsg');
+        bar.classList.add('visible');
+        spinner.style.display = done ? 'none' : 'block';
+        msgEl.textContent = msg;
+        if (done) {
+            bar.style.color = '#4caf50';
+        }
+    }
+
+    // ── Duration fetch ──────────────────────────────────────────────
+    function fetchDuration() {
+        const url = document.getElementById('f_stream_url').value.trim();
+        if (!url) return;
+        fetchDurationFromUrl(url);
+    }
+
+    function fetchDurationFromUrl(url) {
+        document.getElementById('fetchDurBtn').disabled = true;
+        const audio = new Audio(url);
+        audio.addEventListener('loadedmetadata', () => {
+            const mins = Math.floor(audio.duration / 60);
+            const secs = Math.floor(audio.duration % 60).toString().padStart(2, '0');
+            document.getElementById('f_duration').value = `${mins}:${secs}`;
+            document.getElementById('fetchDurBtn').disabled = false;
+            showAutofill('All fields auto-filled ✓', true);
+        });
+        audio.addEventListener('error', () => {
+            document.getElementById('fetchDurBtn').disabled = false;
+            showAutofill('Could not fetch duration — enter manually', true);
+        });
+    }
+
+    // ── Sort order suggestion ────────────────────────────────────────
+    async function fetchNextSortOrder() {
+        if (!getKey()) return;
+        const data = await adminFetch('GET');
+        if (Array.isArray(data) && data.length > 0) {
+            const max = Math.max(...data.map(t => t.sort_order || 0));
+            document.getElementById('f_sort_order').value = max + 1;
+        } else {
+            document.getElementById('f_sort_order').value = 1;
+        }
+    }
+
+    // ── Submit ──────────────────────────────────────────────────────
+    async function submitTrack() {
+        if (!getKey()) {
+            showAlert('Enter your admin key first.', 'error');
+            return;
+        }
+
+        const track = {
+            title:           get('f_title'),
+            artist:          get('f_artist'),
+            genre:           get('f_genre') || null,
+            bpm:             getInt('f_bpm'),
+            duration:        get('f_duration') || null,
+            stream_url:      get('f_stream_url'),
+            artwork_url:     get('f_artwork_url') || null,
+            moods:           get('f_moods') || null,
+            use_cases:       get('f_use_cases') || null,
+            similar_artists: get('f_similar_artists') || null,
+            energy:          get('f_energy') || null,
+            best_moments:    get('f_best_moments') || null,
+            sort_order:      getInt('f_sort_order') || 999,
+            is_active:       document.getElementById('f_is_active').checked,
+        };
+
+        if (!track.title || !track.artist || !track.stream_url) {
+            showAlert('Title, artist and stream URL are required.', 'error');
+            return;
+        }
+
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.textContent = 'Adding…';
+
+        try {
+            const data = await adminFetch('POST', track);
+            if (data.error) {
+                showAlert(`Error: ${data.error}`, 'error');
+            } else {
+                showAlert(`✓ "${track.artist} — ${track.title}" added to catalog.`, 'success');
+                resetForm();
+                loadTrackList();
+                fetchNextSortOrder();
+            }
+        } catch(e) {
+            showAlert(`Network error: ${e.message}`, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Add Track';
+        }
+    }
+
+    function get(id) {
+        return document.getElementById(id).value.trim() || null;
+    }
+
+    function getInt(id) {
+        const v = parseInt(document.getElementById(id).value, 10);
+        return isNaN(v) ? null : v;
+    }
+
+    function resetForm() {
+        ['f_stream_url','f_artist','f_title','f_genre','f_bpm','f_duration',
+         'f_artwork_url','f_moods','f_use_cases','f_similar_artists',
+         'f_best_moments'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('f_energy').value = '';
+        document.getElementById('f_is_active').checked = true;
+        document.getElementById('autofillBar').classList.remove('visible');
+    }
+
+    function showAlert(msg, type) {
+        const el = document.getElementById('formAlert');
+        el.className = `alert ${type}`;
+        el.textContent = msg;
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // ── Track list ──────────────────────────────────────────────────
+    async function loadTrackList() {
+        if (!getKey()) return;
+
+        const container = document.getElementById('trackList');
+        container.innerHTML = '<div class="empty-list">Loading…</div>';
+
+        const tracks = await adminFetch('GET');
+
+        if (!Array.isArray(tracks) || tracks.length === 0) {
+            container.innerHTML = '<div class="empty-list">No tracks yet.</div>';
+            return;
+        }
+
+        container.innerHTML = `
+            <table class="track-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Artist — Title</th>
+                        <th>Genre</th>
+                        <th>BPM</th>
+                        <th>Duration</th>
+                        <th>Order</th>
+                        <th>Active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tracks.map(t => `
+                        <tr class="${t.is_active ? '' : 'inactive-row'}" id="row-${t.id}">
+                            <td class="track-id">${t.id}</td>
+                            <td><strong>${esc(t.artist)}</strong> — ${esc(t.title)}</td>
+                            <td>${esc(t.genre || '—')}</td>
+                            <td>${t.bpm || '—'}</td>
+                            <td>${esc(t.duration || '—')}</td>
+                            <td><input class="sort-input" type="number" value="${t.sort_order || 0}" onchange="updateSortOrder(${t.id}, this.value)"></td>
+                            <td>
+                                <label class="toggle">
+                                    <input type="checkbox" ${t.is_active ? 'checked' : ''} onchange="toggleActive(${t.id}, this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    async function toggleActive(id, active) {
+        await adminFetch('PATCH', { id, is_active: active });
+        const row = document.getElementById(`row-${id}`);
+        if (row) row.className = active ? '' : 'inactive-row';
+    }
+
+    async function updateSortOrder(id, value) {
+        await adminFetch('PATCH', { id, sort_order: parseInt(value, 10) });
+    }
+
+    function esc(str) {
+        return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ── Auth gate ───────────────────────────────────────────────────
+    const PW_HASH = '95b55ab836d6d62db5e40d532c7cdee701975521b67eab091cf3a6e9ef191c2d';
+    const AUTH_SESSION_KEY = 'rs_admin_auth';
+
+    async function sha256(str) {
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+
+    async function checkAuth() {
+        const val = document.getElementById('authInput').value;
+        const hash = await sha256(val);
+        if (hash === PW_HASH) {
+            sessionStorage.setItem(AUTH_SESSION_KEY, '1');
+            showAdmin();
+        } else {
+            document.getElementById('authError').textContent = 'Incorrect password.';
+            document.getElementById('authInput').value = '';
+        }
+    }
+
+    function showAdmin() {
+        document.getElementById('authGate').style.display = 'none';
+        document.getElementById('adminContent').style.display = 'block';
+    }
+
+    // ── Init ────────────────────────────────────────────────────────
+    window.addEventListener('DOMContentLoaded', () => {
+        if (sessionStorage.getItem(AUTH_SESSION_KEY) === '1') {
+            showAdmin();
+        }
+        const key = getKey();
+        if (key) {
+            document.getElementById('serviceKeyInput').value = key;
+            lockKeySection();
+            loadTrackList();
+            fetchNextSortOrder();
+        }
+    });
+</script>
+</body>
+</html>
