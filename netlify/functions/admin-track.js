@@ -32,7 +32,7 @@ exports.handler = async (event) => {
     if (event.httpMethod === 'GET') {
       const { data, error } = await supabase
         .from('tracks')
-        .select('id, title, artist, genre, bpm, duration, is_active, sort_order')
+        .select('id, title, artist, genre, bpm, duration, stream_url, artwork_url, moods, use_cases, similar_artists, energy, best_moments, is_active, sort_order')
         .order('sort_order');
       if (error) throw error;
       return { statusCode: 200, headers, body: JSON.stringify(data) };

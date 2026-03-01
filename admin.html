@@ -544,7 +544,10 @@
 
     </div>
 
-    <button class="btn btn-submit" onclick="submitTrack()" id="submitBtn">Add Track</button>
+    <div style="display:flex; gap:10px; margin-top:8px;">
+        <button class="btn btn-submit" onclick="submitTrack()" id="submitBtn" style="flex:1">Add Track</button>
+        <button class="btn btn-ghost" onclick="cancelEdit()" id="cancelBtn" style="display:none; padding:14px 24px;">Cancel</button>
+    </div>
     <div class="alert" id="formAlert"></div>
 </div>
 
@@ -563,6 +566,8 @@
 <script>
     const ADMIN_FN = '/.netlify/functions/admin-track';
     const SESSION_KEY = 'rs_admin_key';
+    let editingId = null;
+    let trackCache = {};
 
     // ── Key management ─────────────────────────────────────────────
     function getKey() {
@@ -692,6 +697,43 @@
         }
     }
 
+    // ── Edit track ──────────────────────────────────────────────────
+    function editTrack(id) {
+        const t = trackCache[id];
+        if (!t) return;
+        editingId = id;
+
+        document.getElementById('f_stream_url').value    = t.stream_url || '';
+        document.getElementById('f_artist').value        = t.artist || '';
+        document.getElementById('f_title').value         = t.title || '';
+        document.getElementById('f_genre').value         = t.genre || '';
+        document.getElementById('f_bpm').value           = t.bpm || '';
+        document.getElementById('f_duration').value      = t.duration || '';
+        document.getElementById('f_artwork_url').value   = t.artwork_url || '';
+        document.getElementById('f_moods').value         = t.moods || '';
+        document.getElementById('f_use_cases').value     = t.use_cases || '';
+        document.getElementById('f_similar_artists').value = t.similar_artists || '';
+        document.getElementById('f_energy').value        = t.energy || '';
+        document.getElementById('f_best_moments').value  = t.best_moments || '';
+        document.getElementById('f_sort_order').value    = t.sort_order ?? '';
+        document.getElementById('f_is_active').checked   = t.is_active;
+
+        document.getElementById('formCard').querySelector('.card-title').textContent = 'Edit Track';
+        document.getElementById('submitBtn').textContent = 'Save Changes';
+        document.getElementById('cancelBtn').style.display = 'block';
+        document.getElementById('autofillBar').classList.remove('visible');
+        document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelEdit() {
+        editingId = null;
+        resetForm();
+        document.getElementById('formCard').querySelector('.card-title').textContent = 'Add Track';
+        document.getElementById('submitBtn').textContent = 'Add Track';
+        document.getElementById('cancelBtn').style.display = 'none';
+        document.getElementById('formAlert').className = 'alert';
+    }
+
     // ── Submit ──────────────────────────────────────────────────────
     async function submitTrack() {
         if (!getKey()) {
@@ -723,23 +765,25 @@
 
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
-        btn.textContent = 'Adding…';
+        const isEditing = editingId !== null;
+        btn.textContent = isEditing ? 'Saving…' : 'Adding…';
 
         try {
-            const data = await adminFetch('POST', track);
+            const payload = isEditing ? { id: editingId, ...track } : track;
+            const data = await adminFetch(isEditing ? 'PATCH' : 'POST', payload);
             if (data.error) {
                 showAlert(`Error: ${data.error}`, 'error');
             } else {
-                showAlert(`✓ "${track.artist} — ${track.title}" added to catalog.`, 'success');
-                resetForm();
+                showAlert(`✓ "${track.artist} — ${track.title}" ${isEditing ? 'updated' : 'added'}.`, 'success');
+                cancelEdit();
                 loadTrackList();
-                fetchNextSortOrder();
+                if (!isEditing) fetchNextSortOrder();
             }
         } catch(e) {
             showAlert(`Network error: ${e.message}`, 'error');
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Add Track';
+            btn.textContent = isEditing ? 'Save Changes' : 'Add Track';
         }
     }
 
@@ -782,6 +826,10 @@
             return;
         }
 
+        // Cache full track data for edit pre-fill
+        trackCache = {};
+        tracks.forEach(t => trackCache[t.id] = t);
+
         container.innerHTML = `
             <table class="track-table">
                 <thead>
@@ -793,6 +841,7 @@
                         <th>Duration</th>
                         <th>Order</th>
                         <th>Active</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -810,6 +859,7 @@
                                     <span class="toggle-slider"></span>
                                 </label>
                             </td>
+                            <td><button class="btn btn-ghost" style="font-size:12px;padding:5px 12px" onclick="editTrack(${t.id})">edit</button></td>
                         </tr>
                     `).join('')}
                 </tbody>
