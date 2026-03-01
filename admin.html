@@ -551,6 +551,44 @@
     <div class="alert" id="formAlert"></div>
 </div>
 
+<!-- Alternates card (shown when editing a track) -->
+<div class="card" id="alternatesCard" style="display:none">
+    <div class="card-title">Versions <span id="alternatesTrackName" style="font-weight:400;color:rgba(255,255,255,0.4);font-size:13px"></span></div>
+
+    <div id="alternatesList" style="margin-bottom:20px"></div>
+
+    <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:20px">
+        <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Add Version</div>
+        <div class="form-grid">
+            <div class="form-field full">
+                <label>Stream URL</label>
+                <input type="url" id="alt_stream_url" placeholder="https://pub-xxx.r2.dev/audio/…/track-15s.mp3" oninput="onAltUrlChange(this.value)">
+            </div>
+            <div class="form-field">
+                <label>Title</label>
+                <input type="text" id="alt_title" placeholder="15s">
+            </div>
+            <div class="form-field">
+                <label>Duration</label>
+                <div class="input-with-btn">
+                    <input type="text" id="alt_duration" placeholder="0:15">
+                    <button class="btn btn-ghost" onclick="fetchAltDuration()" id="fetchAltDurBtn">fetch</button>
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Sort Order</label>
+                <input type="number" id="alt_sort_order" placeholder="1" min="0">
+            </div>
+            <div class="form-field">
+                <label>Download Album Override</label>
+                <input type="text" id="alt_download_album" placeholder="funky-munky (optional)">
+            </div>
+        </div>
+        <button class="btn" style="margin-top:12px" onclick="addAlternate()">Add Version</button>
+        <div class="alert" id="altAlert" style="margin-top:12px"></div>
+    </div>
+</div>
+
 <!-- Track List -->
 <div class="section-divider">
     <h2>Catalog</h2>
@@ -723,6 +761,13 @@
         document.getElementById('cancelBtn').style.display = 'block';
         document.getElementById('autofillBar').classList.remove('visible');
         document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+
+        // Show alternates card
+        const altCard = document.getElementById('alternatesCard');
+        altCard.style.display = 'block';
+        document.getElementById('alternatesTrackName').textContent = `— ${t.artist} "${t.title}"`;
+        document.getElementById('altAlert').className = 'alert';
+        loadAlternates(id);
     }
 
     function cancelEdit() {
@@ -732,6 +777,7 @@
         document.getElementById('submitBtn').textContent = 'Add Track';
         document.getElementById('cancelBtn').style.display = 'none';
         document.getElementById('formAlert').className = 'alert';
+        document.getElementById('alternatesCard').style.display = 'none';
     }
 
     // ── Submit ──────────────────────────────────────────────────────
@@ -879,6 +925,107 @@
 
     function esc(str) {
         return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ── Alternates ──────────────────────────────────────────────────
+    let altParseTimer = null;
+
+    function onAltUrlChange(val) {
+        clearTimeout(altParseTimer);
+        altParseTimer = setTimeout(() => {
+            if (!val || !val.includes('/audio/')) return;
+            // Auto-parse title from filename
+            const filename = val.split('/').pop();
+            const base = filename.replace(/\.(mp3|wav|flac)$/i, '');
+            // Extract suffix (e.g. "15s", "30s", "intro") after last hyphen group
+            const parts = base.split('-');
+            const suffix = parts[parts.length - 1];
+            const titleEl = document.getElementById('alt_title');
+            if (!titleEl.value) titleEl.value = suffix.charAt(0).toUpperCase() + suffix.slice(1);
+            fetchAltDurationFromUrl(val);
+        }, 400);
+    }
+
+    function fetchAltDuration() {
+        const url = document.getElementById('alt_stream_url').value.trim();
+        if (url) fetchAltDurationFromUrl(url);
+    }
+
+    function fetchAltDurationFromUrl(url) {
+        const btn = document.getElementById('fetchAltDurBtn');
+        btn.disabled = true;
+        const audio = new Audio(url);
+        audio.addEventListener('loadedmetadata', () => {
+            const mins = Math.floor(audio.duration / 60);
+            const secs = Math.floor(audio.duration % 60).toString().padStart(2, '0');
+            document.getElementById('alt_duration').value = `${mins}:${secs}`;
+            btn.disabled = false;
+        });
+        audio.addEventListener('error', () => { btn.disabled = false; });
+    }
+
+    async function loadAlternates(trackId) {
+        const res = await fetch(`${ADMIN_FN}?track_id=${trackId}`, {
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': getKey() }
+        });
+        const alts = await res.json();
+        const list = document.getElementById('alternatesList');
+        if (!Array.isArray(alts) || alts.length === 0) {
+            list.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px">No versions yet.</div>';
+            return;
+        }
+        list.innerHTML = alts.map(a => `
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)" id="alt-row-${a.id}">
+                <span style="font-size:13px;font-weight:500;min-width:80px">${esc(a.title)}</span>
+                <span style="font-size:12px;color:rgba(255,255,255,0.4);min-width:40px">${esc(a.duration || '—')}</span>
+                <span style="font-size:11px;color:rgba(255,255,255,0.25);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.stream_url)}</span>
+                <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;color:#ef9a9a;border-color:rgba(244,67,54,0.3)" onclick="deleteAlternate(${a.id}, ${editingId})">remove</button>
+            </div>
+        `).join('');
+    }
+
+    async function addAlternate() {
+        if (!editingId) return;
+        const stream_url = document.getElementById('alt_stream_url').value.trim();
+        const title = document.getElementById('alt_title').value.trim();
+        if (!stream_url || !title) {
+            showAltAlert('Stream URL and title are required.', 'error');
+            return;
+        }
+        const payload = {
+            _table: 'alternates',
+            track_id: editingId,
+            stream_url,
+            title,
+            duration: document.getElementById('alt_duration').value.trim() || null,
+            sort_order: parseInt(document.getElementById('alt_sort_order').value, 10) || 99,
+            download_album: document.getElementById('alt_download_album').value.trim() || null,
+        };
+        const data = await adminFetch('POST', payload);
+        if (data.error) {
+            showAltAlert(`Error: ${data.error}`, 'error');
+        } else {
+            // Clear add form
+            ['alt_stream_url','alt_title','alt_duration','alt_sort_order','alt_download_album'].forEach(id => document.getElementById(id).value = '');
+            showAltAlert(`✓ "${title}" added.`, 'success');
+            loadAlternates(editingId);
+        }
+    }
+
+    async function deleteAlternate(altId, trackId) {
+        if (!confirm('Remove this version?')) return;
+        const data = await adminFetch('DELETE', { _table: 'alternates', id: altId });
+        if (data.error) {
+            showAltAlert(`Error: ${data.error}`, 'error');
+        } else {
+            document.getElementById(`alt-row-${altId}`)?.remove();
+        }
+    }
+
+    function showAltAlert(msg, type) {
+        const el = document.getElementById('altAlert');
+        el.className = `alert ${type}`;
+        el.textContent = msg;
     }
 
     // ── Auth gate ───────────────────────────────────────────────────
