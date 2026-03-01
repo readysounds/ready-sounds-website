@@ -494,6 +494,12 @@
             <input type="url" id="f_artwork_url" placeholder="https://pub-xxx.r2.dev/images/album-cover.jpg">
         </div>
 
+        <!-- Download Album -->
+        <div class="form-field full">
+            <label>Download Album <span style="font-size:11px;color:rgba(255,255,255,0.3);text-transform:none;letter-spacing:0">(R2 folder override for downloads — e.g. <code style="font-size:11px">funky-munky</code>)</span></label>
+            <input type="text" id="f_download_album" placeholder="funky-munky (leave blank to auto-derive from stream URL)">
+        </div>
+
         <!-- Moods + Use Cases -->
         <div class="form-field">
             <label>Moods</label>
@@ -755,6 +761,7 @@
         document.getElementById('f_best_moments').value  = t.best_moments || '';
         document.getElementById('f_sort_order').value    = t.sort_order ?? '';
         document.getElementById('f_is_active').checked   = t.is_active;
+        document.getElementById('f_download_album').value = t.download_album || '';
 
         document.getElementById('formCard').querySelector('.card-title').textContent = 'Edit Track';
         document.getElementById('submitBtn').textContent = 'Save Changes';
@@ -802,6 +809,7 @@
             best_moments:    get('f_best_moments') || null,
             sort_order:      getInt('f_sort_order') || 999,
             is_active:       document.getElementById('f_is_active').checked,
+            download_album:  get('f_download_album') || null,
         };
 
         if (!track.title || !track.artist || !track.stream_url) {
@@ -844,7 +852,7 @@
 
     function resetForm() {
         ['f_stream_url','f_artist','f_title','f_genre','f_bpm','f_duration',
-         'f_artwork_url','f_moods','f_use_cases','f_similar_artists',
+         'f_artwork_url','f_download_album','f_moods','f_use_cases','f_similar_artists',
          'f_best_moments'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('f_energy').value = '';
         document.getElementById('f_is_active').checked = true;
