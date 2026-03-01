@@ -12,6 +12,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Favorites - Ready Sounds</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -400,7 +401,7 @@
         <a href="browse.html" class="back-link">← Back to Browse</a>
         
         <header>
-            <h1>❤️ My Favorites</h1>
+            <h1>My Favorites</h1>
             <p class="subtitle">Tracks you've loved</p>
         </header>
 
@@ -408,81 +409,93 @@
     </div>
 
     <script>
-        // Load favorites from localStorage
-        function loadFavorites() {
-            const favorites = JSON.parse(localStorage.getItem('readysounds_favorites') || '[]');
+        const SUPABASE_URL = 'https://pfqvrxfazumlydjepwib.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_1oBqgAQj0xzb5-eosyfcBg_9dKxNZfa';
+
+        const emptyState = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🤍</div>
+                <div class="empty-state-text">You haven't favorited any tracks yet.</div>
+                <a href="browse.html" class="browse-btn">Browse Music</a>
+            </div>
+        `;
+
+        async function loadFavorites() {
+            const favoriteIds = JSON.parse(localStorage.getItem('readysounds_favorites') || '[]');
             const container = document.getElementById('favoritesContainer');
-            
-            if (favorites.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🤍</div>
-                        <div class="empty-state-text">You haven't favorited any tracks yet!</div>
-                        <a href="browse.html" class="browse-btn">Browse Music</a>
-                    </div>
-                `;
+
+            if (favoriteIds.length === 0) {
+                container.innerHTML = emptyState;
                 return;
             }
 
-            // Track data — mirrors all main tracks in browse.html
-            const R2 = 'https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/';
-            const trackData = {
-                1:  { title: 'Buck Moon - "Go, Now"',             genre: 'Dance, Electronic, Hip Hop',              bpm: 90,  duration: '1:09', image: R2 + 'primum-electronic-cover.jpg' },
-                4:  { title: 'Buck Moon - "Super Things"',         genre: 'Electronic, Hip Hop, Trap, Dub',          bpm: 152, duration: '4:00', image: R2 + 'primum-electronic-cover.jpg' },
-                6:  { title: 'Buck Moon - "My Love For You"',      genre: 'Dance, EDM, House, Pop, Indie Pop',       bpm: 95,  duration: '3:20', image: R2 + 'primum-electronic-cover.jpg' },
-                7:  { title: 'Buck Moon - "Journey On The Radio"', genre: 'Indie Rock, Electronic, Nu Wave, Pop',    bpm: 160, duration: '2:48', image: R2 + 'primum-electronic-cover.jpg' },
-                8:  { title: 'Buck Moon - "His & Hers"',           genre: 'Electronic, Indie, Pop',                  bpm: 120, duration: '3:00', image: R2 + 'primum-electronic-cover.jpg' },
-                9:  { title: 'Buck Moon - "Give Me Your Energy"',  genre: 'Electronic, Dance, Energetic, Retro',     bpm: 95,  duration: '3:12', image: R2 + 'primum-electronic-cover.jpg' },
-                12: { title: 'Buck Moon - "Snow"',                 genre: 'Electronic, Dance, House, Progressive',   bpm: 120, duration: '5:18', image: R2 + 'primum-electronic-cover.jpg' },
-                17: { title: 'Buck Moon - "Swell"',                genre: 'Electronic, Hip Hop, Trap, Dub',          bpm: 100, duration: '3:36', image: R2 + 'primum-electronic-cover.jpg' },
-                22: { title: 'Crane Flight - "I\'ll Be There"',    genre: 'Afro Beats, Fun, Dance, Electro',         bpm: 100, duration: '2:21', image: R2 + 'afro-beats-vol-1-cover.jpg' },
-                23: { title: 'Buck Moon - "Airborne"',             genre: 'Funk, House, Pop, EDM, Dance',            bpm: 95,  duration: '2:45', image: R2 + 'primum-electronic-cover.jpg' },
-                24: { title: 'Buck Moon - "Spin My World"',        genre: 'Indie, Electronic, Lofi, Pop',            bpm: 95,  duration: '3:40', image: R2 + 'primum-electronic-cover.jpg' },
-                39: { title: 'MallFlex - "Ice Skatin\'"',          genre: 'Funk, Dance, Pop',                        bpm: 95,  duration: '2:22', image: R2 + 'funky-munky.jpg' }
-            };
+            container.innerHTML = '<div style="text-align:center;padding:60px;color:#888;">Loading...</div>';
 
-            let html = '<div class="track-grid">';
-            
-            favorites.forEach(trackId => {
-                const track = trackData[trackId];
-                if (track) {
+            try {
+                if (typeof window.supabase === 'undefined') {
+                    await new Promise(r => setTimeout(r, 200));
+                }
+                const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                const { data: tracks, error } = await client
+                    .from('tracks')
+                    .select('id, title, artist, genre, bpm, duration, artwork_url')
+                    .in('id', favoriteIds)
+                    .eq('is_active', true);
+
+                if (error) throw error;
+
+                if (!tracks || tracks.length === 0) {
+                    container.innerHTML = emptyState;
+                    return;
+                }
+
+                // Index by id so we can render in localStorage order
+                const trackMap = {};
+                tracks.forEach(t => { trackMap[t.id] = t; });
+
+                let html = '<div class="track-grid">';
+                favoriteIds.forEach(trackId => {
+                    const track = trackMap[trackId];
+                    if (!track) return;
+                    const displayTitle = `${track.artist} — "${track.title}"`;
                     html += `
                         <div class="track-item">
                             <div class="track-artwork">
-                                <img src="${track.image}" alt="${track.title}">
+                                ${track.artwork_url ? `<img src="${track.artwork_url}" alt="${displayTitle}">` : ''}
                             </div>
-                            <button class="play-btn" onclick="playTrack(${trackId})">▶</button>
+                            <button class="play-btn" onclick="playTrack(${track.id})">▶</button>
                             <div class="track-info">
-                                <div class="track-title">${track.title}</div>
-                                <div class="track-meta">${track.genre} · ${track.bpm} BPM · ${track.duration}</div>
+                                <div class="track-title">${displayTitle}</div>
+                                <div class="track-meta">${track.genre || ''}${track.bpm ? ' · ' + track.bpm + ' BPM' : ''}${track.duration ? ' · ' + track.duration : ''}</div>
                             </div>
                             <div class="track-actions">
-                                <a href="browse.html#track-${trackId}" class="action-btn">View Track</a>
-                                <button class="unfavorite-btn" onclick="removeFavorite(${trackId})">❤️</button>
+                                <a href="browse.html#track-${track.id}" class="action-btn">View Track</a>
+                                <button class="unfavorite-btn" onclick="removeFavorite(${track.id})">❤️</button>
                             </div>
                         </div>
                     `;
-                }
-            });
+                });
+                html += '</div>';
+                container.innerHTML = html;
 
-            html += '</div>';
-            container.innerHTML = html;
+            } catch (err) {
+                console.error('Error loading favorites:', err);
+                container.innerHTML = '<div style="text-align:center;padding:60px;color:#888;">Error loading favorites. Please try again.</div>';
+            }
         }
 
         function removeFavorite(trackId) {
             let favorites = JSON.parse(localStorage.getItem('readysounds_favorites') || '[]');
             favorites = favorites.filter(id => id !== trackId);
             localStorage.setItem('readysounds_favorites', JSON.stringify(favorites));
-            loadFavorites(); // Reload the page
+            loadFavorites();
         }
 
         function playTrack(trackId) {
-            // Redirect to main page with track ID
             window.location.href = `browse.html?play=${trackId}`;
         }
 
-        // Load favorites on page load
-        loadFavorites();
+        document.addEventListener('DOMContentLoaded', loadFavorites);
 
         function toggleMobileMenu() {
             const panel = document.getElementById('mobilePanel');

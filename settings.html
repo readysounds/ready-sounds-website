@@ -29,7 +29,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 700px;
             margin: 0 auto;
             padding-top: 80px;
         }
@@ -74,9 +74,12 @@
         }
 
         .section-title {
-            font-size: 1.5em;
+            font-size: 1.2em;
+            font-weight: 600;
             margin-bottom: 24px;
             color: #9c27b0;
+            text-transform: lowercase;
+            letter-spacing: 0.02em;
         }
 
         .info-row {
@@ -98,14 +101,14 @@
 
         .info-value {
             font-weight: 600;
-            font-size: 1.05em;
+            font-size: 1em;
         }
 
         .status-badge {
             display: inline-block;
-            padding: 6px 12px;
+            padding: 5px 12px;
             border-radius: 6px;
-            font-size: 0.9em;
+            font-size: 0.85em;
             font-weight: 600;
         }
 
@@ -123,36 +126,47 @@
             background: linear-gradient(135deg, #9c27b0, #4a148c);
             border: none;
             color: white;
-            padding: 12px 24px;
+            padding: 11px 22px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 0.95em;
             font-weight: 600;
             transition: all 0.3s;
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(156, 39, 176, 0.4);
         }
 
-        .btn-danger {
-            background: linear-gradient(135deg, #f44336, #d32f2f);
-        }
-
-        .btn-danger:hover {
-            box-shadow: 0 8px 20px rgba(244, 67, 54, 0.4);
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .btn-secondary:hover {
-            background: rgba(156, 39, 176, 0.2);
+            background: rgba(156, 39, 176, 0.15);
             border-color: rgba(156, 39, 176, 0.3);
             box-shadow: none;
+        }
+
+        .btn-danger {
+            background: rgba(244, 67, 54, 0.12);
+            border: 1px solid rgba(244, 67, 54, 0.25);
+            color: #f44336;
+        }
+
+        .btn-danger:hover {
+            background: rgba(244, 67, 54, 0.2);
+            box-shadow: none;
+            border-color: rgba(244, 67, 54, 0.4);
         }
 
         .loading {
@@ -172,8 +186,7 @@
         }
 
         .no-subscription {
-            text-align: center;
-            padding: 40px 20px;
+            padding: 12px 0;
             color: #888;
         }
 
@@ -184,6 +197,17 @@
 
         .no-subscription a:hover {
             text-decoration: underline;
+        }
+
+        .success-msg {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #4caf50;
+            font-size: 0.9em;
+            margin-top: 12px;
+            display: none;
         }
 
         @media (max-width: 768px) {
@@ -198,7 +222,7 @@
             .info-row {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 8px;
+                gap: 10px;
             }
         }
 
@@ -296,47 +320,6 @@
             text-transform: lowercase;
         }
         .mobile-panel-nav a:hover { color: #9c27b0; }
-        .mobile-panel-cta {
-            display: block;
-            background: #9c27b0;
-            color: white;
-            text-align: center;
-            padding: 16px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 16px;
-            text-decoration: none;
-            margin-top: 32px;
-        }
-        .mobile-panel-auth {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 16px;
-        }
-        .mobile-auth-login {
-            display: block;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 15px;
-            text-align: center;
-            text-decoration: none;
-            background: rgba(255,255,255,0.07);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.15);
-        }
-        .mobile-auth-signup {
-            display: block;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 15px;
-            text-align: center;
-            text-decoration: none;
-            background: #9c27b0;
-            color: white;
-        }
         .mobile-panel-footer {
             margin-top: auto;
             padding-top: 40px;
@@ -352,7 +335,7 @@
                 <a href="browse.html">browse</a>
                 <a href="playlists.html">playlists</a>
                 <a href="pricing.html">pricing</a>
-                <a href="contact.html">contact</a>
+                <a href="account.html">account</a>
             </div>
             <button class="rs-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
         </div>
@@ -366,24 +349,19 @@
             <a href="browse.html">browse</a>
             <a href="playlists.html">playlists</a>
             <a href="pricing.html">pricing</a>
-            <a href="contact.html">contact</a>
+            <a href="account.html">account</a>
         </nav>
-        <a href="pricing.html" class="mobile-panel-cta">Subscribe — $79/yr</a>
-        <div class="mobile-panel-auth">
-            <a href="signup.html" class="mobile-auth-login">log in</a>
-            <a href="signup.html" class="mobile-auth-signup">create free account</a>
-        </div>
         <div class="mobile-panel-footer">
             <a href="terms.html" style="color: rgba(255,255,255,0.4); font-size: 12px; text-decoration: none;">terms & conditions</a>
         </div>
     </div>
 
     <div class="container">
-        <a href="browse.html" class="back-link">← Back to Music Library</a>
-        
+        <a href="account.html" class="back-link">← Back to Account</a>
+
         <header>
-            <h1>⚙️ Account Settings</h1>
-            <p class="subtitle">Manage your subscription and account details</p>
+            <h1>Settings</h1>
+            <p class="subtitle">Manage your account and subscription</p>
         </header>
 
         <div id="content">
@@ -395,6 +373,7 @@
         const SUPABASE_URL = 'https://pfqvrxfazumlydjepwib.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_1oBqgAQj0xzb5-eosyfcBg_9dKxNZfa';
         let supabaseClient = null;
+        let currentUser = null;
 
         async function initPage() {
             if (typeof window.supabase === 'undefined') {
@@ -403,6 +382,14 @@
             }
 
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                window.location.href = 'signup.html';
+                return;
+            }
+
+            currentUser = session.user;
             await loadAccountInfo();
         }
 
@@ -410,190 +397,204 @@
             const content = document.getElementById('content');
 
             try {
-                const { data: { user } } = await supabaseClient.auth.getUser();
-
-                if (!user) {
-                    content.innerHTML = `
-                        <div class="no-subscription">
-                            <p>Please <a href="signup.html">log in</a> to view your account settings.</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                // Get user profile with subscription info
                 const { data: profile, error } = await supabaseClient
                     .from('profiles')
                     .select('*')
-                    .eq('email', user.email)
+                    .eq('id', currentUser.id)
                     .single();
 
                 if (error) {
                     console.error('Error loading profile:', error);
-                    content.innerHTML = '<div class="error">Error loading account information</div>';
+                    content.innerHTML = '<div class="error">Error loading account information. Please refresh and try again.</div>';
                     return;
                 }
 
-                renderAccountInfo(user, profile);
+                renderSettings(profile);
 
             } catch (err) {
                 console.error('Error:', err);
-                content.innerHTML = '<div class="error">Error loading account information</div>';
+                content.innerHTML = '<div class="error">Error loading account information.</div>';
             }
         }
 
-        function renderAccountInfo(user, profile) {
-            const hasSubscription = profile.subscription_status === 'active' || profile.subscription_status === 'cancelled';
-            const isCancelled = profile.subscription_status === 'cancelled';
-            const subscriptionPlan = profile.subscription_plan || 'none';
-            const planName = subscriptionPlan === 'individual_yearly' ? 'Individual (Annual)' :
-                            subscriptionPlan === 'business_yearly' ? 'Business (Annual)' : 'None';
-            const planPrice = subscriptionPlan === 'individual_yearly' ? '$79/year' :
-                             subscriptionPlan === 'business_yearly' ? '$1,299/year' : '$0';
+        function renderSettings(profile) {
+            const subStatus = profile.subscription_status;
+            const hasActiveSub = subStatus === 'active';
+            const isCancelled = subStatus === 'cancelled';
+            const planKey = profile.subscription_plan;
 
-            let html = `
-                <!-- Profile Section -->
-                <div class="section">
-                    <h2 class="section-title">Profile Information</h2>
-                    <div class="info-row">
-                        <span class="info-label">Email</span>
-                        <span class="info-value">${user.email}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Account Created</span>
-                        <span class="info-value">${new Date(user.created_at).toLocaleDateString()}</span>
-                    </div>
-                </div>
-            `;
+            const planNames = {
+                individual_yearly: 'Individual (Annual)',
+                business_yearly: 'Business (Annual)'
+            };
+            const planPrices = {
+                individual_yearly: '$79/year',
+                business_yearly: '$1,299/year'
+            };
 
-            if (hasSubscription) {
-                html += `
-                    <!-- Subscription Section -->
+            const planName = planNames[planKey] || 'None';
+            const planPrice = planPrices[planKey] || '';
+
+            let renewalRow = '';
+            if (profile.subscription_end_date) {
+                const endDate = new Date(profile.subscription_end_date).toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'long', day: 'numeric'
+                });
+                const label = isCancelled ? 'Access Until' : 'Renews';
+                renewalRow = `
+                    <div class="info-row">
+                        <span class="info-label">${label}</span>
+                        <span class="info-value">${endDate}</span>
+                    </div>
+                `;
+            }
+
+            let subscriptionSection = '';
+            if (hasActiveSub || isCancelled) {
+                subscriptionSection = `
                     <div class="section">
-                        <h2 class="section-title">Subscription</h2>
+                        <h2 class="section-title">subscription</h2>
                         <div class="info-row">
                             <span class="info-label">Plan</span>
                             <span class="info-value">${planName}</span>
                         </div>
+                        ${planPrice ? `
                         <div class="info-row">
                             <span class="info-label">Price</span>
                             <span class="info-value">${planPrice}</span>
                         </div>
+                        ` : ''}
                         <div class="info-row">
                             <span class="info-label">Status</span>
-                            ${isCancelled ? 
-                                '<span class="status-badge status-cancelled">Cancelled - Access until period end</span>' :
-                                '<span class="status-badge status-active">Active</span>'
-                            }
+                            <span class="info-value">
+                                ${isCancelled
+                                    ? '<span class="status-badge status-cancelled">Cancelled</span>'
+                                    : '<span class="status-badge status-active">Active</span>'
+                                }
+                            </span>
                         </div>
-                        ${!isCancelled ? `
+                        ${renewalRow}
                         <div class="info-row">
-                            <span class="info-label">Cancel Auto-Renewal</span>
-                            <button class="btn btn-danger" onclick="cancelSubscription()">Cancel Subscription</button>
+                            <span class="info-label">Billing & Cancellation</span>
+                            <button class="btn btn-secondary" id="billingBtn" onclick="openBillingPortal()">Manage Billing</button>
                         </div>
-                        ` : ''}
-                        ${isCancelled ? `
-                        <div class="info-row">
-                            <span class="info-label">Reactivate</span>
-                            <button class="btn" onclick="reactivateSubscription()">Resume Subscription</button>
-                        </div>
-                        ` : ''}
                     </div>
                 `;
             } else {
-                html += `
+                subscriptionSection = `
                     <div class="section">
-                        <h2 class="section-title">Subscription</h2>
+                        <h2 class="section-title">subscription</h2>
                         <div class="no-subscription">
-                            <p>You don't have an active subscription.</p>
-                            <p><a href="pricing.html">View pricing plans</a></p>
+                            <p>You don't have an active subscription. <a href="pricing.html">View plans →</a></p>
                         </div>
                     </div>
                 `;
             }
+
+            const joinDate = new Date(currentUser.created_at).toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+
+            const html = `
+                <!-- Profile Section -->
+                <div class="section">
+                    <h2 class="section-title">profile</h2>
+                    <div class="info-row">
+                        <span class="info-label">Email</span>
+                        <span class="info-value">${currentUser.email}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Member Since</span>
+                        <span class="info-value">${joinDate}</span>
+                    </div>
+                </div>
+
+                ${subscriptionSection}
+
+                <!-- Security Section -->
+                <div class="section">
+                    <h2 class="section-title">security</h2>
+                    <div class="info-row">
+                        <span class="info-label">Password</span>
+                        <button class="btn btn-secondary" id="resetBtn" onclick="sendPasswordReset()">Send Reset Email</button>
+                    </div>
+                    <div class="success-msg" id="resetSuccess">Password reset email sent. Check your inbox.</div>
+                </div>
+
+                <!-- Sign Out Section -->
+                <div class="section">
+                    <h2 class="section-title">session</h2>
+                    <div class="info-row">
+                        <span class="info-label">Signed in as ${currentUser.email}</span>
+                        <button class="btn btn-danger" onclick="signOut()">Sign Out</button>
+                    </div>
+                </div>
+            `;
 
             document.getElementById('content').innerHTML = html;
         }
 
-        async function cancelSubscription() {
-            if (!confirm('Are you sure you want to cancel auto-renewal?\n\nYou will retain access until the end of your current billing period, but your subscription will not renew.')) {
-                return;
-            }
-
+        async function openBillingPortal() {
+            const btn = document.getElementById('billingBtn');
+            const original = btn.textContent;
+            btn.textContent = 'Loading…';
+            btn.disabled = true;
             try {
-                const { data: { user } } = await supabaseClient.auth.getUser();
-                if (!user) return;
-
-                // Update subscription_status to indicate cancellation
-                const { error } = await supabaseClient
-                    .from('profiles')
-                    .update({ 
-                        subscription_status: 'cancelled',
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq('email', user.email);
-
-                if (error) {
-                    console.error('Error cancelling subscription:', error);
-                    alert('Error cancelling subscription. Please try again or contact support.');
-                    return;
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) { window.location.href = 'signup.html'; return; }
+                const res = await fetch('/.netlify/functions/create-portal-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.access_token}`
+                    }
+                });
+                const json = await res.json();
+                if (json.url) {
+                    window.location.href = json.url;
+                } else {
+                    alert(json.error || 'Unable to open billing portal. Please try again.');
+                    btn.textContent = original;
+                    btn.disabled = false;
                 }
-
-                alert('Subscription cancelled. You will retain access until the end of your current billing period.');
-                
-                // Reload the page to show updated status
-                window.location.reload();
-                
             } catch (err) {
-                console.error('Error canceling subscription:', err);
-                alert('Error cancelling subscription. Please contact support at support@readysounds.com');
+                console.error('Billing portal error:', err);
+                alert('Something went wrong. Please try again.');
+                btn.textContent = original;
+                btn.disabled = false;
             }
         }
 
-        async function manageSubscription() {
-            // Redirect to Stripe customer portal
-            alert('To update your payment method, please contact support at support@readysounds.com or use the Stripe customer portal.');
-            
-            // TODO: Implement Stripe customer portal redirect
-            // This would typically redirect to: https://billing.stripe.com/p/login/...
-        }
-
-        async function reactivateSubscription() {
-            if (!confirm('Reactivate your subscription? Auto-renewal will resume.')) {
-                return;
-            }
-
+        async function sendPasswordReset() {
+            const btn = document.getElementById('resetBtn');
+            const original = btn.textContent;
+            btn.textContent = 'Sending…';
+            btn.disabled = true;
             try {
-                const { data: { user } } = await supabaseClient.auth.getUser();
-                if (!user) return;
-
-                // Update subscription_status back to active
-                const { error } = await supabaseClient
-                    .from('profiles')
-                    .update({ 
-                        subscription_status: 'active',
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq('email', user.email);
-
-                if (error) {
-                    console.error('Error reactivating subscription:', error);
-                    alert('Error reactivating subscription. Please try again or contact support.');
-                    return;
-                }
-
-                alert('Subscription reactivated! Auto-renewal has resumed.');
-                
-                // Reload the page to show updated status
-                window.location.reload();
-                
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(currentUser.email, {
+                    redirectTo: window.location.origin + '/settings.html'
+                });
+                if (error) throw error;
+                document.getElementById('resetSuccess').style.display = 'block';
+                btn.textContent = 'Email Sent';
             } catch (err) {
-                console.error('Error reactivating subscription:', err);
-                alert('Error reactivating subscription. Please contact support.');
+                console.error('Password reset error:', err);
+                alert('Error sending reset email. Please try again.');
+                btn.textContent = original;
+                btn.disabled = false;
             }
         }
 
-        // Initialize on page load
+        async function signOut() {
+            try {
+                await supabaseClient.auth.signOut();
+                window.location.href = 'index.html';
+            } catch (err) {
+                console.error('Sign out error:', err);
+                alert('Error signing out. Please try again.');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', initPage);
 
         function toggleMobileMenu() {

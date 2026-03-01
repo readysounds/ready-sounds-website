@@ -623,7 +623,8 @@
 
                 <!-- Right: form -->
                 <div class="contact-form-wrap">
-                    <form id="contactForm" onsubmit="handleSubmit(event)">
+                    <form id="contactForm" name="contact" netlify data-netlify="true" onsubmit="handleSubmit(event)">
+                        <input type="hidden" name="form-name" value="contact">
 
                         <div class="form-row">
                             <div class="form-group">
@@ -688,36 +689,28 @@
 
             const btn = document.getElementById('submitBtn');
             const msg = document.getElementById('formMessage');
+            const form = document.getElementById('contactForm');
 
             btn.disabled = true;
             btn.textContent = 'Sending...';
             msg.style.display = 'none';
 
-            const data = {
-                firstName: document.getElementById('firstName').value.trim(),
-                lastName:  document.getElementById('lastName').value.trim(),
-                email:     document.getElementById('email').value.trim(),
-                subject:   document.getElementById('subject').value,
-                message:   document.getElementById('message').value.trim(),
-            };
-
             try {
-                // Send via mailto as a reliable fallback (works without a backend)
-                const body = encodeURIComponent(
-                    `Name: ${data.firstName} ${data.lastName}\nEmail: ${data.email}\nTopic: ${data.subject}\n\n${data.message}`
-                );
-                const mailtoLink = `mailto:josh@readysounds.com?subject=Contact Form: ${encodeURIComponent(data.subject)}&body=${body}`;
+                const response = await fetch('/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(new FormData(form)).toString()
+                });
 
-                // Show success and open mail client
-                msg.className = 'form-message success';
-                msg.textContent = 'Opening your email client… if nothing opens, email us directly at josh@readysounds.com';
-                msg.style.display = 'block';
-                btn.textContent = 'Message Sent';
-
-                setTimeout(() => {
-                    window.location.href = mailtoLink;
-                }, 300);
-
+                if (response.ok) {
+                    msg.className = 'form-message success';
+                    msg.textContent = "Message sent! We'll get back to you within 24 hours.";
+                    msg.style.display = 'block';
+                    btn.textContent = 'Message Sent';
+                    form.reset();
+                } else {
+                    throw new Error('Submission failed');
+                }
             } catch (err) {
                 msg.className = 'form-message error';
                 msg.textContent = 'Something went wrong. Please email us directly at josh@readysounds.com';
