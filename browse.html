@@ -4001,6 +4001,20 @@
 
                 playerBar.classList.add('visible');
                 buildModalWaveform();
+
+                // Update OS / car / lock screen now-playing metadata
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.metadata = new MediaMetadata({
+                        title:  track.title,
+                        artist: track.artist || 'readysounds',
+                        album:  'readysounds catalog',
+                        artwork: artSrc ? [{ src: artSrc }] : []
+                    });
+                    navigator.mediaSession.setActionHandler('play',  () => { currentAudio?.play(); syncPlayButtons(true); });
+                    navigator.mediaSession.setActionHandler('pause', () => { currentAudio?.pause(); syncPlayButtons(false); });
+                    navigator.mediaSession.setActionHandler('previoustrack', () => playPreviousTrack());
+                    navigator.mediaSession.setActionHandler('nexttrack',     () => playNextTrackManual());
+                }
             }
 
             syncPlayButtons(currentAudio && !currentAudio.paused);
