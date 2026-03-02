@@ -459,13 +459,6 @@
                 <div class="spinner" id="autofillSpinner" style="display:none"></div>
                 <span id="autofillMsg"></span>
             </div>
-            <div id="detectedBar" style="display:none; margin-top:10px; padding:10px 14px; background:rgba(156,39,176,0.07); border:1px solid rgba(156,39,176,0.2); border-radius:8px;">
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-                    <div class="spinner" id="detectedSpinner"></div>
-                    <span id="detectedMsg" style="font-size:12px;color:rgba(156,39,176,0.8)">Scanning for versions…</span>
-                </div>
-                <div id="detectedList" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-            </div>
         </div>
 
         <!-- Artist + Title -->
@@ -619,8 +612,6 @@
     const SESSION_KEY = 'rs_admin_key';
     let editingId = null;
     let trackCache = {};
-    const ALT_VARIANTS = ['15s', '30s', '60s', '90s', '2min', 'intro', 'loop', 'sting'];
-    let detectedAlternates = []; // [{ title, stream_url, duration, sort_order }]
 
     // ── Key management ─────────────────────────────────────────────
     function getKey() {
@@ -693,7 +684,6 @@
 
             showAutofill('Artist, title & artwork filled — fetching duration…');
             fetchDurationFromUrl(url);
-            detectAlternates(url);
         } catch(e) {
             // silently ignore malformed URLs
         }
@@ -737,57 +727,6 @@
             document.getElementById('fetchDurBtn').disabled = false;
             showAutofill('Could not fetch duration — enter manually', true);
         });
-    }
-
-    // ── Alternate version detection ──────────────────────────────────
-    async function detectAlternates(url) {
-        const bar = document.getElementById('detectedBar');
-        const spinner = document.getElementById('detectedSpinner');
-        const msg = document.getElementById('detectedMsg');
-        const list = document.getElementById('detectedList');
-
-        // Only run for full-preview URLs
-        if (!url || !url.match(/-full-preview\.mp3$/i)) {
-            detectedAlternates = [];
-            bar.style.display = 'none';
-            return;
-        }
-
-        // Show scanning state
-        detectedAlternates = [];
-        bar.style.display = 'block';
-        spinner.style.display = 'block';
-        msg.textContent = 'Scanning for versions…';
-        list.innerHTML = '';
-
-        const basePath = url.replace(/-full-preview\.mp3$/i, '');
-
-        const checks = ALT_VARIANTS.map(variant => new Promise(resolve => {
-            const variantUrl = `${basePath}-${variant}.mp3`;
-            const audio = new Audio(variantUrl);
-            const timer = setTimeout(() => { audio.src = ''; resolve(null); }, 6000);
-            audio.addEventListener('loadedmetadata', () => {
-                clearTimeout(timer);
-                const mins = Math.floor(audio.duration / 60);
-                const secs = Math.floor(audio.duration % 60).toString().padStart(2, '0');
-                resolve({ title: variant, stream_url: variantUrl, duration: `${mins}:${secs}` });
-            });
-            audio.addEventListener('error', () => { clearTimeout(timer); resolve(null); });
-        }));
-
-        const results = await Promise.all(checks);
-        detectedAlternates = results.filter(Boolean).map((a, i) => ({ ...a, sort_order: i + 1 }));
-
-        spinner.style.display = 'none';
-        if (detectedAlternates.length === 0) {
-            bar.style.display = 'none';
-        } else {
-            const n = detectedAlternates.length;
-            msg.textContent = `${n} version${n > 1 ? 's' : ''} detected — will be added automatically`;
-            list.innerHTML = detectedAlternates.map(a =>
-                `<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(156,39,176,0.15);border:1px solid rgba(156,39,176,0.3);border-radius:4px;padding:3px 9px;font-size:12px;color:rgba(255,255,255,0.8)">${esc(a.title)}<span style="color:rgba(255,255,255,0.35)">${esc(a.duration)}</span></span>`
-            ).join('');
-        }
     }
 
     // ── Sort order suggestion ────────────────────────────────────────
@@ -889,25 +828,7 @@
             if (data.error) {
                 showAlert(`Error: ${data.error}`, 'error');
             } else {
-                if (!isEditing && detectedAlternates.length > 0) {
-                    const trackId = data.id;
-                    let altAdded = 0;
-                    for (const alt of detectedAlternates) {
-                        const altData = await adminFetch('POST', {
-                            _table: 'alternates',
-                            track_id: trackId,
-                            stream_url: alt.stream_url,
-                            title: alt.title,
-                            duration: alt.duration,
-                            sort_order: alt.sort_order,
-                        });
-                        if (!altData.error) altAdded++;
-                    }
-                    const vLabel = `version${altAdded !== 1 ? 's' : ''}`;
-                    showAlert(`✓ "${track.artist} — ${track.title}" added + ${altAdded} ${vLabel}.`, 'success');
-                } else {
-                    showAlert(`✓ "${track.artist} — ${track.title}" ${isEditing ? 'updated' : 'added'}.`, 'success');
-                }
+                showAlert(`✓ "${track.artist} — ${track.title}" ${isEditing ? 'updated' : 'added'}.`, 'success');
                 cancelEdit();
                 loadTrackList();
                 if (!isEditing) fetchNextSortOrder();
@@ -936,8 +857,6 @@
         document.getElementById('f_energy').value = '';
         document.getElementById('f_is_active').checked = true;
         document.getElementById('autofillBar').classList.remove('visible');
-        detectedAlternates = [];
-        document.getElementById('detectedBar').style.display = 'none';
     }
 
     function showAlert(msg, type) {
