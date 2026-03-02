@@ -564,7 +564,7 @@
     <div id="alternatesList" style="margin-bottom:20px"></div>
 
     <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:20px">
-        <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Add Version</div>
+        <div id="altFormTitle" style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Add Version</div>
         <div class="form-grid">
             <div class="form-field full">
                 <label>Stream URL</label>
@@ -590,7 +590,10 @@
                 <input type="text" id="alt_download_album" placeholder="funky-munky (optional)">
             </div>
         </div>
-        <button class="btn" style="margin-top:12px" onclick="addAlternate()">Add Version</button>
+        <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn" id="altSubmitBtn" onclick="addAlternate()">Add Version</button>
+            <button class="btn btn-ghost" id="altCancelBtn" style="display:none" onclick="cancelAltEdit()">Cancel</button>
+        </div>
         <div class="alert" id="altAlert" style="margin-top:12px"></div>
     </div>
 </div>
@@ -785,6 +788,7 @@
         document.getElementById('cancelBtn').style.display = 'none';
         document.getElementById('formAlert').className = 'alert';
         document.getElementById('alternatesCard').style.display = 'none';
+        cancelAltEdit();
     }
 
     // ── Submit ──────────────────────────────────────────────────────
@@ -937,6 +941,7 @@
 
     // ── Alternates ──────────────────────────────────────────────────
     let altParseTimer = null;
+    let editingAltId = null;
 
     function onAltUrlChange(val) {
         clearTimeout(altParseTimer);
@@ -987,9 +992,33 @@
                 <span style="font-size:13px;font-weight:500;min-width:80px">${esc(a.title)}</span>
                 <span style="font-size:12px;color:rgba(255,255,255,0.4);min-width:40px">${esc(a.duration || '—')}</span>
                 <span style="font-size:11px;color:rgba(255,255,255,0.25);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.stream_url)}</span>
+                <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px" onclick="editAlternate(${a.id}, ${JSON.stringify(a).replace(/"/g, '&quot;')})">edit</button>
                 <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;color:#ef9a9a;border-color:rgba(244,67,54,0.3)" onclick="deleteAlternate(${a.id}, ${editingId})">remove</button>
             </div>
         `).join('');
+    }
+
+    function editAlternate(altId, alt) {
+        editingAltId = altId;
+        document.getElementById('alt_stream_url').value   = alt.stream_url || '';
+        document.getElementById('alt_title').value        = alt.title || '';
+        document.getElementById('alt_duration').value     = alt.duration || '';
+        document.getElementById('alt_sort_order').value   = alt.sort_order ?? '';
+        document.getElementById('alt_download_album').value = alt.download_album || '';
+        document.getElementById('altFormTitle').textContent = 'Edit Version';
+        document.getElementById('altSubmitBtn').textContent = 'Save Changes';
+        document.getElementById('altCancelBtn').style.display = 'block';
+        document.getElementById('altAlert').className = 'alert';
+        document.getElementById('alt_stream_url').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function cancelAltEdit() {
+        editingAltId = null;
+        ['alt_stream_url','alt_title','alt_duration','alt_sort_order','alt_download_album'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('altFormTitle').textContent = 'Add Version';
+        document.getElementById('altSubmitBtn').textContent = 'Add Version';
+        document.getElementById('altCancelBtn').style.display = 'none';
+        document.getElementById('altAlert').className = 'alert';
     }
 
     async function addAlternate() {
@@ -1000,22 +1029,27 @@
             showAltAlert('Stream URL and title are required.', 'error');
             return;
         }
-        const payload = {
+
+        const isEditingAlt = editingAltId !== null;
+        const commonFields = {
             _table: 'alternates',
-            track_id: editingId,
             stream_url,
             title,
             duration: document.getElementById('alt_duration').value.trim() || null,
             sort_order: parseInt(document.getElementById('alt_sort_order').value, 10) || 99,
             download_album: document.getElementById('alt_download_album').value.trim() || null,
         };
-        const data = await adminFetch('POST', payload);
+
+        const payload = isEditingAlt
+            ? { ...commonFields, id: editingAltId }
+            : { ...commonFields, track_id: editingId };
+
+        const data = await adminFetch(isEditingAlt ? 'PATCH' : 'POST', payload);
         if (data.error) {
             showAltAlert(`Error: ${data.error}`, 'error');
         } else {
-            // Clear add form
-            ['alt_stream_url','alt_title','alt_duration','alt_sort_order','alt_download_album'].forEach(id => document.getElementById(id).value = '');
-            showAltAlert(`✓ "${title}" added.`, 'success');
+            showAltAlert(`✓ "${title}" ${isEditingAlt ? 'updated' : 'added'}.`, 'success');
+            cancelAltEdit();
             loadAlternates(editingId);
         }
     }
