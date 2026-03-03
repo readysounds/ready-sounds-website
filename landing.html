@@ -99,7 +99,6 @@
             text-decoration: none;
             font-size: 1.1em;
             font-weight: 600;
-            margin-left: 16px;
             border: 1px solid rgba(255,255,255,0.25);
             transition: all 0.3s;
         }
@@ -150,6 +149,18 @@
         .cta-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 12px 32px rgba(156, 39, 176, 0.4);
+        }
+
+        .hero-ctas {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .hero-ctas-secondary {
+            text-align: center;
         }
 
         .cta-secondary {
@@ -431,10 +442,19 @@
                 font-size: 1.2em;
             }
 
+            .hero-ctas {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .cta-primary, .cta-signin {
+                text-align: center;
+                margin-left: 0;
+            }
+
             .cta-secondary {
                 display: block;
-                margin-left: 0;
-                margin-top: 16px;
+                margin: 0 auto;
             }
 
             .nav-links {
@@ -600,10 +620,13 @@
     <section class="hero">
         <h1>Human-made music.<br>Producer-direct pricing.</h1>
         <p class="subheadline">Cut out the middleman. License directly from the producer.</p>
-        <a href="signup.html" class="cta-primary">Create Free Account</a>
-        <a href="signup.html?mode=signin" class="cta-signin">Sign In</a>
-        <br><br>
-        <a href="browse.html" class="cta-secondary">Browse Music</a>
+        <div class="hero-ctas">
+            <a href="signup.html" class="cta-primary">Create Free Account</a>
+            <a href="signup.html?mode=signin" class="cta-signin">Sign In</a>
+        </div>
+        <div class="hero-ctas-secondary">
+            <a href="browse.html" class="cta-secondary">Browse Music</a>
+        </div>
     </section>
 
     <!-- Benefits Section -->
