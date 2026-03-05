@@ -1590,13 +1590,174 @@
             color: rgba(255, 255, 255, 0.6);
             text-align: center;
         }
-        
+
         .track-actions {
             display: flex;
             gap: 6px;
             justify-content: flex-end;
             align-items: center;
             flex-shrink: 0;
+        }
+
+        /* ── Track Detail Panel ── */
+        .track-panel-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .track-panel-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .track-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: 420px;
+            background: #161616;
+            z-index: 501;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            box-shadow: -8px 0 60px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+        }
+        .track-panel.active {
+            transform: translateX(0);
+        }
+        .track-panel-artwork {
+            width: 100%;
+            aspect-ratio: 1;
+            position: relative;
+            background: #222;
+            flex-shrink: 0;
+        }
+        .track-panel-artwork img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .track-panel-artwork-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+        }
+        .track-panel-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.55);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            line-height: 1;
+        }
+        .track-panel-close:hover { background: rgba(0,0,0,0.8); }
+        .track-panel-body { padding: 24px; flex: 1; }
+        .track-panel-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin: 0 0 4px;
+            line-height: 1.2;
+        }
+        .track-panel-artist {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 10px;
+        }
+        .track-panel-specs {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.35);
+            margin-bottom: 20px;
+            letter-spacing: 0.3px;
+        }
+        .track-panel-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+        .track-panel-btn-primary {
+            flex: 1;
+            background: #bb86fc;
+            color: #000;
+            border: none;
+            padding: 11px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .track-panel-btn-primary:hover { background: #d4a8ff; }
+        .track-panel-btn-secondary {
+            flex: 1;
+            background: transparent;
+            color: #bb86fc;
+            border: 1px solid rgba(187, 134, 252, 0.4);
+            padding: 11px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .track-panel-btn-secondary:hover {
+            border-color: #bb86fc;
+            background: rgba(187, 134, 252, 0.08);
+        }
+        .track-panel-divider {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            margin: 0 0 24px;
+        }
+        .track-panel-meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 16px;
+            margin-bottom: 24px;
+        }
+        .track-panel-meta-full { margin-bottom: 20px; }
+        .track-panel-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 8px;
+        }
+        .track-panel-tags { display: flex; flex-wrap: wrap; gap: 4px 0; }
+        .track-panel-tag { font-size: 13px; color: rgba(255, 255, 255, 0.75); }
+        .track-panel-tag:not(:last-child)::after {
+            content: ' · ';
+            color: rgba(255, 255, 255, 0.25);
+        }
+        .track-panel-value {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.5;
+        }
+        .track-info-clickable { cursor: pointer; }
+        .track-info-clickable:hover .track-title { text-decoration: underline; }
+        @media (max-width: 768px) {
+            .track-panel { width: 100%; }
         }
         
         .action-btn {
@@ -3541,7 +3702,7 @@
                     <div class="track-artwork">
                         <img src="${track.artwork_url || ''}" alt="${escHtml(track.artist)}" onerror="this.style.display='none'; this.parentElement.innerHTML='&#127925;';">
                     </div>
-                    <div class="track-info">
+                    <div class="track-info track-info-clickable" onclick="openTrackPanel(event, ${track.id})">
                         <span class="track-title">${escHtml(track.artist)} - &quot;${escHtml(track.title)}&quot;</span>${hasAlts ? `<span class="versions-badge">${versionsCount} versions</span>` : ''}
                     </div>
                     <div class="expand-arrow"></div>
@@ -3595,8 +3756,17 @@
             tracks.forEach(track => {
                 trackData[track.id] = {
                     title: `${track.artist} - "${track.title}"`,
+                    trackTitle: track.title,
                     artist: track.artist,
-                    duration: track.duration
+                    duration: track.duration,
+                    artwork_url: track.artwork_url || '',
+                    bpm: track.bpm || '',
+                    genre: track.genre || '',
+                    moods: track.moods || '',
+                    use_cases: track.use_cases || '',
+                    similar_artists: track.similar_artists || '',
+                    energy: track.energy || '',
+                    best_moments: track.best_moments || '',
                 };
                 const alts = track.alternates || [];
                 alts.forEach(alt => {
@@ -4116,8 +4286,8 @@
 
         // Toggle alternates visibility
         function toggleAlternates(event, alternatesId) {
-            // Don't toggle if clicking on play button or action buttons
-            if (event.target.closest('.track-play') || event.target.closest('.action-btn') || event.target.closest('.waveform-container')) {
+            // Don't toggle if clicking on play button, action buttons, or track title (opens panel instead)
+            if (event.target.closest('.track-play') || event.target.closest('.action-btn') || event.target.closest('.waveform-container') || event.target.closest('.track-info-clickable')) {
                 return;
             }
             
@@ -4628,21 +4798,25 @@
             // Store the track ID and info for the cart button in the modal
             currentDownloadTrackId = trackId;
             
-            // Get track info from DOM
-            const trackElement = event.target.closest('.track-item');
-            if (trackElement) {
-                const titleElement = trackElement.querySelector('.track-title');
-                if (titleElement) {
-                    let title = titleElement.textContent.trim();
-                    title = title.replace(/\d+\s+versions?/i, '').trim();
-                    const parts = title.split(' - ');
-                    const artist = parts.length > 1 ? parts[0].trim() : 'Buck Moon';
-                    
-                    currentDownloadTrackInfo = {
-                        id: trackId,
-                        title: title,
-                        artist: artist
-                    };
+            // Get track info — prefer trackData lookup, fall back to DOM traversal
+            const tdEntry = trackData[trackId];
+            if (tdEntry) {
+                currentDownloadTrackInfo = {
+                    id: trackId,
+                    title: tdEntry.title,
+                    artist: tdEntry.artist
+                };
+            } else {
+                const trackElement = event.target.closest('.track-item');
+                if (trackElement) {
+                    const titleElement = trackElement.querySelector('.track-title');
+                    if (titleElement) {
+                        let title = titleElement.textContent.trim();
+                        title = title.replace(/\d+\s+versions?/i, '').trim();
+                        const parts = title.split(' - ');
+                        const artist = parts.length > 1 ? parts[0].trim() : 'Buck Moon';
+                        currentDownloadTrackInfo = { id: trackId, title, artist };
+                    }
                 }
             }
             
@@ -5521,6 +5695,76 @@
             }
         }
 
+        // ── Track Detail Panel ──
+        function openTrackPanel(event, trackId) {
+            event.stopPropagation();
+            const data = trackData[trackId];
+            if (!data) return;
+
+            // Artwork
+            const artworkEl = document.getElementById('trackPanelArtwork');
+            const existing = artworkEl.querySelector('img, .track-panel-artwork-placeholder');
+            if (existing) existing.remove();
+            if (data.artwork_url) {
+                const img = document.createElement('img');
+                img.src = data.artwork_url;
+                img.alt = data.artist;
+                artworkEl.insertBefore(img, artworkEl.firstChild);
+            } else {
+                const ph = document.createElement('div');
+                ph.className = 'track-panel-artwork-placeholder';
+                ph.textContent = '🎵';
+                artworkEl.insertBefore(ph, artworkEl.firstChild);
+            }
+
+            // Helper: render a metadata section
+            function metaTags(label, value, fullWidth) {
+                if (!value) return '';
+                const tags = value.split(',').map(t => t.trim()).filter(Boolean);
+                if (!tags.length) return '';
+                const tagsHtml = tags.map(t => `<span class="track-panel-tag">${escHtml(t)}</span>`).join('');
+                const cls = fullWidth ? 'track-panel-meta-full' : '';
+                return `<div class="${cls}"><div class="track-panel-label">${label}</div><div class="track-panel-tags">${tagsHtml}</div></div>`;
+            }
+            function metaValue(label, value) {
+                if (!value) return '';
+                return `<div><div class="track-panel-label">${label}</div><div class="track-panel-value">${escHtml(value)}</div></div>`;
+            }
+
+            const specs = [data.bpm ? `${data.bpm} BPM` : null, data.duration].filter(Boolean).join(' · ');
+
+            document.getElementById('trackPanelBody').innerHTML = `
+                <h2 class="track-panel-title">${escHtml(data.trackTitle)}</h2>
+                <div class="track-panel-artist">${escHtml(data.artist)}</div>
+                ${specs ? `<div class="track-panel-specs">${escHtml(specs)}</div>` : ''}
+                <div class="track-panel-actions">
+                    <button class="track-panel-btn-primary" onclick="downloadTrack(event, ${trackId})">↓ Download</button>
+                    <button class="track-panel-btn-secondary" onclick="addToCart(event, ${trackId})">Add to Cart</button>
+                </div>
+                <hr class="track-panel-divider">
+                <div class="track-panel-meta-grid">
+                    ${metaTags('Moods', data.moods)}
+                    ${metaTags('Genre', data.genre)}
+                    ${metaValue('Energy', data.energy)}
+                </div>
+                ${metaTags('Best Moments', data.best_moments, true)}
+            `;
+
+            document.getElementById('trackPanelOverlay').classList.add('active');
+            document.getElementById('trackPanel').classList.add('active');
+            document.addEventListener('keydown', handlePanelEsc);
+        }
+
+        function closeTrackPanel() {
+            document.getElementById('trackPanelOverlay').classList.remove('active');
+            document.getElementById('trackPanel').classList.remove('active');
+            document.removeEventListener('keydown', handlePanelEsc);
+        }
+
+        function handlePanelEsc(e) {
+            if (e.key === 'Escape') closeTrackPanel();
+        }
+
         // Start initialization when DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
@@ -5532,5 +5776,14 @@
             handleTrackAutoPlay();
         }
     </script>
+
+    <!-- Track Detail Panel -->
+    <div id="trackPanelOverlay" class="track-panel-overlay" onclick="closeTrackPanel()"></div>
+    <div id="trackPanel" class="track-panel">
+        <div class="track-panel-artwork" id="trackPanelArtwork">
+            <button class="track-panel-close" onclick="closeTrackPanel()">&#x2715;</button>
+        </div>
+        <div class="track-panel-body" id="trackPanelBody"></div>
+    </div>
 </body>
 </html>
