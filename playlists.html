@@ -623,7 +623,7 @@
         </div>
 
         <!-- Curated Playlists Section -->
-        <h2 style="font-size: 1.8em; margin-bottom: 20px;">🎵 Curated Playlists</h2>
+        <h2 style="font-size: 1.8em; margin-bottom: 20px;">Curated Playlists</h2>
         <!-- Playlist Grid -->
         <div class="playlist-grid" id="playlistGrid"></div>
 
@@ -863,7 +863,7 @@
                 <div class="playlist-detail active">
                     <div class="playlist-header">
                         <div class="playlist-info">
-                            <h2>${escapeHtml((playlist.emoji || '') + ' ' + playlist.name)}</h2>
+                            <h2>${escapeHtml(playlist.name)}</h2>
                             <p class="playlist-description">${escapeHtml(playlist.description || '')}</p>
                         </div>
                         <div class="playlist-header-actions">
