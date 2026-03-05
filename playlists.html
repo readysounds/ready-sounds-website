@@ -625,420 +625,10 @@
         <!-- Curated Playlists Section -->
         <h2 style="font-size: 1.8em; margin-bottom: 20px;">🎵 Curated Playlists</h2>
         <!-- Playlist Grid -->
-        <div class="playlist-grid" id="playlistGrid">
-            <div class="playlist-card" onclick="showPlaylist('marketing')">
-                <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/playlist-marketing.png" alt="Marketing & Social Media" class="playlist-image" onerror="this.src='https://via.placeholder.com/400x400/667eea/ffffff?text=Marketing+%26+Social'">
-                <div class="play-overlay">▶</div>
-                <div class="playlist-overlay">
-                    <h3 class="playlist-title">Marketing & Social Media</h3>
-                    <p class="playlist-count">3 tracks</p>
-                </div>
-            </div>
+        <div class="playlist-grid" id="playlistGrid"></div>
 
-            <div class="playlist-card" onclick="showPlaylist('realestate')">
-                <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/playlist-realestate.png" alt="Real Estate" class="playlist-image" onerror="this.src='https://via.placeholder.com/400x400/764ba2/ffffff?text=Real+Estate'">
-                <div class="play-overlay">▶</div>
-                <div class="playlist-overlay">
-                    <h3 class="playlist-title">Real Estate & Property Tours</h3>
-                    <p class="playlist-count">1 track</p>
-                </div>
-            </div>
-
-            <div class="playlist-card" onclick="showPlaylist('sports')">
-                <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/playlist-sports.png" alt="Sports & Fitness" class="playlist-image" onerror="this.src='https://via.placeholder.com/400x400/f093fb/ffffff?text=Sports+%26+Fitness'">
-                <div class="play-overlay">▶</div>
-                <div class="playlist-overlay">
-                    <h3 class="playlist-title">Sports & Fitness</h3>
-                    <p class="playlist-count">5 tracks</p>
-                </div>
-            </div>
-
-            <div class="playlist-card" onclick="showPlaylist('travel')">
-                <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/playlist-travel.png" alt="Travel & Lifestyle" class="playlist-image" onerror="this.src='https://via.placeholder.com/400x400/4facfe/ffffff?text=Travel+%26+Lifestyle'">
-                <div class="play-overlay">▶</div>
-                <div class="playlist-overlay">
-                    <h3 class="playlist-title">Travel & Lifestyle</h3>
-                    <p class="playlist-count">4 tracks</p>
-                </div>
-            </div>
-
-            <div class="playlist-card" onclick="showPlaylist('nightlife')">
-                <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/playlist-nightlife.png" alt="Nightlife & Events" class="playlist-image" onerror="this.src='https://via.placeholder.com/400x400/ff6b6b/ffffff?text=Nightlife+%26+Events'">
-                <div class="play-overlay">▶</div>
-                <div class="playlist-overlay">
-                    <h3 class="playlist-title">Nightlife & Events</h3>
-                    <p class="playlist-count">4 tracks</p>
-                </div>
-            </div>
-
-            <div class="playlist-card" onclick="showPlaylist('tech')">
-                <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/playlist-tech.png" alt="Tech & Innovation" class="playlist-image" onerror="this.src='https://via.placeholder.com/400x400/51cf66/ffffff?text=Tech+%26+Innovation'">
-                <div class="play-overlay">▶</div>
-                <div class="playlist-overlay">
-                    <h3 class="playlist-title">Tech & Innovation</h3>
-                    <p class="playlist-count">3 tracks</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Playlist Details (Hidden by default) -->
-        <div id="playlistDetails">
-            <!-- Marketing & Social Media -->
-            <div class="playlist-detail" id="marketing">
-                <div class="playlist-header">
-                    <div class="playlist-info">
-                        <h2>📱 Marketing & Social Media</h2>
-                        <p class="playlist-description">Versatile tracks perfect for ads, social content, and brand videos</p>
-                    </div>
-                    <div class="playlist-header-actions">
-                        <button class="play-playlist-btn" onclick="playPlaylist('marketing')">▶ Play All</button>
-                        <button class="close-playlist" onclick="closePlaylist()">Close</button>
-                    </div>
-                </div>
-                <div class="track-list">
-                    <div class="track-item">
-                        <div class="track-number">1</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "My Love For You"</div>
-                            <div class="track-meta">Electronic · 120 BPM · 3:30</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(6); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                    <div class="track-item">
-                        <div class="track-number">2</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "Journey On The Radio"</div>
-                            <div class="track-meta">Indie Rock · 160 BPM · 2:48</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(7); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                    <div class="track-item">
-                        <div class="track-number">3</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "His & Hers"</div>
-                            <div class="track-meta">Electronic · 118 BPM · 2:40</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(8); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Real Estate & Property Tours -->
-            <div class="playlist-detail" id="realestate">
-                <div class="playlist-header">
-                    <div class="playlist-info">
-                        <h2>🏡 Real Estate & Property Tours</h2>
-                        <p class="playlist-description">Elegant, aspirational music for showcasing properties and spaces</p>
-                    </div>
-                    <div class="playlist-header-actions">
-                        
-                        <div class="playlist-header-actions"><button class="play-playlist-btn" onclick="playPlaylist('realestate')">▶ Play All</button><button class="close-playlist" onclick="closePlaylist()">Close</button></div>
-                    </div>
-                </div>
-                <div class="track-list">
-                    <div class="track-item">
-                        <div class="track-number">1</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "My Love For You"</div>
-                            <div class="track-meta">Electronic · 120 BPM · 3:30</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(6); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sports & Fitness -->
-            <div class="playlist-detail" id="sports">
-                <div class="playlist-header">
-                    <div class="playlist-info">
-                        <h2>💪 Sports & Fitness</h2>
-                        <p class="playlist-description">High-energy, motivational tracks for athletic content and workouts</p>
-                    </div>
-                    <div class="playlist-header-actions">
-
-                        <div class="playlist-header-actions"><button class="play-playlist-btn" onclick="playPlaylist('sports')">▶ Play All</button><button class="close-playlist" onclick="closePlaylist()">Close</button></div>
-                    </div>
-                </div>
-                <div class="track-list">
-                    <div class="track-item">
-                        <div class="track-number">1</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "Go, Now"</div>
-                            <div class="track-meta">Dance, Electronic · 90 BPM · 1:09</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(1); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                    <div class="track-item">
-                        <div class="track-number">2</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "Super Things"</div>
-                            <div class="track-meta">Electronic · 122 BPM · 2:06</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(4); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                    <div class="track-item">
-                        <div class="track-number">3</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "Give Me Your Energy"</div>
-                            <div class="track-meta">Electronic · 128 BPM · 2:22</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(9); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                    <div class="track-item">
-                        <div class="track-number">4</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "Swell"</div>
-                            <div class="track-meta">Electronic · 110 BPM · 2:35</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(17); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                    <div class="track-item">
-                        <div class="track-number">5</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "My Love For You"</div>
-                            <div class="track-meta">Electronic · 120 BPM · 3:30</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(6); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Travel & Lifestyle -->
-            <div class="playlist-detail" id="travel">
-                <div class="playlist-header">
-                    <div class="playlist-info">
-                        <h2>✈️ Travel & Lifestyle</h2>
-                        <p class="playlist-description">Adventurous, feel-good music for vlogs and destination content</p>
-                    </div>
-                    <div class="playlist-header-actions">
-
-                        <div class="playlist-header-actions"><button class="play-playlist-btn" onclick="playPlaylist('travel')">▶ Play All</button><button class="close-playlist" onclick="closePlaylist()">Close</button></div>
-                    </div>
-                </div>
-                <div class="track-list">
-                    <div class="track-item">
-                        <div class="track-number">1</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "Go, Now"</div>
-                            <div class="track-meta">Dance, Electronic · 90 BPM · 1:09</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(1); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                    <div class="track-item">
-                        <div class="track-number">2</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "Super Things"</div>
-                            <div class="track-meta">Electronic · 122 BPM · 2:06</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(4); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                    <div class="track-item">
-                        <div class="track-number">3</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "Swell"</div>
-                            <div class="track-meta">Electronic · 110 BPM · 2:35</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(17); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                    <div class="track-item">
-                        <div class="track-number">4</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "My Love For You"</div>
-                            <div class="track-meta">Electronic · 120 BPM · 3:30</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(6); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Nightlife & Events -->
-            <div class="playlist-detail" id="nightlife">
-                <div class="playlist-header">
-                    <div class="playlist-info">
-                        <h2>🎉 Nightlife & Events</h2>
-                        <p class="playlist-description">Club-ready beats for party scenes and nighttime content</p>
-                    </div>
-                    <div class="playlist-header-actions">
-
-                        <div class="playlist-header-actions"><button class="play-playlist-btn" onclick="playPlaylist('nightlife')">▶ Play All</button><button class="close-playlist" onclick="closePlaylist()">Close</button></div>
-                    </div>
-                </div>
-                <div class="track-list">
-                    <div class="track-item">
-                        <div class="track-number">1</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "Go, Now"</div>
-                            <div class="track-meta">Dance, Electronic · 90 BPM · 1:09</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(1); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                    <div class="track-item">
-                        <div class="track-number">2</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "Give Me Your Energy"</div>
-                            <div class="track-meta">Electronic · 128 BPM · 2:22</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(9); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                    <div class="track-item">
-                        <div class="track-number">3</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "Snow"</div>
-                            <div class="track-meta">Electronic · 128 BPM · 4:18</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(12); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                    <div class="track-item">
-                        <div class="track-number">4</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "My Love For You"</div>
-                            <div class="track-meta">Electronic · 120 BPM · 3:30</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(6); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tech & Innovation -->
-            <div class="playlist-detail" id="tech">
-                <div class="playlist-header">
-                    <div class="playlist-info">
-                        <h2>🚀 Tech & Innovation</h2>
-                        <p class="playlist-description">Futuristic, cutting-edge sounds for product launches and tech content</p>
-                    </div>
-                    <div class="playlist-header-actions">
-
-                        <div class="playlist-header-actions"><button class="play-playlist-btn" onclick="playPlaylist('tech')">▶ Play All</button><button class="close-playlist" onclick="closePlaylist()">Close</button></div>
-                    </div>
-                </div>
-                <div class="track-list">
-                    <div class="track-item">
-                        <div class="track-number">1</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "Go, Now"</div>
-                            <div class="track-meta">Dance, Electronic · 90 BPM · 1:09</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(1); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                    <div class="track-item">
-                        <div class="track-number">2</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "Give Me Your Energy"</div>
-                            <div class="track-meta">Electronic · 128 BPM · 2:22</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(9); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                    <div class="track-item">
-                        <div class="track-number">3</div>
-                        <div class="track-artwork">
-                            <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Primum Electronic">
-                        </div>
-                        <div class="track-info">
-                            <div class="track-title">Buck Moon - "My Love For You"</div>
-                            <div class="track-meta">Electronic · 120 BPM · 3:30</div>
-                        </div>
-                        <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(6); return false;">▶ Play</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Playlist Details (populated dynamically) -->
+        <div id="playlistDetails"></div>
     </div>
 
     <!-- Audio Player -->
@@ -1075,70 +665,93 @@
         const SUPABASE_URL = 'https://pfqvrxfazumlydjepwib.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_1oBqgAQj0xzb5-eosyfcBg_9dKxNZfa';
         let supabaseClient = null;
-        
-        // Initialize Supabase when library is loaded
+
         function initSupabase() {
             if (typeof window.supabase !== 'undefined') {
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('Supabase initialized');
-                loadUserPlaylists();
+                loadData();
             } else {
-                console.log('Waiting for Supabase library...');
                 setTimeout(initSupabase, 100);
             }
         }
-        
-        // Load user playlists
-        async function loadUserPlaylists() {
-            if (!supabaseClient) {
-                console.log('Supabase not ready yet');
+
+        async function loadData() {
+            try {
+                const [tracksRes, playlistsRes] = await Promise.all([
+                    supabaseClient.from('tracks').select('id, title, artist, genre, bpm, duration, stream_url, artwork_url').eq('is_active', true),
+                    supabaseClient.from('curated_playlists').select('*').eq('is_active', true).order('sort_order')
+                ]);
+                if (tracksRes.data) {
+                    tracksRes.data.forEach(t => {
+                        const metaParts = [t.genre, t.bpm ? t.bpm + ' BPM' : null, t.duration].filter(Boolean);
+                        trackDatabase[t.id] = {
+                            title: t.artist + ' \u2014 \u201c' + t.title + '\u201d',
+                            genre: t.genre || '',
+                            bpm: t.bpm || '',
+                            duration: t.duration || '',
+                            meta: metaParts.join(' \u00b7 '),
+                            artwork: t.artwork_url || '',
+                            url: t.stream_url || ''
+                        };
+                    });
+                }
+                if (playlistsRes.data) {
+                    curatedPlaylists = playlistsRes.data;
+                }
+                renderPlaylistGrid();
+                loadUserPlaylists();
+            } catch (err) {
+                console.error('Error loading data:', err);
+            }
+        }
+
+        function renderPlaylistGrid() {
+            const grid = document.getElementById('playlistGrid');
+            if (!curatedPlaylists.length) {
+                grid.innerHTML = '<p style="color:rgba(255,255,255,0.4);padding:40px 0">No curated playlists available.</p>';
                 return;
             }
-            
-            console.log('Loading user playlists...');
-            
+            grid.innerHTML = curatedPlaylists.map(p => {
+                const count = (p.track_ids || []).length;
+                const emojiOrDefault = p.emoji || '\uD83C\uDFB5';
+                const coverHtml = p.cover_url
+                    ? '<img src="' + p.cover_url + '" alt="' + p.name.replace(/"/g, '&quot;') + '" class="playlist-image" onerror="this.style.display=\'none\'">'
+                    : '<div style="width:100%;height:100%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:3em">' + emojiOrDefault + '</div>';
+                return '<div class="playlist-card" onclick="showPlaylist(\'' + p.slug + '\')">'
+                    + coverHtml
+                    + '<div class="play-overlay">\u25B6</div>'
+                    + '<div class="playlist-overlay">'
+                    + '<h3 class="playlist-title">' + escapeHtml(p.name) + '</h3>'
+                    + '<p class="playlist-count">' + count + ' track' + (count !== 1 ? 's' : '') + '</p>'
+                    + '</div></div>';
+            }).join('');
+        }
+
+        // Load user playlists
+        async function loadUserPlaylists() {
+            if (!supabaseClient) return;
             try {
                 const { data: { user } } = await supabaseClient.auth.getUser();
-                console.log('User check:', user ? user.email : 'Not logged in');
-                
                 if (!user) {
                     document.getElementById('myPlaylistsSection').style.display = 'none';
                     return;
                 }
-                
                 const { data, error } = await supabaseClient
                     .from('user_playlists')
                     .select('*')
                     .eq('user_id', user.id)
                     .order('created_at', { ascending: false });
-                
-                console.log('Query result:', { data, error });
-                
-                if (error) {
-                    console.error('Error loading user playlists:', error);
-                    return;
-                }
-                
+                if (error) { console.error('Error loading user playlists:', error); return; }
                 const userPlaylists = data || [];
-                console.log('User playlists:', userPlaylists);
-                
                 if (userPlaylists.length === 0) {
-                    console.log('No playlists found, hiding section');
                     document.getElementById('myPlaylistsSection').style.display = 'none';
                     return;
                 }
-                
-                // Show section
-                console.log('Showing playlists section with', userPlaylists.length, 'playlists');
                 document.getElementById('myPlaylistsSection').style.display = 'block';
-                
-                // Render user playlists
                 const grid = document.getElementById('userPlaylistGrid');
                 let html = '';
-                
                 userPlaylists.forEach(playlist => {
                     const trackCount = (playlist.track_ids || []).length;
-                    // Use a generic gradient for user playlists
                     html += `
                         <div class="playlist-card" onclick="showUserPlaylist('${playlist.id}', '${escapeHtml(playlist.name)}', ${JSON.stringify(playlist.track_ids || [])})">
                             <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 3em;">
@@ -1152,129 +765,26 @@
                         </div>
                     `;
                 });
-                
                 grid.innerHTML = html;
-                
             } catch (err) {
                 console.error('Error loading user playlists:', err);
             }
         }
-        
+
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-        
-        // Track database (mapping track IDs to track info)
-        const trackDatabase = {
-            1: { 
-                title: 'Buck Moon - "Go, Now"', 
-                genre: 'Dance, Electronic', 
-                bpm: 90, 
-                duration: '1:09',
-                meta: 'Dance, Electronic · 90 BPM · 1:09',
-                url: 'https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/audio/primum-electronic/buck-moon-go-now/buck-moon-go-now-full-preview.mp3'
-            },
-            4: { 
-                title: 'Buck Moon - "Super Things"', 
-                genre: 'Electronic', 
-                bpm: 122, 
-                duration: '2:06',
-                meta: 'Electronic · 122 BPM · 2:06',
-                url: 'https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/audio/primum-electronic/buck-moon-super-things/buck-moon-super-things-full-preview.mp3'
-            },
-            6: { 
-                title: 'Buck Moon - "My Love For You"', 
-                genre: 'Electronic', 
-                bpm: 120, 
-                duration: '3:30',
-                meta: 'Electronic · 120 BPM · 3:30',
-                url: 'https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/audio/primum-electronic/buck-moon-my-love-for-you/buck-moon-my-love-for-you-full-preview.mp3'
-            },
-            7: { 
-                title: 'Buck Moon - "Journey On The Radio"', 
-                genre: 'Indie Rock', 
-                bpm: 160, 
-                duration: '2:48',
-                meta: 'Indie Rock · 160 BPM · 2:48',
-                url: 'https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/audio/primum-electronic/buck-moon-journey-on-the-radio/buck-moon-journey-on-the-radio-full-preview.mp3'
-            },
-            8: { 
-                title: 'Buck Moon - "His & Hers"', 
-                genre: 'Electronic', 
-                bpm: 118, 
-                duration: '2:40',
-                meta: 'Electronic · 118 BPM · 2:40',
-                url: 'https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/audio/primum-electronic/buck-moon-his-&-hers/buck-moon-him-or-her-full-preview.mp3'
-            },
-            9: { 
-                title: 'Buck Moon - "Give Me Your Energy"', 
-                genre: 'Electronic', 
-                bpm: 128, 
-                duration: '2:22',
-                meta: 'Electronic · 128 BPM · 2:22',
-                url: 'https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/audio/primum-electronic/buck-moon-give-me-your-energy/buck-moon-give-me-your-energy-full-preview.mp3'
-            },
-            12: { 
-                title: 'Buck Moon - "Snow"', 
-                genre: 'Electronic', 
-                bpm: 128, 
-                duration: '4:18',
-                meta: 'Electronic · 128 BPM · 4:18',
-                url: 'https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/audio/primum-electronic/buck-moon-snow/buck-moon-snow-full-preview.mp3'
-            },
-            17: { 
-                title: 'Buck Moon - "Swell"', 
-                genre: 'Electronic', 
-                bpm: 110, 
-                duration: '2:35',
-                meta: 'Electronic · 110 BPM · 2:35',
-                url: 'https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/audio/primum-electronic/buck-moon-swell/buck-moon-swell-full-preview.mp3'
-            },
-            22: { 
-                title: 'Crane Flight - "I\'ll Be There"', 
-                genre: 'Afro Beats', 
-                bpm: 100, 
-                duration: '2:21',
-                meta: 'Afro Beats, Fun, Dance · 100 BPM · 2:21',
-                url: 'https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/audio/afro-beats-vol-1/crane-flight-ill-be-there/crane-flight-ill-be-there-full-preview.mp3'
-            },
-            23: { 
-                title: 'Buck Moon - "Airborne"', 
-                genre: 'Funk, House, Pop', 
-                bpm: 95, 
-                duration: '2:45',
-                meta: 'Funk, House, Pop, EDM, Dance · 95 BPM · 2:45',
-                url: 'https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/audio/primum-electronic/buck-moon-airborne/buck-moon-airborne-full-preview.mp3'
-            },
-            24: { 
-                title: 'Buck Moon - "Spin My World"', 
-                genre: 'Indie, Electronic, Lofi, Pop', 
-                bpm: 95, 
-                duration: '3:40',
-                meta: 'Indie, Electronic, Lofi, Pop · 95 BPM · 3:40',
-                url: 'https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/audio/primum-electronic/buck-moon-spin-my-world/buck-moon-spin-my-world-full-preview.mp3'
-            },
-            39: { 
-                title: 'MallFlex - "Ice Skatin\'"', 
-                genre: 'Funk, Dance, Pop', 
-                bpm: 110, 
-                duration: '2:22',
-                meta: 'Funk, Dance, Pop · 110 BPM · 2:22',
-                url: 'https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/audio/mallflex-funky-mondays/mallflex-ice-skatin-full-preview.mp3'
-            }
-        };
-        
+
+        // Track database (populated from Supabase on load)
+        const trackDatabase = {};
+        let curatedPlaylists = [];
+
         function showUserPlaylist(playlistId, playlistName, trackIds) {
-            // Hide grid
             document.getElementById('playlistGrid').style.display = 'none';
             document.getElementById('myPlaylistsSection').style.display = 'none';
-            
-            // Create dynamic playlist detail view
             const detailsContainer = document.getElementById('playlistDetails');
-            
-            // Build track list HTML
             let tracksHTML = '';
             trackIds.forEach((trackId, index) => {
                 const track = trackDatabase[trackId];
@@ -1283,11 +793,11 @@
                         <div class="track-item">
                             <div class="track-number">${index + 1}</div>
                             <div class="track-artwork">
-                                <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Track">
+                                <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.title)}">
                             </div>
                             <div class="track-info">
-                                <div class="track-title">${track.title}</div>
-                                <div class="track-meta">${track.genre} · ${track.bpm} BPM · ${track.duration}</div>
+                                <div class="track-title">${escapeHtml(track.title)}</div>
+                                <div class="track-meta">${escapeHtml(track.meta)}</div>
                             </div>
                             <div class="track-actions">
                                 <button class="track-btn" onclick="playTrack(${trackId}); return false;">▶ Play</button>
@@ -1296,9 +806,7 @@
                     `;
                 }
             });
-            
-            // Create detail view
-            const detailHTML = `
+            detailsContainer.innerHTML = `
                 <div class="playlist-detail active" id="userPlaylist-${playlistId}">
                     <div class="playlist-header">
                         <div class="playlist-info">
@@ -1315,11 +823,9 @@
                     </div>
                 </div>
             `;
-            
-            detailsContainer.innerHTML = detailHTML;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        
+
         function playUserPlaylist(trackIds) {
             if (trackIds && trackIds.length > 0) {
                 currentPlaylist = trackIds;
@@ -1327,41 +833,57 @@
                 playTrack(currentPlaylist[0]);
             }
         }
-        
-        // Playlist track mappings
-        function showPlaylist(playlistId) {
-            // Hide all playlists
-            const allPlaylists = document.querySelectorAll('.playlist-detail');
-            allPlaylists.forEach(p => p.classList.remove('active'));
-            
-            // Hide grid
+
+        function showPlaylist(slug) {
+            const playlist = curatedPlaylists.find(p => p.slug === slug);
+            if (!playlist) return;
             document.getElementById('playlistGrid').style.display = 'none';
-            
-            // Show selected playlist
-            document.getElementById(playlistId).classList.add('active');
-            
-            // Scroll to top
+            document.getElementById('myPlaylistsSection').style.display = 'none';
+            const trackIds = playlist.track_ids || [];
+            const tracksHTML = trackIds.map((trackId, index) => {
+                const track = trackDatabase[trackId];
+                if (!track) return '';
+                return `
+                    <div class="track-item">
+                        <div class="track-number">${index + 1}</div>
+                        <div class="track-artwork">
+                            <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.title)}">
+                        </div>
+                        <div class="track-info">
+                            <div class="track-title">${escapeHtml(track.title)}</div>
+                            <div class="track-meta">${escapeHtml(track.meta)}</div>
+                        </div>
+                        <div class="track-actions">
+                            <button class="track-btn" onclick="playTrack(${trackId}); return false;">▶ Play</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('playlistDetails').innerHTML = `
+                <div class="playlist-detail active">
+                    <div class="playlist-header">
+                        <div class="playlist-info">
+                            <h2>${escapeHtml((playlist.emoji || '') + ' ' + playlist.name)}</h2>
+                            <p class="playlist-description">${escapeHtml(playlist.description || '')}</p>
+                        </div>
+                        <div class="playlist-header-actions">
+                            <button class="play-playlist-btn" onclick="playCuratedPlaylist('${slug}')">▶ Play All</button>
+                            <button class="close-playlist" onclick="closePlaylist()">Close</button>
+                        </div>
+                    </div>
+                    <div class="track-list">${tracksHTML || '<p style="color:#888;padding:20px">No tracks in this playlist.</p>'}</div>
+                </div>
+            `;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function closePlaylist() {
-            // Hide all playlists
-            const allPlaylists = document.querySelectorAll('.playlist-detail');
-            allPlaylists.forEach(p => p.classList.remove('active'));
-            
-            // Clear dynamic playlist details
             document.getElementById('playlistDetails').innerHTML = '';
-            
-            // Show grids
             document.getElementById('playlistGrid').style.display = 'grid';
-            
-            // Show My Playlists section if user has playlists
             loadUserPlaylists();
-            
-            // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        
+
         // Audio Player Functionality
         const audioElement = document.getElementById('audioElement');
         const audioPlayer = document.getElementById('audioPlayer');
@@ -1369,45 +891,43 @@
         const progressFill = document.getElementById('progressFill');
         const currentTimeEl = document.getElementById('currentTime');
         const durationEl = document.getElementById('duration');
-        
+
         let currentPlaylist = [];
         let currentTrackIndex = 0;
-        
+
         function playTrack(trackId) {
             const track = trackDatabase[trackId];
             if (!track) return;
-            
             audioElement.src = track.url;
             document.getElementById('playerTitle').textContent = track.title;
             document.getElementById('playerMeta').textContent = track.meta;
-            
             audioPlayer.classList.add('active');
             audioElement.play();
-            playPauseBtn.textContent = '⏸';
+            playPauseBtn.textContent = '\u23F8';
         }
-        
+
         function togglePlayPause() {
             if (audioElement.paused) {
                 audioElement.play();
-                playPauseBtn.textContent = '⏸';
+                playPauseBtn.textContent = '\u23F8';
             } else {
                 audioElement.pause();
-                playPauseBtn.textContent = '▶';
+                playPauseBtn.textContent = '\u25B6';
             }
         }
-        
+
         function previousTrack() {
             if (currentPlaylist.length === 0) return;
             currentTrackIndex = (currentTrackIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
             playTrack(currentPlaylist[currentTrackIndex]);
         }
-        
+
         function nextTrack() {
             if (currentPlaylist.length === 0) return;
             currentTrackIndex = (currentTrackIndex + 1) % currentPlaylist.length;
             playTrack(currentPlaylist[currentTrackIndex]);
         }
-        
+
         function seek(event) {
             const bar = event.currentTarget;
             const clickX = event.offsetX;
@@ -1415,14 +935,13 @@
             const percentage = clickX / width;
             audioElement.currentTime = audioElement.duration * percentage;
         }
-        
+
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
+            return mins + ':' + secs.toString().padStart(2, '0');
         }
-        
-        // Update progress bar
+
         audioElement.addEventListener('timeupdate', () => {
             if (audioElement.duration) {
                 const percentage = (audioElement.currentTime / audioElement.duration) * 100;
@@ -1430,36 +949,23 @@
                 currentTimeEl.textContent = formatTime(audioElement.currentTime);
             }
         });
-        
+
         audioElement.addEventListener('loadedmetadata', () => {
             durationEl.textContent = formatTime(audioElement.duration);
         });
-        
-        // Auto-play next track when current one ends
+
         audioElement.addEventListener('ended', () => {
             nextTrack();
         });
-        
-        // Play playlist function - queue and play all tracks
-        function playPlaylist(playlistId) {
-            const trackIds = {
-                'marketing': [6, 7, 8],
-                'realestate': [6],
-                'sports': [1, 4, 9, 17, 6],
-                'travel': [1, 4, 17, 6],
-                'nightlife': [1, 9, 12, 6],
-                'tech': [1, 9, 6]
-            }[playlistId];
-            
-            if (trackIds && trackIds.length > 0) {
-                currentPlaylist = trackIds;
-                currentTrackIndex = 0;
-                playTrack(currentPlaylist[0]);
-            }
+
+        function playCuratedPlaylist(slug) {
+            const playlist = curatedPlaylists.find(p => p.slug === slug);
+            if (!playlist || !playlist.track_ids || !playlist.track_ids.length) return;
+            currentPlaylist = playlist.track_ids;
+            currentTrackIndex = 0;
+            playTrack(currentPlaylist[0]);
         }
-        
-        // Load user playlists on page load
-        // Initialize Supabase and load playlists on page load
+
         document.addEventListener('DOMContentLoaded', () => {
             initSupabase();
         });
@@ -1473,7 +979,7 @@
             } else {
                 panel.classList.add('open');
                 overlay.classList.add('active');
-                if (toggle) toggle.textContent = '✕';
+                if (toggle) toggle.textContent = '\u2715';
                 document.body.style.overflow = 'hidden';
             }
         }
@@ -1483,10 +989,11 @@
             const toggle = document.getElementById('mobileMenuToggle');
             if (panel) panel.classList.remove('open');
             if (overlay) overlay.classList.remove('active');
-            if (toggle) toggle.textContent = '☰';
+            if (toggle) toggle.textContent = '\u2630';
             document.body.style.overflow = '';
         }
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobilePanel(); });
+
     </script>
 </body>
 </html>

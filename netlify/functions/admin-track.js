@@ -28,11 +28,20 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body || '{}');
     const { _table = 'tracks', ...rest } = body;
-    const table = _table === 'alternates' ? 'alternates' : 'tracks';
+    const table = _table === 'alternates' ? 'alternates' : (_table === 'curated_playlists' ? 'curated_playlists' : 'tracks');
 
-    // GET — list tracks (with alternates) or alternates for a specific track
+    // GET — list tracks (with alternates), alternates for a specific track, or curated playlists
     if (event.httpMethod === 'GET') {
       const params = event.queryStringParameters || {};
+
+      if (params.table === 'curated_playlists') {
+        const { data, error } = await supabase
+          .from('curated_playlists')
+          .select('*')
+          .order('sort_order');
+        if (error) throw error;
+        return { statusCode: 200, headers, body: JSON.stringify(data) };
+      }
 
       if (params.track_id) {
         // Return alternates for a specific track

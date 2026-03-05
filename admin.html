@@ -609,6 +609,67 @@
     <div id="trackList"><div class="empty-list">Enter your service role key above to load tracks.</div></div>
 </div>
 
+<!-- Playlists Section -->
+<div class="section-divider" style="margin-top:40px">
+    <h2>Playlists</h2>
+    <hr>
+</div>
+
+<!-- Add/Edit Playlist Form -->
+<div class="card" id="playlistFormCard">
+    <div class="card-title" id="playlistFormTitle">Add Playlist</div>
+    <div class="form-grid">
+        <div class="form-field">
+            <label>Name</label>
+            <input type="text" id="pf_name" placeholder="Marketing & Social Media" oninput="onPlaylistNameChange(this.value)">
+        </div>
+        <div class="form-field">
+            <label>Slug <span style="font-size:11px;color:rgba(255,255,255,0.3);text-transform:none;letter-spacing:0">(URL-safe, e.g. marketing)</span></label>
+            <input type="text" id="pf_slug" placeholder="marketing">
+        </div>
+        <div class="form-field">
+            <label>Emoji</label>
+            <input type="text" id="pf_emoji" placeholder="📱" maxlength="4" style="max-width:80px">
+        </div>
+        <div class="form-field">
+            <label>Sort Order</label>
+            <input type="number" id="pf_sort_order" placeholder="1" min="0">
+        </div>
+        <div class="form-field full">
+            <label>Description</label>
+            <textarea id="pf_description" placeholder="Versatile tracks perfect for ads, social content, and brand videos"></textarea>
+        </div>
+        <div class="form-field full">
+            <label>Cover Image URL</label>
+            <input type="url" id="pf_cover_url" placeholder="https://pub-xxx.r2.dev/images/playlist-marketing.png">
+        </div>
+        <div class="form-field full">
+            <label>Track IDs <span style="font-size:11px;color:rgba(255,255,255,0.3);text-transform:none;letter-spacing:0">(comma-separated, e.g. 6, 7, 8 — see Catalog above for IDs)</span></label>
+            <input type="text" id="pf_track_ids" placeholder="6, 7, 8">
+        </div>
+        <div class="form-field" style="justify-content:flex-end;padding-bottom:4px">
+            <label>Visibility</label>
+            <div class="toggle-row">
+                <label class="toggle">
+                    <input type="checkbox" id="pf_is_active" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label">Active (visible on playlists page)</span>
+            </div>
+        </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-submit" onclick="submitPlaylist()" id="playlistSubmitBtn" style="flex:1">Add Playlist</button>
+        <button class="btn btn-ghost" onclick="cancelPlaylistEdit()" id="playlistCancelBtn" style="display:none;padding:14px 24px">Cancel</button>
+    </div>
+    <div class="alert" id="playlistFormAlert"></div>
+</div>
+
+<!-- Playlist List -->
+<div class="card">
+    <div id="playlistList"><div class="empty-list">Enter your admin key above to load playlists.</div></div>
+</div>
+
 </div> <!-- /adminContent -->
 
 <script>
@@ -628,6 +689,7 @@
         sessionStorage.setItem(SESSION_KEY, val);
         lockKeySection();
         loadTrackList();
+        loadPlaylistList();
         fetchNextSortOrder();
     }
 
@@ -1071,6 +1133,160 @@
         el.textContent = msg;
     }
 
+    // ── Playlists ───────────────────────────────────────────────────
+    let editingPlaylistId = null;
+    let playlistCache = {};
+
+    function onPlaylistNameChange(val) {
+        const slugEl = document.getElementById('pf_slug');
+        if (slugEl && !slugEl.dataset.manuallySet) {
+            slugEl.value = val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        }
+    }
+
+    async function loadPlaylistList() {
+        if (!getKey()) return;
+        const container = document.getElementById('playlistList');
+        container.innerHTML = '<div class="empty-list">Loading…</div>';
+        const res = await fetch(`${ADMIN_FN}?table=curated_playlists`, {
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': getKey() }
+        });
+        const playlists = await res.json();
+        if (!Array.isArray(playlists) || playlists.length === 0) {
+            container.innerHTML = '<div class="empty-list">No playlists yet.</div>';
+            return;
+        }
+        playlistCache = {};
+        playlists.forEach(p => playlistCache[p.id] = p);
+        container.innerHTML = `
+            <table class="track-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Slug</th>
+                        <th>Tracks</th>
+                        <th>Order</th>
+                        <th>Active</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${playlists.map(p => `
+                        <tr class="${p.is_active ? '' : 'inactive-row'}" id="pl-row-${p.id}">
+                            <td class="track-id">${p.id}</td>
+                            <td><strong>${esc(p.emoji || '')} ${esc(p.name)}</strong></td>
+                            <td style="color:rgba(255,255,255,0.4);font-size:12px">${esc(p.slug)}</td>
+                            <td>${(p.track_ids || []).length}</td>
+                            <td><input class="sort-input" type="number" value="${p.sort_order || 0}" onchange="updatePlaylistSortOrder(${p.id}, this.value)"></td>
+                            <td>
+                                <label class="toggle">
+                                    <input type="checkbox" ${p.is_active ? 'checked' : ''} onchange="togglePlaylistActive(${p.id}, this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </td>
+                            <td><button class="btn btn-ghost" style="font-size:12px;padding:5px 12px" onclick="editPlaylist(${p.id})">edit</button></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    function editPlaylist(id) {
+        const p = playlistCache[id];
+        if (!p) return;
+        editingPlaylistId = id;
+        document.getElementById('pf_name').value = p.name || '';
+        document.getElementById('pf_slug').value = p.slug || '';
+        document.getElementById('pf_slug').dataset.manuallySet = '1';
+        document.getElementById('pf_emoji').value = p.emoji || '';
+        document.getElementById('pf_description').value = p.description || '';
+        document.getElementById('pf_cover_url').value = p.cover_url || '';
+        document.getElementById('pf_track_ids').value = (p.track_ids || []).join(', ');
+        document.getElementById('pf_sort_order').value = p.sort_order ?? '';
+        document.getElementById('pf_is_active').checked = p.is_active;
+        document.getElementById('playlistFormTitle').textContent = 'Edit Playlist';
+        document.getElementById('playlistSubmitBtn').textContent = 'Save Changes';
+        document.getElementById('playlistCancelBtn').style.display = 'block';
+        document.getElementById('playlistFormAlert').className = 'alert';
+        document.getElementById('playlistFormCard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelPlaylistEdit() {
+        editingPlaylistId = null;
+        ['pf_name','pf_slug','pf_emoji','pf_description','pf_cover_url','pf_track_ids'].forEach(id => {
+            const el = document.getElementById(id);
+            el.value = '';
+            delete el.dataset.manuallySet;
+        });
+        document.getElementById('pf_sort_order').value = '';
+        document.getElementById('pf_is_active').checked = true;
+        document.getElementById('playlistFormTitle').textContent = 'Add Playlist';
+        document.getElementById('playlistSubmitBtn').textContent = 'Add Playlist';
+        document.getElementById('playlistCancelBtn').style.display = 'none';
+        document.getElementById('playlistFormAlert').className = 'alert';
+    }
+
+    async function submitPlaylist() {
+        if (!getKey()) { showPlaylistAlert('Enter your admin key first.', 'error'); return; }
+        const name = document.getElementById('pf_name').value.trim();
+        const slug = document.getElementById('pf_slug').value.trim();
+        if (!name || !slug) { showPlaylistAlert('Name and slug are required.', 'error'); return; }
+        const trackIdsRaw = document.getElementById('pf_track_ids').value.trim();
+        const track_ids = trackIdsRaw
+            ? trackIdsRaw.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n))
+            : [];
+        const playlist = {
+            _table: 'curated_playlists',
+            name,
+            slug,
+            emoji: document.getElementById('pf_emoji').value.trim() || '🎵',
+            description: document.getElementById('pf_description').value.trim() || null,
+            cover_url: document.getElementById('pf_cover_url').value.trim() || null,
+            track_ids,
+            sort_order: parseInt(document.getElementById('pf_sort_order').value, 10) || 999,
+            is_active: document.getElementById('pf_is_active').checked,
+        };
+        const btn = document.getElementById('playlistSubmitBtn');
+        btn.disabled = true;
+        const isEditing = editingPlaylistId !== null;
+        btn.textContent = isEditing ? 'Saving…' : 'Adding…';
+        try {
+            const payload = isEditing ? { ...playlist, id: editingPlaylistId } : playlist;
+            const data = await adminFetch(isEditing ? 'PATCH' : 'POST', payload);
+            if (data.error) {
+                showPlaylistAlert(`Error: ${data.error}`, 'error');
+            } else {
+                showPlaylistAlert(`✓ "${name}" ${isEditing ? 'updated' : 'added'}.`, 'success');
+                cancelPlaylistEdit();
+                loadPlaylistList();
+            }
+        } catch(e) {
+            showPlaylistAlert(`Network error: ${e.message}`, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = isEditing ? 'Save Changes' : 'Add Playlist';
+        }
+    }
+
+    async function togglePlaylistActive(id, active) {
+        await adminFetch('PATCH', { _table: 'curated_playlists', id, is_active: active });
+        const row = document.getElementById(`pl-row-${id}`);
+        if (row) row.className = active ? '' : 'inactive-row';
+    }
+
+    async function updatePlaylistSortOrder(id, value) {
+        await adminFetch('PATCH', { _table: 'curated_playlists', id, sort_order: parseInt(value, 10) });
+    }
+
+    function showPlaylistAlert(msg, type) {
+        const el = document.getElementById('playlistFormAlert');
+        el.className = `alert ${type}`;
+        el.textContent = msg;
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
     // ── Auth gate ───────────────────────────────────────────────────
     const PW_HASH = '95b55ab836d6d62db5e40d532c7cdee701975521b67eab091cf3a6e9ef191c2d';
     const AUTH_SESSION_KEY = 'rs_admin_auth';
@@ -1107,6 +1323,7 @@
             document.getElementById('serviceKeyInput').value = key;
             lockKeySection();
             loadTrackList();
+            loadPlaylistList();
             fetchNextSortOrder();
         }
     });
