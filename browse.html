@@ -1604,7 +1604,7 @@
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.6);
-            z-index: 500;
+            z-index: 1001;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
@@ -1620,7 +1620,7 @@
             height: 100vh;
             width: 420px;
             background: #161616;
-            z-index: 501;
+            z-index: 1002;
             transform: translateX(100%);
             transition: transform 0.3s ease;
             overflow-y: auto;
@@ -2862,11 +2862,23 @@
             }
 
             .auth-buttons {
-                display: none;
+                display: none !important;
             }
-            
+
+            .cart-icon {
+                display: none !important;
+            }
+
             /* Mobile menu now handled by full-screen panel */
-            
+
+            .search-section {
+                margin-bottom: 12px;
+            }
+
+            .catalog-headline {
+                padding: 0 0 16px 0 !important;
+            }
+
             /* Main content */
             .main {
                 margin-top: 54px;
@@ -2999,7 +3011,8 @@
                 color: #9c27b0;
             }
             
-            .track-item.alternate .expand-arrow {
+            .track-item.alternate .expand-arrow,
+            .track-item:not(.has-alternates) .expand-arrow {
                 display: none;
             }
             
@@ -3365,7 +3378,7 @@
             <!-- Main Content Area -->
             <div class="main-content">
                 <!-- Catalog Headline -->
-                <div style="padding: 0 0 32px 0;">
+                <div class="catalog-headline" style="padding: 0 0 32px 0;">
                     <h1 style="font-size: 1.3em; font-weight: 700; color: #fff; margin-bottom: 8px;">No middlemen. No algorithms. Just music.</h1>
                     <p style="color: #888; font-size: 0.95em; letter-spacing: 0.03em;">Human-made tracks, stems, and alternate versions — direct from the producer.</p>
                 </div>
@@ -3705,7 +3718,7 @@
                     <div class="track-info track-info-clickable" onclick="openTrackPanel(event, ${track.id})">
                         <span class="track-title">${escHtml(track.artist)} - &quot;${escHtml(track.title)}&quot;</span>${hasAlts ? `<span class="versions-badge">${versionsCount} versions</span>` : ''}
                     </div>
-                    <div class="expand-arrow"></div>
+                    <div class="expand-arrow">▾</div>
                     <div class="waveform-container" onclick="seekAudio(event, ${track.id})" data-track-id="${track.id}">
                         <div class="waveform-progress" id="progress-${track.id}"></div>
                         <div class="waveform">${generateWaveformBars()}</div>
