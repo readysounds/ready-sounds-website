@@ -1576,6 +1576,30 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             min-width: 0;
+            position: relative;
+            cursor: default;
+        }
+
+        .track-genre::after {
+            content: attr(data-genre);
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 0;
+            background: #1e1e1e;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s;
+            z-index: 100;
+        }
+
+        .track-genre:hover::after {
+            opacity: 1;
         }
         
         .track-bpm {
@@ -3675,7 +3699,7 @@
                     <div class="waveform-progress" id="progress-${domId}"></div>
                     <div class="waveform">${generateWaveformBars()}</div>
                 </div>
-                <div class="track-genre">${escHtml(track.genre || '')}</div>
+                <div class="track-genre" data-genre="${escHtml(track.genre || '')}">${escHtml(track.genre || '')}</div>
                 <div class="track-bpm">${track.bpm || ''}</div>
                 <div class="track-duration">${escHtml(alt.duration || '')}</div>
                 <div class="track-actions">
@@ -3717,7 +3741,7 @@
                         <div class="waveform-progress" id="progress-${track.id}"></div>
                         <div class="waveform">${generateWaveformBars()}</div>
                     </div>
-                    <div class="track-genre">${escHtml(track.genre || '')}</div>
+                    <div class="track-genre" data-genre="${escHtml(track.genre || '')}">${escHtml(track.genre || '')}</div>
                     <div class="track-bpm">${track.bpm || ''}</div>
                     <div class="track-duration">${escHtml(track.duration || '')}</div>
                     <div class="track-actions">
