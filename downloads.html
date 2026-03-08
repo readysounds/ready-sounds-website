@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZJS68FCQ0Q"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-ZJS68FCQ0Q');
+    </script>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Downloads - readysounds</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: white;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(10, 10, 10, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: white;
+        }
+
+        .main {
+            max-width: 960px;
+            margin: 60px auto;
+            padding: 0 32px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 13px;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: white; }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 80px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 15px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 100px 40px;
+        }
+
+        .empty-state-icon {
+            font-size: 56px;
+            margin-bottom: 20px;
+            opacity: 0.25;
+        }
+
+        .empty-state h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 28px;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #9c27b0;
+            color: white;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover { background: #7b1fa2; }
+
+        /* Downloads table */
+        .downloads-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .downloads-table th {
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: rgba(255,255,255,0.35);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .downloads-table td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .downloads-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .downloads-table tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .track-cell {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .track-artwork {
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: rgba(255,255,255,0.06);
+            flex-shrink: 0;
+        }
+
+        .track-artwork-placeholder {
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
+            background: rgba(156,39,176,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .track-name {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 3px;
+        }
+
+        .track-artist {
+            font-size: 12px;
+            color: rgba(255,255,255,0.45);
+        }
+
+        .version-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 4px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .format-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: rgba(156,39,176,0.12);
+            border: 1px solid rgba(156,39,176,0.25);
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #ba68c8;
+            letter-spacing: 0.04em;
+        }
+
+        .date-cell {
+            color: rgba(255,255,255,0.45);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .license-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 6px;
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .license-btn:hover {
+            border-color: rgba(156,39,176,0.5);
+            color: #ba68c8;
+            background: rgba(156,39,176,0.08);
+        }
+
+        .license-btn svg {
+            opacity: 0.6;
+        }
+
+        .license-btn:hover svg {
+            opacity: 1;
+        }
+
+        /* License ID tooltip */
+        .license-id {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: rgba(255,255,255,0.3);
+        }
+
+        /* Mobile nav */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.8);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+        }
+
+        @media (max-width: 900px) {
+            .mobile-menu-toggle { display: block; }
+            .header-nav { display: none; }
+        }
+
+        .mobile-panel-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 1998;
+            display: none;
+        }
+        .mobile-panel-overlay.active { display: block; }
+
+        .mobile-panel {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 100%; height: 100%;
+            background: #111111;
+            z-index: 1999;
+            transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 28px;
+            overflow-y: auto;
+        }
+        .mobile-panel.open { right: 0; }
+
+        .mobile-panel-close {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.55);
+            font-size: 28px;
+            cursor: pointer;
+            margin-bottom: 32px;
+            line-height: 1;
+        }
+        .mobile-panel-nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: 700;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            text-transform: lowercase;
+        }
+        .mobile-panel-nav a:hover { color: #9c27b0; }
+        .mobile-panel-cta {
+            display: block;
+            background: #9c27b0;
+            color: white;
+            text-align: center;
+            padding: 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            text-decoration: none;
+            margin-top: 32px;
+        }
+        .mobile-panel-footer {
+            margin-top: auto;
+            padding-top: 40px;
+        }
+
+        /* Responsive table */
+        @media (max-width: 700px) {
+            .main { padding: 0 16px; margin: 40px auto; }
+            .col-version, .col-format { display: none; }
+            .downloads-table th, .downloads-table td { padding: 12px 8px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="browse.html" class="logo">readysounds.</a>
+            <nav class="header-nav">
+                <a href="browse.html" class="nav-item">browse</a>
+                <a href="playlists.html" class="nav-item">playlists</a>
+                <a href="pricing.html" class="nav-item">pricing</a>
+                <a href="account.html" class="nav-item">account</a>
+            </nav>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+        </div>
+    </header>
+
+    <div class="mobile-panel-overlay" id="mobilePanelOverlay" onclick="closeMobilePanel()"></div>
+    <div class="mobile-panel" id="mobilePanel">
+        <button class="mobile-panel-close" onclick="closeMobilePanel()">✕</button>
+        <nav class="mobile-panel-nav">
+            <a href="browse.html">browse</a>
+            <a href="playlists.html">playlists</a>
+            <a href="pricing.html">pricing</a>
+            <a href="account.html">account</a>
+        </nav>
+        <a href="browse.html" class="mobile-panel-cta">browse music</a>
+        <div class="mobile-panel-footer">
+            <a href="terms.html" style="color: rgba(255,255,255,0.4); font-size: 12px; text-decoration: none;">terms & conditions</a>
+        </div>
+    </div>
+
+    <main class="main">
+        <div class="page-header">
+            <a href="account.html" class="back-link">← account</a>
+            <h1 class="page-title">My Downloads</h1>
+            <p class="page-subtitle">Every track you've downloaded, with license certificates</p>
+        </div>
+
+        <div id="loadingState" class="loading">Loading your downloads...</div>
+
+        <div id="emptyState" class="empty-state" style="display:none;">
+            <div class="empty-state-icon">↓</div>
+            <h2>No downloads yet</h2>
+            <p>Your download history will appear here once you start downloading tracks.</p>
+            <a href="browse.html" class="btn-primary">Browse Music</a>
+        </div>
+
+        <div id="downloadsContent" style="display:none;">
+            <table class="downloads-table">
+                <thead>
+                    <tr>
+                        <th>Track</th>
+                        <th class="col-version">Version</th>
+                        <th class="col-format">Format</th>
+                        <th>Date</th>
+                        <th>License</th>
+                    </tr>
+                </thead>
+                <tbody id="downloadsList"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        function toggleMobileMenu() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel.classList.contains('open')) {
+                closeMobilePanel();
+            } else {
+                panel.classList.add('open');
+                overlay.classList.add('active');
+                if (toggle) toggle.textContent = '✕';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        function closeMobilePanel() {
+            const panel = document.getElementById('mobilePanel');
+            const overlay = document.getElementById('mobilePanelOverlay');
+            const toggle = document.getElementById('mobileMenuToggle');
+            if (panel) panel.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
+            if (toggle) toggle.textContent = '☰';
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobilePanel(); });
+
+        let supabaseClient;
+
+        async function init() {
+            const SUPABASE_URL = 'https://pfqvrxfazumlydjepwib.supabase.co';
+            const SUPABASE_ANON_KEY = 'sb_publishable_1oBqgAQj0xzb5-eosyfcBg_9dKxNZfa';
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                window.location.href = 'signup.html';
+                return;
+            }
+
+            await loadDownloads(session);
+        }
+
+        async function loadDownloads(session) {
+            const { data: downloads, error } = await supabaseClient
+                .from('downloads')
+                .select('*, tracks(artwork_url)')
+                .eq('user_id', session.user.id)
+                .order('downloaded_at', { ascending: false });
+
+            document.getElementById('loadingState').style.display = 'none';
+
+            if (error) {
+                console.error('Error loading downloads:', error);
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+
+            if (!downloads || downloads.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('downloadsContent').style.display = 'block';
+            renderDownloads(downloads);
+        }
+
+        function renderDownloads(downloads) {
+            const tbody = document.getElementById('downloadsList');
+            tbody.innerHTML = downloads.map(d => {
+                const date = new Date(d.downloaded_at).toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                });
+                const artworkUrl = d.tracks?.artwork_url || '';
+                const artworkHtml = artworkUrl
+                    ? `<img class="track-artwork" src="${escHtml(artworkUrl)}" alt="" loading="lazy">`
+                    : `<div class="track-artwork-placeholder">♪</div>`;
+
+                return `<tr>
+                    <td>
+                        <div class="track-cell">
+                            ${artworkHtml}
+                            <div>
+                                <div class="track-name">${escHtml(d.track_title)}</div>
+                                <div class="track-artist">${escHtml(d.track_artist)}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="col-version">
+                        <span class="version-badge">${escHtml(d.version_title)}</span>
+                    </td>
+                    <td class="col-format">
+                        <span class="format-badge">${escHtml(d.file_format)}</span>
+                    </td>
+                    <td class="date-cell">${escHtml(date)}</td>
+                    <td>
+                        <button class="license-btn" onclick="openLicenseCertificate('${escHtml(d.id)}')">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10 9 9 9 8 9"/>
+                            </svg>
+                            Get License
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function openLicenseCertificate(downloadId) {
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) {
+                    window.location.href = 'signup.html';
+                    return;
+                }
+
+                const res = await fetch(`/.netlify/functions/license-certificate?id=${encodeURIComponent(downloadId)}`, {
+                    headers: { 'Authorization': `Bearer ${session.access_token}` }
+                });
+
+                if (!res.ok) {
+                    alert('Could not load license certificate. Please try again.');
+                    return;
+                }
+
+                const html = await res.text();
+                const win = window.open('', '_blank');
+                if (win) {
+                    win.document.write(html);
+                    win.document.close();
+                } else {
+                    alert('Please allow pop-ups for this site to view license certificates.');
+                }
+            } catch (err) {
+                console.error('License certificate error:', err);
+                alert('Could not load license certificate. Please try again.');
+            }
+        }
+
+        function escHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

@@ -5,6 +5,16 @@ const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { createClient } = require('@supabase/supabase-js');
 
+function generateLicenseId() {
+  const year = new Date().getFullYear();
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let suffix = '';
+  for (let i = 0; i < 8; i++) {
+    suffix += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return `RS-${year}-${suffix}`;
+}
+
 exports.handler = async (event, context) => {
   // Enable CORS
   const headers = {
@@ -39,7 +49,7 @@ exports.handler = async (event, context) => {
 
     const token = authHeader.replace('Bearer ', '');
 
-    // Initialize Supabase client
+    // Initialize Supabase client (server-side, anon key)
     const supabase = createClient(
       process.env.SUPABASE_URL,
       process.env.SUPABASE_ANON_KEY
@@ -47,7 +57,7 @@ exports.handler = async (event, context) => {
 
     // Verify the user's session
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+
     if (authError || !user) {
       return {
         statusCode: 401,
@@ -78,8 +88,9 @@ exports.handler = async (event, context) => {
     console.log('User has active subscription:', profile.subscription_plan);
 
     // Parse the request body
-    const { filePath } = JSON.parse(event.body);
-    
+    const body = JSON.parse(event.body);
+    const { filePath, trackId, trackTitle, trackArtist, versionTitle, fileFormat } = body;
+
     if (!filePath) {
       return {
         statusCode: 400,
@@ -110,11 +121,41 @@ exports.handler = async (event, context) => {
 
     console.log('Generated signed URL successfully');
 
+    // Log the download record using a user-authenticated client (respects RLS)
+    const licenseId = generateLicenseId();
+    try {
+      const userSupabase = createClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_ANON_KEY,
+        { global: { headers: { Authorization: `Bearer ${token}` } } }
+      );
+
+      const derivedFormat = fileFormat || (filePath.toLowerCase().endsWith('.wav') ? 'WAV' : 'MP3');
+      const derivedTitle = trackTitle || filePath.split('/').pop().replace(/\.(mp3|wav)$/i, '').replace(/-/g, ' ');
+
+      await userSupabase.from('downloads').insert({
+        user_id: user.id,
+        track_id: trackId || null,
+        track_title: derivedTitle,
+        track_artist: trackArtist || 'Ready Sounds',
+        version_title: versionTitle || 'Full Track',
+        file_format: derivedFormat,
+        subscription_plan: profile.subscription_plan,
+        license_id: licenseId,
+      });
+
+      console.log('Download logged with license ID:', licenseId);
+    } catch (logError) {
+      // Non-fatal: log the error but still return the download URL
+      console.error('Failed to log download:', logError.message);
+    }
+
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         downloadUrl: signedUrl,
+        licenseId,
         expiresIn: 300 // 5 minutes
       })
     };
@@ -124,9 +165,9 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         error: 'Failed to generate download URL',
-        message: error.message 
+        message: error.message
       })
     };
   }

@@ -405,6 +405,9 @@
                     <span class="info-label">Liked Tracks</span>
                     <span class="info-value" id="likedTracks">—</span>
                 </div>
+                <div class="info-row" style="border-bottom: none; padding-top: 20px;">
+                    <a href="downloads.html" class="btn btn-secondary">View Download History &amp; Licenses</a>
+                </div>
             </div>
         </div>
     </main>
@@ -512,10 +515,16 @@
                 document.getElementById('noSubscription').style.display = 'block';
             }
 
-            // Activity stats (from localStorage for now)
+            // Activity stats
             const likedTracks = JSON.parse(localStorage.getItem('likedTracks') || '[]');
             document.getElementById('likedTracks').textContent = likedTracks.length;
-            document.getElementById('totalDownloads').textContent = localStorage.getItem('totalDownloads') || '0';
+
+            // Download count from DB
+            const { count } = await supabaseClient
+                .from('downloads')
+                .select('id', { count: 'exact', head: true })
+                .eq('user_id', user.id);
+            document.getElementById('totalDownloads').textContent = count ?? 0;
         }
 
         async function openBillingPortal() {

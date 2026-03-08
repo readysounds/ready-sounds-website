@@ -4879,14 +4879,22 @@
         async function showDownloadOptions(trackId) {
             const trackElement = document.querySelector(`[data-track-id="${trackId}"]`);
             if (!trackElement) return;
-            
+
+            // Get track info — prefer trackData (has clean title/artist), fall back to DOM
+            const td = trackData[trackId] || {};
+            const trackMeta = {
+                trackId,
+                trackTitle: td.trackTitle || '',
+                trackArtist: td.artist || '',
+            };
+
             // Get track info
             const titleElement = trackElement.querySelector('.track-title');
-            let trackTitle = 'Track';
-            if (titleElement) {
+            let trackTitle = td.trackTitle || 'Track';
+            if (!td.trackTitle && titleElement) {
                 trackTitle = titleElement.textContent.trim().replace(/\d+\s+versions?/i, '').trim();
             }
-            
+
             // Set modal title
             document.getElementById('downloadOptionsTrackTitle').textContent = trackTitle;
             
@@ -4925,7 +4933,7 @@
             mp3Btn.onclick = () => {
                 const mp3Url = fixAlbum(streamUrl.replace('/audio/', '/downloads/'));
                 const mp3Filename = filename;
-                downloadFile(mp3Url, mp3Filename);
+                downloadFile(mp3Url, mp3Filename, { ...trackMeta, versionTitle: 'Full Track', fileFormat: 'MP3' });
             };
             mainSection.appendChild(mp3Btn);
 
@@ -4939,7 +4947,7 @@
                 // 2. Change .mp3 to .wav (filename keeps -preview as that's how files are named in R2)
                 const wavUrl = fixAlbum(streamUrl.replace('/audio/', '/downloads/').replace('.mp3', '.wav'));
                 const wavFilename = filename.replace('.mp3', '.wav');
-                downloadFile(wavUrl, wavFilename);
+                downloadFile(wavUrl, wavFilename, { ...trackMeta, versionTitle: 'Full Track', fileFormat: 'WAV' });
             };
             mainSection.appendChild(wavBtn);
             
@@ -4976,7 +4984,7 @@
                                 altMp3.onclick = () => {
                                     const altMp3Url = fixAlbum(altStreamUrl.replace('/audio/', '/downloads/').replace('-preview', ''));
                                     const altMp3Filename = altFilename.replace('-preview', '');
-                                    downloadFile(altMp3Url, altMp3Filename);
+                                    downloadFile(altMp3Url, altMp3Filename, { ...trackMeta, versionTitle: altTitle, fileFormat: 'MP3' });
                                 };
                                 altDiv.appendChild(altMp3);
                                 
@@ -4987,7 +4995,7 @@
                                 altWav.onclick = () => {
                                     const altWavUrl = fixAlbum(altStreamUrl.replace('/audio/', '/downloads/').replace('-preview', '').replace('.mp3', '.wav'));
                                     const altWavFilename = altFilename.replace('-preview', '').replace('.mp3', '.wav');
-                                    downloadFile(altWavUrl, altWavFilename);
+                                    downloadFile(altWavUrl, altWavFilename, { ...trackMeta, versionTitle: altTitle, fileFormat: 'WAV' });
                                 };
                                 altDiv.appendChild(altWav);
                                 
@@ -5033,25 +5041,25 @@
         }
         
         // Download a single file
-        async function downloadFile(url, filename) {
+        async function downloadFile(url, filename, trackMeta = {}) {
             try {
                 console.log('Requesting download for:', filename);
-                
+
                 // Get user's auth token
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 if (!session) {
                     alert('Please log in to download files.');
                     return;
                 }
-                
+
                 // Convert the R2 public URL to a file path
                 // Example: https://pub-xxx.r2.dev/downloads/primum-electronic/track.wav
                 // Extract: downloads/primum-electronic/track.wav
                 const urlObj = new URL(url);
                 const filePath = urlObj.pathname.substring(1); // Remove leading slash
-                
+
                 console.log('Requesting secure download URL for:', filePath);
-                
+
                 // Call our Netlify function to get a signed URL
                 const response = await fetch('/.netlify/functions/download', {
                     method: 'POST',
@@ -5059,7 +5067,14 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${session.access_token}`
                     },
-                    body: JSON.stringify({ filePath })
+                    body: JSON.stringify({
+                        filePath,
+                        trackId: trackMeta.trackId || null,
+                        trackTitle: trackMeta.trackTitle || '',
+                        trackArtist: trackMeta.trackArtist || '',
+                        versionTitle: trackMeta.versionTitle || 'Full Track',
+                        fileFormat: trackMeta.fileFormat || (filename.toLowerCase().endsWith('.wav') ? 'WAV' : 'MP3')
+                    })
                 });
                 
                 if (!response.ok) {
