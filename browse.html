@@ -3734,7 +3734,7 @@
                         <img src="${track.artwork_url || ''}" alt="${escHtml(track.artist)}" onerror="this.style.display='none'; this.parentElement.innerHTML='&#127925;';">
                     </div>
                     <div class="track-info track-info-clickable" onclick="openTrackPanel(event, ${track.id})">
-                        <span class="track-title">${escHtml(track.artist)} - &quot;${escHtml(track.title)}&quot;</span>${hasAlts ? `<span class="versions-badge">${versionsCount} versions</span>` : ''}
+                        <span class="track-title">${escHtml(track.artist)} - &quot;${escHtml(track.title)}&quot;</span>${hasAlts ? `<span class="versions-badge" onclick="event.stopPropagation(); toggleAlternates(event, 'alternates-${track.id}')">${versionsCount} versions</span>` : ''}
                     </div>
                     <div class="expand-arrow">▾</div>
                     <div class="waveform-container" onclick="seekAudio(event, ${track.id})" data-track-id="${track.id}">
