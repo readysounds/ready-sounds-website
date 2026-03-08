@@ -148,11 +148,6 @@
             font-size: 11px;
             margin-left: 4px;
         }
-
-        .cart-count-zero {
-            background: rgba(255, 255, 255, 0.12);
-            color: rgba(255, 255, 255, 0.4);
-        }
         
         /* Auth Buttons */
         .auth-buttons {
@@ -1481,7 +1476,7 @@
         .track-list-header {
             display: grid;
             grid-template-columns: 50px 60px minmax(150px, 2fr) 20px minmax(100px, 1fr) 80px 55px 55px 200px;
-            gap: 12px;
+            gap: 16px;
             padding: 12px 16px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             font-size: 12px;
@@ -1489,11 +1484,6 @@
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
-
-        .track-list-header > div:nth-child(7),
-        .track-list-header > div:nth-child(8) {
-            text-align: center;
         }
         
         .track-group {
@@ -1586,30 +1576,6 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             min-width: 0;
-            position: relative;
-            cursor: default;
-        }
-
-        .track-genre::after {
-            content: attr(data-genre);
-            position: absolute;
-            bottom: calc(100% + 6px);
-            left: 0;
-            background: #1e1e1e;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #fff;
-            font-size: 11px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.15s;
-            z-index: 100;
-        }
-
-        .track-genre:hover::after {
-            opacity: 1;
         }
         
         .track-bpm {
@@ -1943,37 +1909,30 @@
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out;
-            border-left: 2px solid rgba(156, 39, 176, 0.35);
-            margin-left: 50px;
+            background: rgba(255, 255, 255, 0.01);
         }
-
+        
         .alternates-container.expanded {
             max-height: 1000px;
             transition: max-height 0.5s ease-in;
         }
-
+        
         .track-item.alternate {
-            background: rgba(0, 0, 0, 0.25);
-            padding-left: 16px;
+            background: rgba(156, 39, 176, 0.03);
+            padding-left: 40px;
         }
-
+        
         .track-item.alternate:hover {
             background: rgba(156, 39, 176, 0.06);
         }
-
-        .track-item.alternate .track-artwork {
-            visibility: hidden;
-        }
-
+        
         .track-item.alternate .track-title {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.65);
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
         }
         
         .versions-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+            display: inline-block;
             background: rgba(156, 39, 176, 0.2);
             border: 1px solid rgba(156, 39, 176, 0.4);
             color: #9c27b0;
@@ -1983,23 +1942,6 @@
             font-weight: 600;
             text-transform: lowercase;
             flex-shrink: 0;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .versions-badge:hover {
-            background: rgba(156, 39, 176, 0.35);
-            border-color: rgba(156, 39, 176, 0.7);
-        }
-
-        .badge-arrow {
-            display: inline-block;
-            transition: transform 0.2s;
-            font-size: 12px;
-        }
-
-        .track-item.main-track.has-alternates.expanded .badge-arrow {
-            transform: rotate(180deg);
         }
         
         /* Waveform */
@@ -2025,6 +1967,9 @@
             cursor: pointer;
         }
         
+        .track-item.main-track.has-alternates.expanded .expand-arrow {
+            transform: rotate(180deg);
+        }
         
         .waveform {
             height: 100%;
@@ -3122,7 +3067,7 @@
                 <a href="playlists.html" class="nav-item">Playlists</a>
                 <a href="pricing.html" class="nav-item">Pricing</a>
                 <a href="terms.html" class="nav-item">Terms & Conditions</a>
-                <div class="cart-icon" id="cartBtn">Cart <span class="cart-count cart-count-zero">0</span></div>
+                <div class="cart-icon" id="cartBtn">Cart (0)</div>
                 <div class="auth-buttons" id="authButtons">
                     <a href="signup.html" class="auth-btn auth-btn-login" id="loginBtn">Log In</a>
                     <a href="signup.html" class="auth-btn auth-btn-signup" id="signupBtn">Create Free Account</a>
@@ -3730,7 +3675,7 @@
                     <div class="waveform-progress" id="progress-${domId}"></div>
                     <div class="waveform">${generateWaveformBars()}</div>
                 </div>
-                <div class="track-genre" data-genre="${escHtml(track.genre || '')}">${escHtml(track.genre || '')}</div>
+                <div class="track-genre">${escHtml(track.genre || '')}</div>
                 <div class="track-bpm">${track.bpm || ''}</div>
                 <div class="track-duration">${escHtml(alt.duration || '')}</div>
                 <div class="track-actions">
@@ -3765,14 +3710,14 @@
                         <img src="${track.artwork_url || ''}" alt="${escHtml(track.artist)}" onerror="this.style.display='none'; this.parentElement.innerHTML='&#127925;';">
                     </div>
                     <div class="track-info track-info-clickable" onclick="openTrackPanel(event, ${track.id})">
-                        <span class="track-title">${escHtml(track.artist)} - &quot;${escHtml(track.title)}&quot;</span>${hasAlts ? `<span class="versions-badge">${versionsCount} versions <span class="badge-arrow">▾</span></span>` : ''}
+                        <span class="track-title">${escHtml(track.artist)} - &quot;${escHtml(track.title)}&quot;</span>${hasAlts ? `<span class="versions-badge">${versionsCount} versions</span>` : ''}
                     </div>
-                    <div class="expand-arrow"></div>
+                    <div class="expand-arrow">▾</div>
                     <div class="waveform-container" onclick="seekAudio(event, ${track.id})" data-track-id="${track.id}">
                         <div class="waveform-progress" id="progress-${track.id}"></div>
                         <div class="waveform">${generateWaveformBars()}</div>
                     </div>
-                    <div class="track-genre" data-genre="${escHtml(track.genre || '')}">${escHtml(track.genre || '')}</div>
+                    <div class="track-genre">${escHtml(track.genre || '')}</div>
                     <div class="track-bpm">${track.bpm || ''}</div>
                     <div class="track-duration">${escHtml(track.duration || '')}</div>
                     <div class="track-actions">
@@ -4044,7 +3989,7 @@
             if (cart.length > 0) {
                 cartBtn.innerHTML = `Cart <span class="cart-count">${cart.length}</span>`;
             } else {
-                cartBtn.innerHTML = `Cart <span class="cart-count cart-count-zero">0</span>`;
+                cartBtn.innerHTML = 'Cart (0)';
             }
         }
 
