@@ -148,13 +148,13 @@
 
         header {
             text-align: center;
-            margin-bottom: 50px;
-            padding: 40px 0;
+            margin-bottom: 32px;
+            padding: 20px 0;
         }
 
         h1 {
-            font-size: 3em;
-            margin-bottom: 10px;
+            font-size: 2em;
+            margin-bottom: 8px;
             background: linear-gradient(135deg, #9c27b0, #4a148c);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -162,7 +162,7 @@
         }
 
         .subtitle {
-            font-size: 1.2em;
+            font-size: 1em;
             color: #a0a0a0;
         }
 
@@ -618,7 +618,7 @@
 
         <!-- My Playlists Section -->
         <div id="myPlaylistsSection" style="margin-bottom: 60px; display: none;">
-            <h2 style="font-size: 1.8em; margin-bottom: 20px; color: #9c27b0;">📝 My Playlists</h2>
+            <h2 style="font-size: 1.8em; margin-bottom: 20px;">My Playlists</h2>
             <div class="playlist-grid" id="userPlaylistGrid"></div>
         </div>
 
@@ -754,8 +754,8 @@
                     const trackCount = (playlist.track_ids || []).length;
                     html += `
                         <div class="playlist-card" onclick="showUserPlaylist('${playlist.id}', '${escapeHtml(playlist.name)}', ${JSON.stringify(playlist.track_ids || [])})">
-                            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 3em;">
-                                📝
+                            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 3.5em; color: rgba(255,255,255,0.9);">
+                                ♪
                             </div>
                             <div class="play-overlay">▶</div>
                             <div class="playlist-overlay">
