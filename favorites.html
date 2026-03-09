@@ -502,6 +502,15 @@
             </div>
         `;
 
+        function escHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
         async function loadFavorites() {
             const favoriteIds = JSON.parse(localStorage.getItem('readysounds_favorites') || '[]');
             const container = document.getElementById('favoritesContainer');
@@ -539,16 +548,16 @@
                 favoriteIds.forEach(trackId => {
                     const track = trackMap[trackId];
                     if (!track) return;
-                    const displayTitle = `${track.artist} — "${track.title}"`;
+                    const displayTitle = `${escHtml(track.artist)} \u2014 &quot;${escHtml(track.title)}&quot;`;
                     html += `
                         <div class="track-item">
                             <div class="track-artwork">
-                                ${track.artwork_url ? `<img src="${track.artwork_url}" alt="${displayTitle}">` : ''}
+                                ${track.artwork_url ? `<img src="${escHtml(track.artwork_url)}" alt="${displayTitle}">` : ''}
                             </div>
                             <button class="play-btn" onclick="playTrack(${track.id})">▶</button>
                             <div class="track-info">
                                 <div class="track-title">${displayTitle}</div>
-                                <div class="track-meta">${track.genre || ''}${track.bpm ? ' · ' + track.bpm + ' BPM' : ''}${track.duration ? ' · ' + track.duration : ''}</div>
+                                <div class="track-meta">${escHtml(track.genre || '')}${track.bpm ? ' · ' + escHtml(String(track.bpm)) + ' BPM' : ''}${track.duration ? ' · ' + escHtml(track.duration) : ''}</div>
                             </div>
                             <div class="track-actions">
                                 <a href="browse.html#track-${track.id}" class="action-btn">View Track</a>

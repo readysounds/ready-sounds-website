@@ -500,6 +500,15 @@
             }
         }
 
+        function escHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
         function renderSettings(profile) {
             const subStatus = profile.subscription_status;
             const hasActiveSub = subStatus === 'active';
@@ -584,7 +593,7 @@
                     <h2 class="section-title">profile</h2>
                     <div class="info-row">
                         <span class="info-label">Email</span>
-                        <span class="info-value">${currentUser.email}</span>
+                        <span class="info-value">${escHtml(currentUser.email)}</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Member Since</span>
@@ -608,7 +617,7 @@
                 <div class="section">
                     <h2 class="section-title">session</h2>
                     <div class="info-row">
-                        <span class="info-label">Signed in as ${currentUser.email}</span>
+                        <span class="info-label">Signed in as ${escHtml(currentUser.email)}</span>
                         <button class="btn btn-danger" onclick="signOut()">Sign Out</button>
                     </div>
                 </div>

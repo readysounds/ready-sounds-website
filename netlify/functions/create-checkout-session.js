@@ -24,9 +24,22 @@ exports.handler = async (event, context) => {
     };
   }
 
+  // Server-side price table — never trust client-supplied prices
+  const LICENSE_PRICES = {
+    individual: 1000, // $10.00 in cents
+    business: 12500   // $125.00 in cents
+  };
+
+  // Valid subscription plan combinations
+  const SUBSCRIPTION_PRICE_IDS = {
+    individual_monthly: process.env.STRIPE_INDIVIDUAL_MONTHLY_PRICE_ID,
+    individual_annual:  process.env.STRIPE_INDIVIDUAL_ANNUAL_PRICE_ID,
+    business_annual:    process.env.STRIPE_BUSINESS_PRICE_ID
+  };
+
   try {
     const { items, mode, planType, billingPeriod } = JSON.parse(event.body);
-    
+
     let sessionConfig = {
       payment_method_types: ['card'],
       success_url: `${process.env.URL}/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -35,46 +48,55 @@ exports.handler = async (event, context) => {
     };
 
     if (mode === 'subscription') {
-      // Subscription checkout (Individual or Business plan)
-      let priceId;
-      
-      if (planType === 'individual') {
-        // Individual plan - support both monthly and annual
-        priceId = billingPeriod === 'monthly' 
-          ? process.env.STRIPE_INDIVIDUAL_MONTHLY_PRICE_ID 
-          : process.env.STRIPE_INDIVIDUAL_ANNUAL_PRICE_ID;
-      } else {
-        // Business plan - annual only
-        priceId = process.env.STRIPE_BUSINESS_PRICE_ID;
+      // Validate planType and billingPeriod
+      const period = billingPeriod === 'monthly' ? 'monthly' : 'annual';
+      const key = `${planType}_${period}`;
+      const priceId = SUBSCRIPTION_PRICE_IDS[key];
+
+      if (!priceId) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Invalid plan selection' })
+        };
       }
-      
+
       sessionConfig.mode = 'subscription';
-      sessionConfig.line_items = [{
-        price: priceId,
-        quantity: 1
-      }];
+      sessionConfig.line_items = [{ price: priceId, quantity: 1 }];
       sessionConfig.metadata.planType = planType;
-      sessionConfig.metadata.billingPeriod = billingPeriod || 'annual';
-      
+      sessionConfig.metadata.billingPeriod = period;
+
     } else {
       // One-time payment for à la carte tracks
+      if (!Array.isArray(items) || items.length === 0) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'No items provided' })
+        };
+      }
+
       sessionConfig.mode = 'payment';
-      sessionConfig.line_items = items.map(item => ({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: item.trackTitle,
-            description: `${item.license === 'individual' ? 'Individual' : 'Business'} License`,
-            metadata: {
-              trackId: item.trackId.toString(),
-              license: item.license
-            }
+      sessionConfig.line_items = items.map(item => {
+        const unitAmount = LICENSE_PRICES[item.license];
+        if (!unitAmount) throw new Error(`Invalid license type: ${item.license}`);
+        return {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: item.trackTitle,
+              description: `${item.license === 'individual' ? 'Individual' : 'Business'} License`,
+              metadata: {
+                trackId: item.trackId.toString(),
+                license: item.license
+              }
+            },
+            unit_amount: unitAmount
           },
-          unit_amount: item.price * 100 // Convert to cents
-        },
-        quantity: 1
-      }));
-      
+          quantity: 1
+        };
+      });
+
       // Store track IDs in metadata for fulfillment
       sessionConfig.metadata.trackIds = items.map(i => i.trackId).join(',');
       sessionConfig.metadata.licenses = items.map(i => i.license).join(',');

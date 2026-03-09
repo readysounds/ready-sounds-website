@@ -3920,8 +3920,8 @@
                     <div class="cart-item">
                         <div class="cart-item-header">
                             <div class="cart-item-info">
-                                <div class="cart-item-title">${item.title}</div>
-                                <div class="cart-item-artist">${item.artist || 'Buck Moon'}</div>
+                                <div class="cart-item-title">${escHtml(item.title)}</div>
+                                <div class="cart-item-artist">${escHtml(item.artist || 'Buck Moon')}</div>
                             </div>
                             <button class="cart-item-remove" onclick="removeFromCart(${item.id})" title="Remove from cart">×</button>
                         </div>
@@ -5611,8 +5611,8 @@
                                 <div class="track-item" style="margin-bottom: 12px; background: rgba(26, 26, 26, 0.8); padding: 16px; border-radius: 8px; display: flex; align-items: center; gap: 16px;">
                                     <button onclick="playTrack(event, ${trackId})" style="width: 40px; height: 40px; border-radius: 50%; background: #9c27b0; border: none; color: white; cursor: pointer; font-size: 18px;">▶</button>
                                     <div style="flex: 1;">
-                                        <div style="font-weight: 600; margin-bottom: 4px;">${title}</div>
-                                        <div style="color: #888; font-size: 0.9em;">${genre} · ${bpm} BPM · ${duration}</div>
+                                        <div style="font-weight: 600; margin-bottom: 4px;">${escHtml(title)}</div>
+                                        <div style="color: #888; font-size: 0.9em;">${escHtml(genre)} · ${escHtml(bpm)} BPM · ${escHtml(duration)}</div>
                                     </div>
                                     <button onclick="toggleFavorite(${trackId})" style="background: none; border: none; cursor: pointer; font-size: 24px;">❤️</button>
                                 </div>
