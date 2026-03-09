@@ -4484,17 +4484,35 @@
             // Play new track
             if (streamUrl) {
                 currentAudio = new Audio(streamUrl);
+                currentAudio.preload = 'auto';
                 currentTrackId = trackId;
+                currentPlayButton = button;
+
+                // Buffering feedback
+                currentAudio.addEventListener('waiting', () => {
+                    if (currentPlayButton) currentPlayButton.textContent = '…';
+                });
+                currentAudio.addEventListener('stalled', () => {
+                    if (currentPlayButton) currentPlayButton.textContent = '…';
+                });
+                currentAudio.addEventListener('playing', () => {
+                    if (currentPlayButton) currentPlayButton.textContent = '⏸';
+                });
+                currentAudio.addEventListener('error', (e) => {
+                    console.error('Audio error:', e);
+                    if (currentPlayButton) currentPlayButton.textContent = '▶';
+                    syncPlayButtons(false);
+                });
+
                 currentAudio.play().catch(err => {
                     console.error('Audio playback error:', err);
-                    alert('Unable to play audio. Error: ' + err.message + '\n\nCheck browser console for details.');
+                    button.textContent = '▶';
                 });
                 button.textContent = '⏸';
-                currentPlayButton = button;
-                
+
                 // Update player bar
                 updateNowPlayingBar(trackId);
-                
+
                 currentAudio.onended = function() {
                     button.textContent = '▶';
                     syncPlayButtons(false);
