@@ -14,18 +14,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Favorites - Ready Sounds</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/supabase.js"></script>
+    <script src="/nav.js"></script>
+    <script src="/auth.js"></script>
+    <link rel="stylesheet" href="/styles.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #0a0a0a;
-            color: #ffffff;
-            min-height: 100vh;
             padding: 20px;
         }
 
@@ -273,157 +267,9 @@
             padding: 4px 8px;
             line-height: 1;
         }
-        .profile-container {
-            position: relative;
-            display: none;
-        }
-        .profile-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #9c27b0, #4a148c);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-        }
-        .profile-icon:hover {
-            border-color: rgba(156, 39, 176, 0.5);
-            transform: scale(1.05);
-        }
-        .profile-dropdown {
-            position: absolute;
-            top: 50px;
-            right: 0;
-            background: #1a1a1a;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            min-width: 240px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-            display: none;
-            z-index: 1001;
-            overflow: hidden;
-        }
-        .profile-dropdown.active { display: block; }
-        .profile-dropdown-header {
-            padding: 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 14px;
-            font-weight: 600;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .profile-dropdown-item {
-            padding: 12px 16px;
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.2s;
-            cursor: pointer;
-            font-size: 15px;
-        }
-        .profile-dropdown-item:hover { background: rgba(156, 39, 176, 0.1); }
-        .profile-dropdown-divider {
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
-            margin: 8px 0;
-        }
         @media (max-width: 768px) {
             .rs-nav-links { display: none; }
             .rs-menu-toggle { display: block; }
-        }
-        .mobile-panel-overlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.65);
-            z-index: 1998;
-            display: none;
-        }
-        .mobile-panel-overlay.active { display: block; }
-        .mobile-panel {
-            position: fixed;
-            top: 0; right: -100%;
-            width: 100%; height: 100%;
-            background: #111111;
-            z-index: 1999;
-            transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
-            display: flex;
-            flex-direction: column;
-            padding: 24px 28px;
-            overflow-y: auto;
-        }
-        .mobile-panel.open { right: 0; }
-        .mobile-panel-close {
-            align-self: flex-end;
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.55);
-            font-size: 28px;
-            cursor: pointer;
-            margin-bottom: 32px;
-            line-height: 1;
-        }
-        .mobile-panel-nav a {
-            display: block;
-            color: white;
-            text-decoration: none;
-            font-size: 28px;
-            font-weight: 700;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
-        }
-        .mobile-panel-nav a:hover { color: #9c27b0; }
-        .mobile-panel-cta {
-            display: block;
-            background: #9c27b0;
-            color: white;
-            text-align: center;
-            padding: 16px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 16px;
-            text-decoration: none;
-            margin-top: 32px;
-        }
-        .mobile-panel-auth {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 16px;
-        }
-        .mobile-auth-login {
-            display: block;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 15px;
-            text-align: center;
-            text-decoration: none;
-            background: rgba(255,255,255,0.07);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.15);
-        }
-        .mobile-auth-signup {
-            display: block;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 15px;
-            text-align: center;
-            text-decoration: none;
-            background: #9c27b0;
-            color: white;
-        }
-        .mobile-panel-footer {
-            margin-top: auto;
-            padding-top: 40px;
         }
     </style>
 </head>
@@ -491,9 +337,6 @@
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://pfqvrxfazumlydjepwib.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_1oBqgAQj0xzb5-eosyfcBg_9dKxNZfa';
-
         const emptyState = `
             <div class="empty-state">
                 <div class="empty-state-icon">🤍</div>
@@ -523,10 +366,7 @@
             container.innerHTML = '<div style="text-align:center;padding:60px;color:#888;">Loading...</div>';
 
             try {
-                if (typeof window.supabase === 'undefined') {
-                    await new Promise(r => setTimeout(r, 200));
-                }
-                const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                const client = await window.RS.waitForClient();
                 const { data: tracks, error } = await client
                     .from('tracks')
                     .select('id, title, artist, genre, bpm, duration, artwork_url')
@@ -588,66 +428,8 @@
 
         document.addEventListener('DOMContentLoaded', loadFavorites);
 
-        function toggleMobileMenu() {
-            const panel = document.getElementById('mobilePanel');
-            const overlay = document.getElementById('mobilePanelOverlay');
-            const toggle = document.getElementById('mobileMenuToggle');
-            if (panel.classList.contains('open')) {
-                closeMobilePanel();
-            } else {
-                panel.classList.add('open');
-                overlay.classList.add('active');
-                if (toggle) toggle.textContent = '✕';
-                document.body.style.overflow = 'hidden';
-            }
-        }
-        function closeMobilePanel() {
-            const panel = document.getElementById('mobilePanel');
-            const overlay = document.getElementById('mobilePanelOverlay');
-            const toggle = document.getElementById('mobileMenuToggle');
-            if (panel) panel.classList.remove('open');
-            if (overlay) overlay.classList.remove('active');
-            if (toggle) toggle.textContent = '☰';
-            document.body.style.overflow = '';
-        }
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeMobilePanel(); closeProfileDropdown(); } });
-
-        // ── Profile dropdown ──
-        function toggleProfileDropdown() {
-            document.getElementById('profileDropdown').classList.toggle('active');
-        }
-        function closeProfileDropdown() {
-            const d = document.getElementById('profileDropdown');
-            if (d) d.classList.remove('active');
-        }
-        document.addEventListener('click', function(e) {
-            const pc = document.getElementById('profileContainer');
-            if (pc && !pc.contains(e.target)) closeProfileDropdown();
-        });
-
-        async function handleLogout() {
-            const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            await client.auth.signOut();
-            localStorage.removeItem('readysounds_favorites');
-            window.location.href = 'browse.html';
-        }
-
-        // ── Auth init ──
-        async function initNavAuth() {
-            if (typeof window.supabase === 'undefined') {
-                setTimeout(initNavAuth, 100);
-                return;
-            }
-            const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            const { data: { session } } = await client.auth.getSession();
-            const profileContainer = document.getElementById('profileContainer');
-            const profileInitial = document.getElementById('profileInitial');
-            if (session && session.user) {
-                if (profileContainer) profileContainer.style.display = 'block';
-                if (profileInitial) profileInitial.textContent = session.user.email.charAt(0).toUpperCase();
-            }
-        }
-        initNavAuth();
+        // Init nav auth using shared module
+        window.RS.initNavAuth();
     </script>
 </body>
 </html>

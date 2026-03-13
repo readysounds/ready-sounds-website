@@ -1,0 +1,166 @@
+// browse-tracks.js — Shared state, HTML rendering helpers, and Supabase track loader
+// Depends on: supabase.js (supabaseClient set by browse-init.js)
+
+// ── Shared playback state ────────────────────────────────────────────────────
+let currentAudio = null;
+let currentPlayButton = null;
+let currentTrackId = null;
+let cart = [];
+
+// Track data — populated dynamically from Supabase
+const trackData = {};
+
+// ── Rendering helpers ────────────────────────────────────────────────────────
+
+// Generate waveform bars (decorative)
+function generateWaveformBars() {
+    const heights = [40, 55, 70, 82, 90, 95, 90, 82, 74, 65, 56, 48, 55, 68, 80, 88, 92, 85, 75, 62];
+    return heights.map(h => `<div class="waveform-bar" style="height: ${h}%"></div>`).join('');
+}
+
+// Render a single alternate version
+function renderAlternate(alt, track) {
+    const domId = alt.id + 100;
+    const downloadAttr = (alt.download_album || track.download_album)
+        ? `data-download-album="${alt.download_album || track.download_album}"`
+        : '';
+    return `
+    <div class="track-item alternate"
+         data-track-id="${domId}"
+         data-stream-url="${alt.stream_url}"
+         ${downloadAttr}>
+        <div class="track-play" onclick="playTrack(event, ${domId})">&#9654;</div>
+        <div class="track-artwork">
+            <img src="${track.artwork_url || ''}" alt="${escHtml(track.artist)}" onerror="this.style.display='none'; this.parentElement.innerHTML='&#127925;';">
+        </div>
+        <div class="track-info">
+            <span class="track-title">${escHtml(alt.title)}</span>
+        </div>
+        <div class="expand-arrow"></div>
+        <div class="waveform-container" onclick="seekAudio(event, ${domId})" data-track-id="${domId}">
+            <div class="waveform-progress" id="progress-${domId}"></div>
+            <div class="waveform">${generateWaveformBars()}</div>
+        </div>
+        <div class="track-genre" data-genre="${escHtml(track.genre || '')}">${escHtml(track.genre || '')}</div>
+        <div class="track-moods"></div>
+        <div class="track-bpm">${track.bpm || ''}</div>
+        <div class="track-duration">${escHtml(alt.duration || '')}</div>
+        <div class="track-actions">
+            <button class="action-btn action-btn-playlist" onclick="openPlaylistMenu(event, ${domId})">+</button>
+            <button class="action-btn action-btn-download" onclick="downloadTrack(event, ${domId})">&#11015;</button>
+        </div>
+    </div>`;
+}
+
+// Render a track group (main track + alternates)
+function renderTrackGroup(track) {
+    const alts = (track.alternates || []).slice().sort((a, b) => a.sort_order - b.sort_order);
+    const hasAlts = alts.length > 0;
+    const versionsCount = alts.length;
+    const downloadAttr = track.download_album ? `data-download-album="${track.download_album}"` : '';
+    const toggleAttr = hasAlts ? `onclick="toggleAlternates(event, 'alternates-${track.id}')"` : '';
+    const moodsList = (track.moods || '').split(',').slice(0, 3).map(m => m.trim()).filter(Boolean).join(', ');
+
+    return `
+    <div class="track-group">
+        <div class="track-item main-track${hasAlts ? ' has-alternates' : ''}"
+             data-track-id="${track.id}"
+             data-stream-url="${track.stream_url}"
+             data-use-cases="${escAttr(track.use_cases || '')}"
+             data-moods="${escAttr(track.moods || '')}"
+             data-similar-artists="${escAttr(track.similar_artists || '')}"
+             data-energy="${escAttr(track.energy || '')}"
+             data-best-moments="${escAttr(track.best_moments || '')}"
+             ${downloadAttr}
+             ${toggleAttr}>
+            <div class="track-play" onclick="playTrack(event, ${track.id})">&#9654;</div>
+            <div class="track-artwork">
+                <img src="${track.artwork_url || ''}" alt="${escHtml(track.artist)}" onerror="this.style.display='none'; this.parentElement.innerHTML='&#127925;';">
+            </div>
+            <div class="track-info track-info-clickable" onclick="openTrackPanel(event, ${track.id})">
+                <span class="track-title">${escHtml(track.title)}${hasAlts ? `<span class="versions-badge" onclick="event.stopPropagation(); toggleAlternates(event, 'alternates-${track.id}')">${versionsCount} versions</span>` : ''}</span>
+                <span class="track-artist">${escHtml(track.artist)}</span>
+            </div>
+            <div class="expand-arrow">▾</div>
+            <div class="waveform-container" onclick="seekAudio(event, ${track.id})" data-track-id="${track.id}">
+                <div class="waveform-progress" id="progress-${track.id}"></div>
+                <div class="waveform">${generateWaveformBars()}</div>
+            </div>
+            <div class="track-genre" data-genre="${escHtml(track.genre || '')}">${escHtml(track.genre || '')}</div>
+            <div class="track-moods">${escHtml(moodsList)}</div>
+            <div class="track-bpm">${track.bpm || ''}</div>
+            <div class="track-duration">${escHtml(track.duration || '')}</div>
+            <div class="track-actions">
+                <button class="action-btn action-btn-like" data-track-id="${track.id}" onclick="toggleLike(event, ${track.id})">&#129293;</button>
+                <button class="action-btn action-btn-primary" onclick="addToCart(event, ${track.id})">cart</button>
+                <button class="action-btn action-btn-playlist" onclick="openPlaylistMenu(event, ${track.id})">+</button>
+                <button class="action-btn action-btn-download" onclick="downloadTrack(event, ${track.id})">&#11015;</button>
+            </div>
+        </div>
+        ${hasAlts ? `<div class="alternates-container" id="alternates-${track.id}">${alts.map(a => renderAlternate(a, track)).join('')}</div>` : ''}
+    </div>`;
+}
+
+// Escape HTML special characters for text content
+function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+// Escape for HTML attribute values
+function escAttr(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+}
+
+// ── Supabase track loader ────────────────────────────────────────────────────
+
+// Load all tracks from Supabase and render them
+async function loadTracksFromSupabase() {
+    const container = document.getElementById('trackListContainer');
+    if (!container || !supabaseClient) return;
+
+    container.innerHTML = '<div style="text-align:center;padding:60px;color:#888;">Loading tracks...</div>';
+
+    const { data: tracks, error } = await supabaseClient
+        .from('tracks')
+        .select('*, alternates(*)')
+        .eq('is_active', true)
+        .order('sort_order');
+
+    if (error || !tracks || tracks.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:60px;color:#888;">Failed to load tracks. Please refresh.</div>';
+        console.error('Error loading tracks:', error);
+        return;
+    }
+
+    // Populate trackData lookup for the player bar
+    tracks.forEach(track => {
+        trackData[track.id] = {
+            title: `${track.artist} - "${track.title}"`,
+            trackTitle: track.title,
+            artist: track.artist,
+            duration: track.duration,
+            artwork_url: track.artwork_url || '',
+            bpm: track.bpm || '',
+            genre: track.genre || '',
+            moods: track.moods || '',
+            use_cases: track.use_cases || '',
+            similar_artists: track.similar_artists || '',
+            energy: track.energy || '',
+            best_moments: track.best_moments || '',
+        };
+        const alts = track.alternates || [];
+        alts.forEach(alt => {
+            const domId = alt.id + 100;
+            trackData[domId] = {
+                title: `${track.artist} - "${track.title}" (${alt.title})`,
+                artist: track.artist,
+                duration: alt.duration
+            };
+        });
+    });
+
+    // Render track list
+    container.innerHTML = tracks.map(track => renderTrackGroup(track)).join('');
+
+    // Re-apply liked state for logged-in users
+    if (typeof loadFavorites === 'function') loadFavorites();
+}
