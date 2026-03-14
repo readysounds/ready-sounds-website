@@ -358,53 +358,53 @@
         .track-list {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+        }
+
+        .track-list-header {
+            display: grid;
+            grid-template-columns: 60px minmax(200px, 1fr) 80px minmax(70px, 160px) 110px;
+            align-items: center;
+            padding: 6px 12px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 4px;
+        }
+
+        .track-list-header span {
+            font-size: 0.75em;
+            color: rgba(255,255,255,0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+            overflow: hidden;
         }
 
         .track-item {
-            background: rgba(26, 26, 26, 0.5);
-            border-radius: 10px;
-            padding: 20px;
-            display: flex;
+            display: grid;
+            grid-template-columns: 60px minmax(200px, 1fr) 80px minmax(70px, 160px) 110px;
             align-items: center;
-            gap: 15px;
-            transition: all 0.3s;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
             border: 1px solid transparent;
         }
 
         .track-item:hover {
             background: rgba(156, 39, 176, 0.1);
-            border-color: rgba(156, 39, 176, 0.3);
+            border-color: rgba(156, 39, 176, 0.2);
         }
 
         .track-item.playing {
             background: rgba(156, 39, 176, 0.15);
-            border-color: rgba(156, 39, 176, 0.5);
-        }
-
-        .track-item.playing .track-number {
-            font-size: 0;
-        }
-
-        .track-item.playing .track-number::after {
-            content: '♪';
-            font-size: 1.2rem;
-            color: #9c27b0;
-        }
-
-        .track-number {
-            font-size: 1.2em;
-            color: #9c27b0;
-            min-width: 30px;
-            text-align: center;
+            border-color: rgba(156, 39, 176, 0.4);
         }
 
         .track-artwork {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
             overflow: hidden;
             flex-shrink: 0;
+            position: relative;
         }
 
         .track-artwork img {
@@ -413,22 +413,64 @@
             object-fit: cover;
         }
 
+        .track-item.playing .track-artwork::after {
+            content: '♪';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.55);
+            color: #9c27b0;
+            font-size: 1.3rem;
+            border-radius: 6px;
+        }
+
         .track-info {
-            flex: 1;
+            padding: 0 12px;
+            min-width: 0;
         }
 
         .track-title {
-            font-size: 1.1em;
-            margin-bottom: 5px;
+            font-size: 0.95em;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 3px;
         }
 
-        .track-meta {
+        .track-artist {
             color: #888;
-            font-size: 0.9em;
+            font-size: 0.82em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .track-duration-col {
+            font-size: 0.85em;
+            color: #aaa;
+        }
+
+        .track-mood-col {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .track-mood-tag {
+            font-size: 0.75em;
+            color: rgba(200,150,220,0.85);
+            background: rgba(156,39,176,0.12);
+            border-radius: 4px;
+            padding: 2px 7px;
+            white-space: nowrap;
         }
 
         .track-actions {
             display: flex;
+            justify-content: flex-end;
             gap: 10px;
         }
 
@@ -629,7 +671,7 @@
         async function loadData() {
             try {
                 const [tracksRes, playlistsRes] = await Promise.all([
-                    supabaseClient.from('tracks').select('id, title, artist, genre, bpm, duration, stream_url, artwork_url').eq('is_active', true),
+                    supabaseClient.from('tracks').select('id, title, artist, genre, bpm, duration, moods, stream_url, artwork_url').eq('is_active', true),
                     supabaseClient.from('curated_playlists').select('*').eq('is_active', true).order('sort_order')
                 ]);
                 if (tracksRes.data) {
@@ -637,9 +679,12 @@
                         const metaParts = [t.genre, t.bpm ? t.bpm + ' BPM' : null, t.duration].filter(Boolean);
                         trackDatabase[t.id] = {
                             title: t.artist + ' \u2014 \u201c' + t.title + '\u201d',
+                            artist: t.artist || '',
+                            trackTitle: t.title || '',
                             genre: t.genre || '',
                             bpm: t.bpm || '',
                             duration: t.duration || '',
+                            moods: t.moods || '',
                             meta: metaParts.join(' \u00b7 '),
                             artwork: t.artwork_url || '',
                             url: t.stream_url || ''
@@ -737,19 +782,22 @@
             document.getElementById('myPlaylistsSection').style.display = 'none';
             const detailsContainer = document.getElementById('playlistDetails');
             let tracksHTML = '';
-            trackIds.forEach((trackId, index) => {
+            trackIds.forEach((trackId) => {
                 const track = trackDatabase[trackId];
                 if (track) {
+                    const moodTags = (track.moods || '').split(',').slice(0, 2).map(m => m.trim()).filter(Boolean)
+                        .map(m => `<span class="track-mood-tag">${escapeHtml(m)}</span>`).join('');
                     tracksHTML += `
                         <div class="track-item" data-track-id="${trackId}">
-                            <div class="track-number">${index + 1}</div>
                             <div class="track-artwork">
-                                <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.title)}">
+                                <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.trackTitle)}">
                             </div>
                             <div class="track-info">
-                                <div class="track-title">${escapeHtml(track.title)}</div>
-                                <div class="track-meta">${escapeHtml(track.meta)}</div>
+                                <div class="track-title">${escapeHtml(track.trackTitle)}</div>
+                                <div class="track-artist">${escapeHtml(track.artist)}</div>
                             </div>
+                            <div class="track-duration-col">${escapeHtml(track.duration)}</div>
+                            <div class="track-mood-col">${moodTags}</div>
                             <div class="track-actions">
                                 <button class="track-btn" onclick="playTrack(${trackId}); return false;">▶ Play</button>
                             </div>
@@ -770,6 +818,13 @@
                         </div>
                     </div>
                     <div class="track-list">
+                        <div class="track-list-header">
+                            <span></span>
+                            <span style="padding-left:12px">Title</span>
+                            <span>Duration</span>
+                            <span>Mood</span>
+                            <span></span>
+                        </div>
                         ${tracksHTML || '<p style="color: #888; padding: 20px;">No tracks in this playlist yet</p>'}
                     </div>
                 </div>
@@ -791,19 +846,22 @@
             document.getElementById('playlistGrid').style.display = 'none';
             document.getElementById('myPlaylistsSection').style.display = 'none';
             const trackIds = playlist.track_ids || [];
-            const tracksHTML = trackIds.map((trackId, index) => {
+            const tracksHTML = trackIds.map((trackId) => {
                 const track = trackDatabase[trackId];
                 if (!track) return '';
+                const moodTags = (track.moods || '').split(',').slice(0, 2).map(m => m.trim()).filter(Boolean)
+                    .map(m => `<span class="track-mood-tag">${escapeHtml(m)}</span>`).join('');
                 return `
                     <div class="track-item" data-track-id="${trackId}">
-                        <div class="track-number">${index + 1}</div>
                         <div class="track-artwork">
-                            <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.title)}">
+                            <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.trackTitle)}">
                         </div>
                         <div class="track-info">
-                            <div class="track-title">${escapeHtml(track.title)}</div>
-                            <div class="track-meta">${escapeHtml(track.meta)}</div>
+                            <div class="track-title">${escapeHtml(track.trackTitle)}</div>
+                            <div class="track-artist">${escapeHtml(track.artist)}</div>
                         </div>
+                        <div class="track-duration-col">${escapeHtml(track.duration)}</div>
+                        <div class="track-mood-col">${moodTags}</div>
                         <div class="track-actions">
                             <button class="track-btn" onclick="playTrack(${trackId}); return false;">▶ Play</button>
                         </div>
@@ -829,7 +887,16 @@
                             <button class="close-playlist" onclick="closePlaylist()">← Back to Playlists</button>
                         </div>
                     </div>
-                    <div class="track-list">${tracksHTML || '<p style="color:#888;padding:20px">No tracks in this playlist.</p>'}</div>
+                    <div class="track-list">
+                        <div class="track-list-header">
+                            <span></span>
+                            <span style="padding-left:12px">Title</span>
+                            <span>Duration</span>
+                            <span>Mood</span>
+                            <span></span>
+                        </div>
+                        ${tracksHTML || '<p style="color:#888;padding:20px">No tracks in this playlist.</p>'}
+                    </div>
                 </div>
             `;
             window.scrollTo({ top: 0, behavior: 'smooth' });
