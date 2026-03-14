@@ -59,7 +59,8 @@ function renderTrackGroup(track) {
     const versionsCount = alts.length;
     const downloadAttr = track.download_album ? `data-download-album="${track.download_album}"` : '';
     const toggleAttr = hasAlts ? `onclick="toggleAlternates(event, 'alternates-${track.id}')"` : '';
-    const moodsList = (track.moods || '').split(',').slice(0, 3).map(m => m.trim()).filter(Boolean).join(', ');
+    const moodTags = (track.moods || '').split(',').slice(0, 3).map(m => m.trim()).filter(Boolean);
+    const moodsList = moodTags.map(m => `<span class="mood-tag" onclick="filterByMood('${escAttr(m)}');event.stopPropagation()">${escHtml(m)}</span>`).join(', ');
 
     return `
     <div class="track-group">
@@ -87,7 +88,7 @@ function renderTrackGroup(track) {
                 <div class="waveform">${generateWaveformBars()}</div>
             </div>
             <div class="track-genre" data-genre="${escHtml(track.genre || '')}">${escHtml(track.genre || '')}</div>
-            <div class="track-moods">${escHtml(moodsList)}</div>
+            <div class="track-moods">${moodsList}</div>
             <div class="track-bpm">${track.bpm || ''}</div>
             <div class="track-duration">${escHtml(track.duration || '')}</div>
             <div class="track-actions">

@@ -49,6 +49,17 @@ function clearAllFilters() {
     applyFilters();
 }
 
+// Filter by mood from a track row tag click
+function filterByMood(mood) {
+    const normalized = mood.toLowerCase().trim();
+    if (!activeFilters.mood.includes(normalized)) {
+        activeFilters.mood.push(normalized);
+        const sidebarOption = document.querySelector(`.filter-option[onclick*="'mood', '${normalized}'"]`);
+        if (sidebarOption) sidebarOption.querySelector('.filter-checkbox')?.classList.add('checked');
+    }
+    applyFilters();
+}
+
 // Apply filters to tracks
 const SEARCH_STOP_WORDS = new Set(['i','me','my','we','our','you','your','he','him','his','she','her','it','its','they','them','their','what','which','who','am','is','are','was','were','be','been','have','has','had','do','does','did','a','an','the','and','but','if','or','as','of','at','by','for','with','about','to','from','in','on','out','up','how','all','some','no','not','so','than','too','very','can','will','just','now','looking','find','need','want','get','something','song','music','track','sound','audio','good','great','nice','please','im','id','like','video','videos','footage','reel','reels','promo','content','background','scene','scenes','sequence','sequences','montage','montages']);
 
@@ -100,6 +111,11 @@ function applyFilters() {
                 if (range === '150+') return trackBPM > 150;
                 return false;
             });
+        }
+
+        if (activeFilters.mood.length > 0) {
+            const trackMoods = (mainTrack.getAttribute('data-moods') || '').toLowerCase().split(',').map(m => m.trim());
+            filterMatch = filterMatch && activeFilters.mood.some(fm => trackMoods.includes(fm.toLowerCase()));
         }
 
         if (activeFilters.duration.length > 0) {
