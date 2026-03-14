@@ -116,50 +116,51 @@ async function openPlaylistMenu(event, trackId) {
     currentPlaylistMenu = menu;
 }
 
-async function createNewPlaylist(trackId) {
-    const name = prompt('Enter playlist name:');
-    if (!name || !name.trim()) return;
+let _createPlaylistTrackId = null;
 
-    const playlistName = name.trim();
+function createNewPlaylist(trackId) {
+    _createPlaylistTrackId = trackId;
+    const overlay = document.getElementById('createPlaylistOverlay');
+    const modal = document.getElementById('createPlaylistModal');
+    const input = document.getElementById('createPlaylistInput');
+    overlay.classList.add('active');
+    modal.classList.add('active');
+    input.value = '';
+    input.focus();
+}
+
+function closeCreatePlaylistModal() {
+    document.getElementById('createPlaylistOverlay').classList.remove('active');
+    document.getElementById('createPlaylistModal').classList.remove('active');
+    _createPlaylistTrackId = null;
+}
+
+async function confirmCreatePlaylist() {
+    const input = document.getElementById('createPlaylistInput');
+    const playlistName = input.value.trim();
+    if (!playlistName) { input.focus(); return; }
+
+    closeCreatePlaylistModal();
 
     try {
         const { data: { user } } = await supabaseClient.auth.getUser();
-        if (!user) {
-            alert('Please log in to create playlists');
-            return;
-        }
+        if (!user) return;
 
-        // Create playlist in Supabase
-        const { data, error } = await supabaseClient
+        const { error } = await supabaseClient
             .from('user_playlists')
-            .insert([
-                {
-                    user_id: user.id,
-                    name: playlistName,
-                    track_ids: [trackId]
-                }
-            ])
+            .insert([{ user_id: user.id, name: playlistName, track_ids: [_createPlaylistTrackId] }])
             .select();
 
-        if (error) {
-            console.error('Error creating playlist:', error);
-            alert('Failed to create playlist');
-            return;
-        }
+        if (error) { console.error('Error creating playlist:', error); return; }
 
-        // Close menu
         if (currentPlaylistMenu) {
             currentPlaylistMenu.remove();
             currentPlaylistMenu = null;
         }
 
-        // Reload user playlists
         await loadUserPlaylists();
-
-        alert(`Created playlist "${playlistName}" and added track!`);
     } catch (err) {
         console.error('Error:', err);
-        alert('Failed to create playlist');
     }
 }
 
@@ -215,7 +216,7 @@ async function toggleTrackInPlaylist(trackId, playlistId) {
 
 function updatePlaylistButton(trackId, button) {
     // Check if track is in any playlist
-    const isInAnyPlaylist = Object.values(playlists).some(tracks => tracks.includes(trackId));
+    const isInAnyPlaylist = userPlaylists.some(playlist => (playlist.track_ids || []).includes(trackId));
     if (isInAnyPlaylist) {
         button.classList.add('in-playlist');
     } else {
@@ -223,36 +224,3 @@ function updatePlaylistButton(trackId, button) {
     }
 }
 
-// Initialize playlist buttons on page load
-document.addEventListener('DOMContentLoaded', function() {
-    Object.values(playlists).forEach(tracks => {
-        tracks.forEach(trackId => {
-            const buttons = document.querySelectorAll(`[onclick*="openPlaylistMenu(event, ${trackId})"]`);
-            buttons.forEach(btn => updatePlaylistButton(trackId, btn));
-        });
-    });
-});
-
-// Mobile track menu (more button)
-function openTrackMenu(event, trackId) {
-    event.stopPropagation();
-
-    // For now, just show an alert with options
-    // TODO: Create a proper bottom sheet menu
-    const options = [
-        'Like',
-        'Add to Playlist',
-        'Download'
-    ];
-
-    // Simple implementation - you can enhance this with a proper modal later
-    const choice = prompt('Choose an action:\n\n1. Like\n2. Add to Playlist\n3. Download\n\nEnter number (1-3):');
-
-    if (choice === '1') {
-        toggleLike(event, trackId);
-    } else if (choice === '2') {
-        openPlaylistMenu(event, trackId);
-    } else if (choice === '3') {
-        downloadTrack(event, trackId);
-    }
-}

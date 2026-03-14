@@ -1813,6 +1813,76 @@
             font-weight: bold;
         }
         
+        /* Create Playlist Modal */
+        .create-playlist-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2100;
+        }
+        .create-playlist-overlay.active { display: block; }
+        .create-playlist-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1a1a1a;
+            border: 1px solid rgba(156, 39, 176, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            width: 320px;
+            z-index: 2101;
+        }
+        .create-playlist-modal.active { display: block; }
+        .create-playlist-modal h3 {
+            font-size: 1.1em;
+            margin-bottom: 16px;
+            color: white;
+        }
+        .create-playlist-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: white;
+            font-size: 0.95em;
+            outline: none;
+            box-sizing: border-box;
+            margin-bottom: 16px;
+        }
+        .create-playlist-input:focus {
+            border-color: rgba(156, 39, 176, 0.6);
+        }
+        .create-playlist-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .create-playlist-cancel {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 9px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .create-playlist-cancel:hover { background: rgba(255, 255, 255, 0.14); }
+        .create-playlist-confirm {
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            border: none;
+            color: white;
+            padding: 9px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        .create-playlist-confirm:hover { opacity: 0.9; }
+
         /* Alternate Versions */
         .alternates-container {
             max-height: 0;
@@ -3475,6 +3545,17 @@
 
     <!-- Track Detail Panel -->
     <div id="trackPanelOverlay" class="track-panel-overlay" onclick="closeTrackPanel()"></div>
+    <!-- Create Playlist Modal -->
+    <div class="create-playlist-overlay" id="createPlaylistOverlay" onclick="closeCreatePlaylistModal()"></div>
+    <div class="create-playlist-modal" id="createPlaylistModal">
+        <h3>New Playlist</h3>
+        <input type="text" id="createPlaylistInput" class="create-playlist-input" placeholder="Playlist name" maxlength="80" onkeydown="if(event.key==='Enter')confirmCreatePlaylist();if(event.key==='Escape')closeCreatePlaylistModal();">
+        <div class="create-playlist-actions">
+            <button class="create-playlist-cancel" onclick="closeCreatePlaylistModal()">Cancel</button>
+            <button class="create-playlist-confirm" onclick="confirmCreatePlaylist()">Create</button>
+        </div>
+    </div>
+
     <div id="trackPanel" class="track-panel">
         <div class="track-panel-artwork" id="trackPanelArtwork">
             <button class="track-panel-close" onclick="closeTrackPanel()">&#x2715;</button>

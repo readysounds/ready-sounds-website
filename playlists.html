@@ -342,6 +342,21 @@
             border-color: rgba(156, 39, 176, 0.3);
         }
 
+        .track-item.playing {
+            background: rgba(156, 39, 176, 0.15);
+            border-color: rgba(156, 39, 176, 0.5);
+        }
+
+        .track-item.playing .track-number {
+            font-size: 0;
+        }
+
+        .track-item.playing .track-number::after {
+            content: '♪';
+            font-size: 1.2rem;
+            color: #9c27b0;
+        }
+
         .track-number {
             font-size: 1.2em;
             color: #9c27b0;
@@ -691,7 +706,7 @@
                 const track = trackDatabase[trackId];
                 if (track) {
                     tracksHTML += `
-                        <div class="track-item">
+                        <div class="track-item" data-track-id="${trackId}">
                             <div class="track-number">${index + 1}</div>
                             <div class="track-artwork">
                                 <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.title)}">
@@ -716,7 +731,7 @@
                         </div>
                         <div class="playlist-header-actions">
                             <button class="play-playlist-btn" onclick="playUserPlaylist(${JSON.stringify(trackIds)})">▶ Play All</button>
-                            <button class="close-playlist" onclick="closePlaylist()">Close</button>
+                            <button class="close-playlist" onclick="closePlaylist()">← Back to Playlists</button>
                         </div>
                     </div>
                     <div class="track-list">
@@ -745,7 +760,7 @@
                 const track = trackDatabase[trackId];
                 if (!track) return '';
                 return `
-                    <div class="track-item">
+                    <div class="track-item" data-track-id="${trackId}">
                         <div class="track-number">${index + 1}</div>
                         <div class="track-artwork">
                             <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.title)}">
@@ -769,7 +784,7 @@
                         </div>
                         <div class="playlist-header-actions">
                             <button class="play-playlist-btn" onclick="playCuratedPlaylist('${slug}')">▶ Play All</button>
-                            <button class="close-playlist" onclick="closePlaylist()">Close</button>
+                            <button class="close-playlist" onclick="closePlaylist()">← Back to Playlists</button>
                         </div>
                     </div>
                     <div class="track-list">${tracksHTML || '<p style="color:#888;padding:20px">No tracks in this playlist.</p>'}</div>
@@ -802,9 +817,13 @@
             audioElement.src = track.url;
             document.getElementById('playerTitle').textContent = track.title;
             document.getElementById('playerMeta').textContent = track.meta;
+            document.getElementById('playerArtwork').src = track.artwork;
             audioPlayer.classList.add('active');
             audioElement.play();
             playPauseBtn.textContent = '\u23F8';
+            document.querySelectorAll('.track-item.playing').forEach(el => el.classList.remove('playing'));
+            const activeItem = document.querySelector(`.track-item[data-track-id="${trackId}"]`);
+            if (activeItem) activeItem.classList.add('playing');
         }
 
         function togglePlayPause() {
