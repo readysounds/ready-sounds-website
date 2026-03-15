@@ -47,6 +47,7 @@ function clearAllFilters() {
     });
 
     applyFilters();
+    renderFilterChips();
 }
 
 // Filter by mood from a track row tag click
@@ -58,6 +59,50 @@ function filterByMood(mood) {
         if (sidebarOption) sidebarOption.querySelector('.filter-checkbox')?.classList.add('checked');
     }
     applyFilters();
+}
+
+// Label maps for chips display
+const FILTER_LABELS = {
+    genre: { dance: 'Dance', electronic: 'Electronic', 'hip hop': 'Hip Hop', ambient: 'Ambient', corporate: 'Corporate', cinematic: 'Cinematic' },
+    bpm:   { '60-90': '60–90 BPM', '90-120': '90–120 BPM', '120-150': '120–150 BPM', '150+': '150+ BPM' },
+    mood:  {},  // capitalized dynamically
+    duration: { short: 'Short', medium: 'Medium', long: 'Long' }
+};
+
+function renderFilterChips() {
+    const bar = document.getElementById('activeFiltersBar');
+    if (!bar) return;
+
+    const allActive = Object.entries(activeFilters).flatMap(([cat, values]) =>
+        values.map(val => ({ cat, val }))
+    );
+
+    if (allActive.length === 0) {
+        bar.style.display = 'none';
+        bar.innerHTML = '';
+        return;
+    }
+
+    bar.style.display = 'flex';
+    bar.innerHTML = allActive.map(({ cat, val }) => {
+        const label = FILTER_LABELS[cat]?.[val] || (val.charAt(0).toUpperCase() + val.slice(1));
+        return `<span class="filter-chip">
+            ${label}
+            <span class="filter-chip-remove" onclick="removeFilterChip('${cat}','${val}')" title="Remove">×</span>
+        </span>`;
+    }).join('') + `<span class="filter-chips-clear" onclick="clearAllFilters()">Clear all</span>`;
+}
+
+function removeFilterChip(category, value) {
+    activeFilters[category] = activeFilters[category].filter(v => v !== value);
+    // Uncheck the corresponding sidebar checkbox
+    const option = document.querySelector(`.filter-option[onclick*="'${category}', '${value}'"]`);
+    if (option) option.querySelector('.filter-checkbox')?.classList.remove('checked');
+    // Also uncheck in the mobile filter modal clone
+    const modalOption = document.querySelector(`#filterModalBody .filter-option[onclick*="'${category}', '${value}'"]`);
+    if (modalOption) modalOption.querySelector('.filter-checkbox')?.classList.remove('checked');
+    applyFilters();
+    renderFilterChips();
 }
 
 // Apply filters to tracks
@@ -131,4 +176,6 @@ function applyFilters() {
 
         group.style.display = (searchMatch && filterMatch) ? '' : 'none';
     });
+
+    renderFilterChips();
 }
