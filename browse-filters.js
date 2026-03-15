@@ -61,9 +61,20 @@ function filterByMood(mood) {
     applyFilters();
 }
 
+// Genre buckets: maps filter value → all track genre strings it should match
+const GENRE_GROUPS = {
+    'electronic': ['electronic', 'edm', 'electro', 'house', 'tech', 'progressive', 'nu wave', 'future bass', 'synth pop', 'synth punk', 'dub'],
+    'dance':      ['dance'],
+    'pop':        ['pop', 'indie pop', 'funk pop'],
+    'indie':      ['indie', 'indie pop', 'indie rock'],
+    'funk':       ['funk', 'funk rock', 'funk pop'],
+    'hip hop':    ['hip hop', 'trap', 'afro beats'],
+    'lo-fi':      ['lofi', 'lo-fi'],
+};
+
 // Label maps for chips display
 const FILTER_LABELS = {
-    genre: { dance: 'Dance', electronic: 'Electronic', 'hip hop': 'Hip Hop', ambient: 'Ambient', corporate: 'Corporate', cinematic: 'Cinematic' },
+    genre: { electronic: 'Electronic', dance: 'Dance', pop: 'Pop', indie: 'Indie', funk: 'Funk', 'hip hop': 'Hip Hop', 'lo-fi': 'Lo-Fi' },
     bpm:   { '60-90': '60–90 BPM', '90-120': '90–120 BPM', '120-150': '120–150 BPM', '150+': '150+ BPM' },
     mood:  {},  // capitalized dynamically
     duration: { short: 'Short', medium: 'Medium', long: 'Long' }
@@ -145,7 +156,10 @@ function applyFilters() {
         const trackDuration = mainTrack.querySelector('.track-duration')?.textContent || '';
 
         if (activeFilters.genre.length > 0) {
-            filterMatch = filterMatch && activeFilters.genre.some(fg => trackGenres.includes(fg.toLowerCase()));
+            filterMatch = filterMatch && activeFilters.genre.some(fg => {
+                const group = GENRE_GROUPS[fg.toLowerCase()] || [fg.toLowerCase()];
+                return trackGenres.some(tg => group.includes(tg));
+            });
         }
 
         if (activeFilters.bpm.length > 0) {
