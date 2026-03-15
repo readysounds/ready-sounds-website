@@ -1,6 +1,30 @@
 // browse-player.js — Audio playback, player bar, and modal player for browse.html
 // Depends on: browse-tracks.js (currentAudio, currentPlayButton, currentTrackId, trackData)
 
+// ── Volume ────────────────────────────────────────────────────────────────────
+
+function setVolume(val) {
+    const v = parseInt(val);
+    if (typeof currentAudio !== 'undefined' && currentAudio) currentAudio.volume = v / 100;
+    const slider = document.getElementById('volumeSlider');
+    if (slider) slider.style.background =
+        `linear-gradient(to right, #9c27b0 ${v}%, rgba(255,255,255,0.15) ${v}%)`;
+    const icon = document.getElementById('volumeIcon');
+    if (icon) icon.textContent = v === 0 ? '🔇' : v < 50 ? '🔉' : '🔊';
+}
+
+function toggleMute() {
+    const slider = document.getElementById('volumeSlider');
+    if (!slider) return;
+    if (parseInt(slider.value) > 0) {
+        slider._prev = slider.value;
+        slider.value = 0;
+    } else {
+        slider.value = slider._prev || 100;
+    }
+    setVolume(slider.value);
+}
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 const formatTime = (seconds) => {
