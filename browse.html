@@ -2807,6 +2807,194 @@
            ======================================== */
         
         /* ========================================
+           TABLET LAYOUT - iPad / ≤768px
+           ======================================== */
+
+        @media (max-width: 768px) {
+            /* Show filter floating button */
+            .mobile-filter-btn {
+                display: flex;
+            }
+
+            /* Hide sidebar - full width for tracks */
+            .sidebar {
+                display: none;
+            }
+
+            /* Container goes single column */
+            .container {
+                flex-direction: column;
+                padding: 0 16px;
+            }
+
+            /* Main section */
+            .main {
+                padding: 16px 0 100px 0;
+            }
+
+            .catalog-headline {
+                padding: 0 0 16px 0 !important;
+            }
+
+            .search-section {
+                margin-bottom: 12px;
+            }
+
+            /* Hide desktop track table header */
+            .track-list-header {
+                display: none;
+            }
+
+            /* Card-style track items */
+            .track-item {
+                display: grid;
+                grid-template-columns: 52px 1fr 28px;
+                gap: 10px;
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 10px;
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                margin-bottom: 8px;
+                align-items: center;
+            }
+
+            .track-item:hover {
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            .track-item.alternate {
+                grid-template-columns: 44px 1fr;
+                padding: 7px;
+                margin: 6px 0 0 0;
+                background: rgba(255, 255, 255, 0.03);
+            }
+
+            /* Play button overlays artwork */
+            .track-play {
+                grid-column: 1;
+                grid-row: 1;
+                display: flex;
+                width: 28px;
+                height: 28px;
+                background: rgba(0, 0, 0, 0.85);
+                border: 2px solid rgba(255, 255, 255, 0.95);
+                border-radius: 50%;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                color: white;
+                z-index: 10;
+                backdrop-filter: blur(4px);
+                align-self: center;
+                justify-self: center;
+            }
+
+            .track-artwork {
+                grid-column: 1;
+                grid-row: 1;
+                width: 52px;
+                height: 52px;
+                position: relative;
+            }
+
+            .track-item.alternate .track-artwork {
+                width: 44px;
+                height: 44px;
+            }
+
+            .track-item.alternate .track-play {
+                width: 22px;
+                height: 22px;
+                font-size: 10px;
+            }
+
+            /* Track info - middle column */
+            .track-info {
+                grid-column: 2;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                gap: 2px;
+                min-width: 0;
+            }
+
+            .track-title {
+                font-size: 14px;
+                font-weight: 600;
+                line-height: 1.2;
+                width: 100%;
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .track-artist {
+                font-size: 12px;
+                color: rgba(255, 255, 255, 0.45);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 100%;
+            }
+
+            .versions-badge {
+                display: none;
+            }
+
+            /* Expand arrow - third column */
+            .expand-arrow {
+                grid-column: 3;
+                display: flex;
+                width: 28px;
+                height: 28px;
+                align-items: center;
+                justify-content: center;
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 14px;
+                background: rgba(255, 255, 255, 0.08);
+                border-radius: 6px;
+                flex-shrink: 0;
+                transition: all 0.2s;
+            }
+
+            .track-item.main-track.expanded .expand-arrow {
+                transform: rotate(180deg);
+                background: rgba(156, 39, 176, 0.2);
+                color: #9c27b0;
+            }
+
+            .track-item.alternate .expand-arrow,
+            .track-item:not(.has-alternates) .expand-arrow {
+                display: none;
+            }
+
+            /* Hide desktop-only columns */
+            .waveform-container,
+            .track-genre,
+            .track-moods,
+            .track-bpm,
+            .track-duration,
+            .track-actions {
+                display: none;
+            }
+
+            .track-group {
+                margin-bottom: 12px;
+            }
+
+            .alternates-container {
+                padding: 0;
+                margin-top: 8px;
+            }
+
+            /* Slim down nav - hide signup button, keep login */
+            .auth-btn-signup {
+                display: none;
+            }
+        }
+
+        /* ========================================
            MOBILE LAYOUT - Phones Only (480px and below)
            ======================================== */
         /* Tablet and small desktop - show hamburger to save space */
