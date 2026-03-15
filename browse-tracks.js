@@ -135,7 +135,7 @@ async function loadTracksFromSupabase() {
     // Populate trackData lookup for the player bar
     tracks.forEach(track => {
         trackData[track.id] = {
-            title: `${track.artist} - "${track.title}"`,
+            title: track.title,
             trackTitle: track.title,
             artist: track.artist,
             duration: track.duration,
@@ -152,7 +152,7 @@ async function loadTracksFromSupabase() {
         alts.forEach(alt => {
             const domId = alt.id + 100;
             trackData[domId] = {
-                title: `${track.artist} - "${track.title}" (${alt.title})`,
+                title: `${track.title} (${alt.title})`,
                 artist: track.artist,
                 duration: alt.duration
             };
