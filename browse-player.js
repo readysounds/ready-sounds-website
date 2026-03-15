@@ -101,9 +101,8 @@ function updateNowPlayingBar(trackId) {
 
         // Update OS / car / lock screen now-playing metadata
         if ('mediaSession' in navigator) {
-            const osTitle = track.title.includes(' - ') ? track.title.split(' - ').slice(1).join(' - ') : track.title;
             navigator.mediaSession.metadata = new MediaMetadata({
-                title:  osTitle,
+                title:  track.title,
                 artist: track.artist || 'readysounds',
                 album:  'readysounds catalog',
                 artwork: artSrc ? [{ src: artSrc }] : []
