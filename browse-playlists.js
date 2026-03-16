@@ -1,6 +1,22 @@
 // browse-playlists.js — Playlist management and mobile track menu for browse.html
 // Depends on: browse-tracks.js (supabaseClient via browse-init.js), browse-downloads.js (isUserLoggedIn, showLoginPrompt)
 
+// ── Toast ─────────────────────────────────────────────────────────────────────
+let _toastTimer = null;
+function showToast(message) {
+    let el = document.getElementById('appToast');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'appToast';
+        el.className = 'toast';
+        document.body.appendChild(el);
+    }
+    el.textContent = message;
+    el.classList.add('visible');
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => el.classList.remove('visible'), 2000);
+}
+
 // Playlist Management
 let userPlaylists = [];  // Will store playlists from Supabase
 
@@ -9,7 +25,6 @@ async function loadUserPlaylists() {
     try {
         // Check if Supabase is initialized
         if (!supabaseClient) {
-            console.log('Supabase not initialized yet, skipping playlist load');
             return;
         }
 
@@ -32,7 +47,6 @@ async function loadUserPlaylists() {
         }
 
         userPlaylists = data || [];
-        console.log('Loaded user playlists:', userPlaylists);
     } catch (err) {
         console.error('Error loading playlists:', err);
         userPlaylists = [];
@@ -159,6 +173,7 @@ async function confirmCreatePlaylist() {
         }
 
         await loadUserPlaylists();
+        showToast(`Playlist "${playlistName}" created`);
     } catch (err) {
         console.error('Error:', err);
     }
@@ -200,6 +215,8 @@ async function toggleTrackInPlaylist(trackId, playlistId) {
             return;
         }
 
+        const wasAdded = index === -1;
+
         // Close menu
         if (currentPlaylistMenu) {
             currentPlaylistMenu.remove();
@@ -208,6 +225,7 @@ async function toggleTrackInPlaylist(trackId, playlistId) {
 
         // Reload playlists
         await loadUserPlaylists();
+        showToast(wasAdded ? 'Added to playlist' : 'Removed from playlist');
 
     } catch (err) {
         console.error('Error:', err);

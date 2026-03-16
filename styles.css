@@ -357,3 +357,26 @@ footer {
     padding-top: 40px;
     border-top: 1px solid var(--color-border-dim);
 }
+
+/* ── Toast notifications ──────────────────────────────────────────────────── */
+.toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1e1e1e;
+    border: 1px solid rgba(156, 39, 176, 0.4);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 99999;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+    white-space: nowrap;
+}
+.toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}

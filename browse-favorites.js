@@ -42,29 +42,78 @@ document.addEventListener('click', function(e) {
 
 let favorites = [];
 
-function loadFavorites() {
+async function loadFavorites() {
+    // Show local favorites immediately for instant UI
     const saved = localStorage.getItem('readysounds_favorites');
     favorites = saved ? JSON.parse(saved) : [];
     updateHeartIcons();
+
+    // Sync with Supabase if logged in
+    if (!supabaseClient) return;
+    try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) return;
+
+        const { data, error } = await supabaseClient
+            .from('user_favorites')
+            .select('track_id')
+            .eq('user_id', user.id);
+
+        if (error) return;
+
+        const serverIds = (data || []).map(r => r.track_id);
+
+        // Push any local-only favorites up to the server
+        const localOnly = favorites.filter(id => !serverIds.includes(id));
+        if (localOnly.length > 0) {
+            await supabaseClient.from('user_favorites').insert(
+                localOnly.map(id => ({ user_id: user.id, track_id: id }))
+            );
+        }
+
+        // Merge server and local into one list
+        favorites = [...new Set([...favorites, ...serverIds])];
+        localStorage.setItem('readysounds_favorites', JSON.stringify(favorites));
+        updateHeartIcons();
+    } catch (err) {
+        console.error('Error syncing favorites:', err);
+    }
 }
 
 function saveFavorites() {
     localStorage.setItem('readysounds_favorites', JSON.stringify(favorites));
 }
 
-function toggleFavorite(trackId) {
-    console.log('toggleFavorite called with trackId:', trackId);
-    const index = favorites.indexOf(trackId);
-    if (index > -1) {
-        favorites.splice(index, 1);
-        console.log('Removed from favorites:', trackId);
+async function toggleFavorite(trackId) {
+    const wasLiked = favorites.includes(trackId);
+
+    // Update local state immediately
+    if (wasLiked) {
+        favorites = favorites.filter(id => id !== trackId);
     } else {
         favorites.push(trackId);
-        console.log('Added to favorites:', trackId);
     }
     saveFavorites();
     updateHeartIcons();
-    console.log('Current favorites:', favorites);
+
+    // Sync to Supabase in the background
+    if (!supabaseClient) return;
+    try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) return;
+
+        if (wasLiked) {
+            await supabaseClient.from('user_favorites')
+                .delete()
+                .eq('user_id', user.id)
+                .eq('track_id', trackId);
+        } else {
+            await supabaseClient.from('user_favorites')
+                .insert({ user_id: user.id, track_id: trackId });
+        }
+    } catch (err) {
+        console.error('Error syncing favorite:', err);
+    }
 }
 
 function updateHeartIcons() {

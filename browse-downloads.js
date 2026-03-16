@@ -12,7 +12,6 @@ async function hasActiveSubscription() {
         const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
 
         if (userError || !user) {
-            console.log('No user logged in');
             return false;
         }
 
@@ -30,11 +29,9 @@ async function hasActiveSubscription() {
 
         // Check if subscription is active
         if (profile && profile.subscription_status === 'active') {
-            console.log('User has active subscription:', profile.subscription_plan);
             return true;
         }
 
-        console.log('No active subscription found');
         return false;
     } catch (error) {
         console.error('Error checking subscription:', error);
@@ -167,10 +164,19 @@ async function showDownloadOptions(trackId) {
     const mp3Btn = document.createElement('button');
     mp3Btn.className = 'download-option-btn';
     mp3Btn.textContent = '🎵 Download MP3';
-    mp3Btn.onclick = () => {
-        const mp3Url = fixAlbum(streamUrl.replace('/audio/', '/downloads/'));
-        const mp3Filename = filename;
-        downloadFile(mp3Url, mp3Filename, { ...trackMeta, versionTitle: 'Full Track', fileFormat: 'MP3' });
+    mp3Btn.onclick = async (e) => {
+        const btn = e.currentTarget;
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Downloading...';
+        try {
+            const mp3Url = fixAlbum(streamUrl.replace('/audio/', '/downloads/'));
+            await downloadFile(mp3Url, filename, { ...trackMeta, versionTitle: 'Full Track', fileFormat: 'MP3' });
+            closeDownloadOptions();
+        } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
     };
     mainSection.appendChild(mp3Btn);
 
@@ -178,13 +184,21 @@ async function showDownloadOptions(trackId) {
     const wavBtn = document.createElement('button');
     wavBtn.className = 'download-option-btn';
     wavBtn.textContent = '🎧 Download WAV (High Quality)';
-    wavBtn.onclick = () => {
-        // Convert MP3 URL to WAV URL:
-        // 1. Change /audio/ to /downloads/
-        // 2. Change .mp3 to .wav (filename keeps -preview as that's how files are named in R2)
-        const wavUrl = fixAlbum(streamUrl.replace('/audio/', '/downloads/').replace('.mp3', '.wav'));
-        const wavFilename = filename.replace('.mp3', '.wav');
-        downloadFile(wavUrl, wavFilename, { ...trackMeta, versionTitle: 'Full Track', fileFormat: 'WAV' });
+    wavBtn.onclick = async (e) => {
+        const btn = e.currentTarget;
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Downloading...';
+        try {
+            // Change /audio/ to /downloads/ and .mp3 to .wav
+            const wavUrl = fixAlbum(streamUrl.replace('/audio/', '/downloads/').replace('.mp3', '.wav'));
+            const wavFilename = filename.replace('.mp3', '.wav');
+            await downloadFile(wavUrl, wavFilename, { ...trackMeta, versionTitle: 'Full Track', fileFormat: 'WAV' });
+            closeDownloadOptions();
+        } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
     };
     mainSection.appendChild(wavBtn);
 
@@ -218,10 +232,19 @@ async function showDownloadOptions(trackId) {
                         const altMp3 = document.createElement('button');
                         altMp3.className = 'download-option-btn-small';
                         altMp3.textContent = 'MP3';
-                        altMp3.onclick = () => {
-                            const altMp3Url = fixAlbum(altStreamUrl.replace('/audio/', '/downloads/').replace('-preview', ''));
-                            const altMp3Filename = altFilename.replace('-preview', '');
-                            downloadFile(altMp3Url, altMp3Filename, { ...trackMeta, versionTitle: altTitle, fileFormat: 'MP3' });
+                        altMp3.onclick = async (e) => {
+                            const btn = e.currentTarget;
+                            btn.disabled = true;
+                            btn.textContent = '...';
+                            try {
+                                const altMp3Url = fixAlbum(altStreamUrl.replace('/audio/', '/downloads/').replace('-preview', ''));
+                                const altMp3Filename = altFilename.replace('-preview', '');
+                                await downloadFile(altMp3Url, altMp3Filename, { ...trackMeta, versionTitle: altTitle, fileFormat: 'MP3' });
+                                closeDownloadOptions();
+                            } finally {
+                                btn.disabled = false;
+                                btn.textContent = 'MP3';
+                            }
                         };
                         altDiv.appendChild(altMp3);
 
@@ -229,10 +252,19 @@ async function showDownloadOptions(trackId) {
                         const altWav = document.createElement('button');
                         altWav.className = 'download-option-btn-small';
                         altWav.textContent = 'WAV';
-                        altWav.onclick = () => {
-                            const altWavUrl = fixAlbum(altStreamUrl.replace('/audio/', '/downloads/').replace('-preview', '').replace('.mp3', '.wav'));
-                            const altWavFilename = altFilename.replace('-preview', '').replace('.mp3', '.wav');
-                            downloadFile(altWavUrl, altWavFilename, { ...trackMeta, versionTitle: altTitle, fileFormat: 'WAV' });
+                        altWav.onclick = async (e) => {
+                            const btn = e.currentTarget;
+                            btn.disabled = true;
+                            btn.textContent = '...';
+                            try {
+                                const altWavUrl = fixAlbum(altStreamUrl.replace('/audio/', '/downloads/').replace('-preview', '').replace('.mp3', '.wav'));
+                                const altWavFilename = altFilename.replace('-preview', '').replace('.mp3', '.wav');
+                                await downloadFile(altWavUrl, altWavFilename, { ...trackMeta, versionTitle: altTitle, fileFormat: 'WAV' });
+                                closeDownloadOptions();
+                            } finally {
+                                btn.disabled = false;
+                                btn.textContent = 'WAV';
+                            }
                         };
                         altDiv.appendChild(altWav);
 
@@ -253,7 +285,19 @@ async function showDownloadOptions(trackId) {
     const stemsBtn = document.createElement('button');
     stemsBtn.className = 'download-option-btn';
     stemsBtn.textContent = '📦 Download All Stems (ZIP)';
-    stemsBtn.onclick = () => downloadStems(basePath, album, folder, baseName);
+    stemsBtn.onclick = async (e) => {
+        const btn = e.currentTarget;
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Preparing stems...';
+        try {
+            await downloadStems(basePath, album, folder, baseName);
+            closeDownloadOptions();
+        } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+    };
     stemsSection.appendChild(stemsBtn);
 
     optionsList.appendChild(stemsSection);
@@ -280,8 +324,6 @@ function closeDownloadOptions() {
 // Download a single file
 async function downloadFile(url, filename, trackMeta = {}) {
     try {
-        console.log('Requesting download for:', filename);
-
         // Get user's auth token
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) {
@@ -294,8 +336,6 @@ async function downloadFile(url, filename, trackMeta = {}) {
         // Extract: downloads/primum-electronic/track.wav
         const urlObj = new URL(url);
         const filePath = urlObj.pathname.substring(1); // Remove leading slash
-
-        console.log('Requesting secure download URL for:', filePath);
 
         // Call our Netlify function to get a signed URL
         const response = await fetch('/.netlify/functions/download', {
@@ -336,8 +376,6 @@ async function downloadFile(url, filename, trackMeta = {}) {
         link.click();
         document.body.removeChild(link);
         setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
-
-        console.log('Download completed:', filename);
     } catch (error) {
         console.error('Download error:', error);
         alert('Download failed. Please try again.');
@@ -346,8 +384,6 @@ async function downloadFile(url, filename, trackMeta = {}) {
 
 // Download stems as ZIP
 async function downloadStems(basePath, album, folder, baseName) {
-    console.log('Fetching stems for:', baseName);
-
     // Try all possible stem types we've seen across all tracks
     // Code will try to fetch each one, and only include stems that exist
     const allPossibleStems = [
@@ -396,13 +432,15 @@ async function downloadStems(basePath, album, folder, baseName) {
 
     // Load JSZip library if not already loaded
     if (typeof JSZip === 'undefined') {
-        console.log('Loading ZIP library...');
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-        script.onload = () => createAndDownloadZip(stemUrls, baseName);
-        document.head.appendChild(script);
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+            script.onload = () => createAndDownloadZip(stemUrls, baseName).then(resolve).catch(reject);
+            script.onerror = () => reject(new Error('Failed to load ZIP library'));
+            document.head.appendChild(script);
+        });
     } else {
-        createAndDownloadZip(stemUrls, baseName);
+        return createAndDownloadZip(stemUrls, baseName);
     }
 }
 
@@ -410,8 +448,6 @@ async function downloadStems(basePath, album, folder, baseName) {
 async function createAndDownloadZip(stemUrls, baseName) {
     const zip = new JSZip();
     const stemsFolder = zip.folder('stems');
-
-    console.log('Searching for stems...');
 
     // Show loading message
     const loadingMsg = document.createElement('div');
@@ -428,7 +464,6 @@ async function createAndDownloadZip(stemUrls, baseName) {
                 const blob = await response.blob();
                 stemsFolder.file(filename, blob);
                 foundCount++;
-                console.log('Added to ZIP:', filename);
                 return true;
             }
         } catch (error) {
@@ -439,14 +474,16 @@ async function createAndDownloadZip(stemUrls, baseName) {
 
     await Promise.all(fetchPromises);
 
-    // Update message
-    loadingMsg.textContent = `Creating ZIP with ${foundCount} stems...`;
+    // Remove loading message
+    document.body.removeChild(loadingMsg);
+
+    if (foundCount === 0) {
+        alert('No stems found for this track.');
+        return;
+    }
 
     // Generate ZIP
     const content = await zip.generateAsync({type: 'blob'});
-
-    // Remove loading message
-    document.body.removeChild(loadingMsg);
 
     // Download ZIP
     const link = document.createElement('a');
@@ -455,8 +492,6 @@ async function createAndDownloadZip(stemUrls, baseName) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
-    console.log(`ZIP download started with ${foundCount} stems`);
 }
 
 // Add to cart from download modal
@@ -493,11 +528,9 @@ function addToCartFromModal() {
 async function isUserLoggedIn() {
     try {
         if (!supabaseClient) {
-            console.log('Supabase client not initialized yet');
             return false;
         }
         const { data: { session } } = await supabaseClient.auth.getSession();
-        console.log('Session check:', session ? 'Logged in' : 'Not logged in');
         return session !== null && session.user !== null;
     } catch (error) {
         console.error('Error checking auth status:', error);

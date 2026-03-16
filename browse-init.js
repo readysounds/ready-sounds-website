@@ -71,24 +71,15 @@ let supabaseClient = null;
 
 async function handleOAuthCallback() {
     const hash = window.location.hash;
-    console.log('🔍 Checking for OAuth callback. Hash:', hash);
 
     if (!hash || !hash.includes('access_token')) {
-        console.log('No OAuth tokens found in URL');
         return false;
     }
-
-    console.log('📱 OAuth callback detected, processing tokens...');
 
     // Parse hash parameters
     const params = new URLSearchParams(hash.substring(1));
     const access_token = params.get('access_token');
     const refresh_token = params.get('refresh_token');
-
-    console.log('Tokens found:', {
-        hasAccessToken: !!access_token,
-        hasRefreshToken: !!refresh_token
-    });
 
     if (!access_token || !refresh_token) {
         console.error('❌ Missing tokens in OAuth callback');
@@ -100,7 +91,6 @@ async function handleOAuthCallback() {
     try {
         const supabaseClient = window.RS.getClient();
 
-        console.log('Setting session with tokens...');
         const { data, error } = await supabaseClient.auth.setSession({
             access_token: access_token,
             refresh_token: refresh_token
@@ -111,8 +101,6 @@ async function handleOAuthCallback() {
             alert('Authentication error: ' + error.message);
             return false;
         }
-
-        console.log('✅ Session set successfully! User:', data.user?.email);
 
         // Clean up URL
         window.history.replaceState(null, '', window.location.pathname);
@@ -159,8 +147,6 @@ async function initAuth() {
                 profileInitial.textContent = session.user.email.charAt(0).toUpperCase();
             }
 
-            console.log('User logged in:', session.user.email);
-
             // Load favorites from localStorage
             loadFavorites();
 
@@ -175,7 +161,6 @@ async function initAuth() {
                 cartButtons.forEach(btn => {
                     btn.style.display = 'none';
                 });
-                console.log('Cart buttons hidden for subscribed user');
             }
         } else {
             // User is not logged in - show login buttons
@@ -190,7 +175,6 @@ async function initAuth() {
 
     // Listen for auth changes
     supabaseClient.auth.onAuthStateChange((event, session) => {
-        console.log('Auth state changed:', event);
         // Handle all auth state changes including INITIAL_SESSION (after OAuth redirect)
         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') {
             checkAuth();
@@ -205,7 +189,6 @@ function handleTrackAutoPlay() {
     if (hash && hash.startsWith('#track-')) {
         const trackId = parseInt(hash.replace('#track-', ''));
         if (trackId) {
-            console.log('Auto-playing track from hash:', trackId);
             // Wait a moment for DOM to be ready
             setTimeout(() => {
                 const trackButton = document.querySelector(`[data-track-id="${trackId}"]`);
@@ -273,7 +256,9 @@ function openTrackPanel(event, trackId) {
             ${metaTags('Genre', data.genre)}
             ${metaValue('Energy', data.energy)}
         </div>
+        ${metaTags('Use Cases', data.use_cases, true)}
         ${metaTags('Best Moments', data.best_moments, true)}
+        ${metaTags('Similar Artists', data.similar_artists, true)}
     `;
 
     document.getElementById('trackPanelOverlay').classList.add('active');
