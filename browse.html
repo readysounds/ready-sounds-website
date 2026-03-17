@@ -3391,7 +3391,13 @@
             <nav class="header-nav" id="headerNav">
                 <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()">☰</button>
                 <a href="browse.html" class="nav-item active">Browse</a>
-                <a href="playlists.html" class="nav-item">Playlists</a>
+                <div class="nav-music-dropdown">
+                    <span class="nav-item nav-music-trigger">Music</span>
+                    <div class="nav-music-menu">
+                        <a href="playlists.html">Playlists</a>
+                        <a href="compilations.html">Compilations</a>
+                    </div>
+                </div>
                 <a href="pricing.html" class="nav-item">Pricing</a>
                 <a href="terms.html" class="nav-item">Terms & Conditions</a>
                 <div class="cart-icon" id="cartBtn">Cart (0)</div>
@@ -3444,6 +3450,7 @@
         <nav class="mobile-panel-nav">
             <a href="browse.html" class="mobile-panel-link active">Browse</a>
             <a href="playlists.html" class="mobile-panel-link">Playlists</a>
+            <a href="compilations.html" class="mobile-panel-link">Compilations</a>
             <a href="pricing.html" class="mobile-panel-link">Pricing</a>
         </nav>
 

@@ -285,7 +285,64 @@ body {
     border-color: var(--color-purple-mid);
 }
 
-/* ── 7. Base Button Components ───────────────────────────────────────────── */
+/* ── 7. Music Nav Dropdown ───────────────────────────────────────────────── */
+
+.nav-music-dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.nav-music-trigger {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s;
+}
+.nav-music-trigger::after {
+    content: '▾';
+    font-size: 0.85em;
+    margin-left: 2px;
+}
+.nav-music-trigger:hover { color: var(--color-purple); }
+
+.nav-music-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    background: #1a1a1a;
+    border: 1px solid var(--color-purple-border);
+    border-radius: 8px;
+    padding: 8px 0;
+    min-width: 150px;
+    display: none;
+    flex-direction: column;
+    z-index: 1001;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+.nav-music-dropdown:hover .nav-music-menu { display: flex; }
+
+.nav-music-menu a {
+    display: block;
+    padding: 10px 16px;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.nav-music-menu a:hover {
+    background: var(--color-purple-bg);
+    color: var(--color-purple);
+}
+
+/* ── 8. Base Button Components ───────────────────────────────────────────── */
 
 .btn {
     padding: 12px 24px;

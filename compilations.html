@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compilations - Ready Sounds</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/supabase.js"></script>
+    <script src="/nav.js"></script>
+    <script src="/auth.js"></script>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body {
+            padding: 20px;
+            padding-bottom: 120px;
+        }
+
+        .rs-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 1000;
+            padding: 16px 0;
+        }
+
+        .rs-nav-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .rs-logo {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            text-transform: lowercase;
+            margin-right: auto;
+        }
+
+        .rs-nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        .rs-nav-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .rs-nav-links a:hover { color: #9c27b0; }
+        .rs-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .rs-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+        }
+        @media (max-width: 768px) {
+            .rs-nav-links { display: none; }
+            .rs-menu-toggle { display: block; }
+        }
+
+        .page-header {
+            padding: 120px 0 40px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ffffff, #9c27b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1em;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .compilations-grid {
+            max-width: 1200px;
+            margin: 40px auto;
+            display: grid;
+            gap: 24px;
+            padding: 0 20px;
+        }
+
+        .compilation-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .compilation-card:hover {
+            border-color: rgba(156, 39, 176, 0.4);
+            background: rgba(156, 39, 176, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .compilations-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        @media (max-width: 900px) {
+            .compilations-grid { grid-template-columns: 1fr; }
+        }
+
+        .compilation-card {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .compilation-thumb {
+            width: 100%;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            position: relative;
+            overflow: hidden;
+        }
+        .compilation-thumb::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.6) 100%);
+        }
+
+        .compilation-info {
+            padding: 20px;
+        }
+        .compilation-info h3 {
+            font-size: 1.25em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+        .compilation-info .genres {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .genre-tag {
+            font-size: 0.75em;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.07);
+            color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .compilation-info .browse-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 16px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #9c27b0;
+        }
+        .compilation-card:hover .browse-link {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Site Navigation -->
+    <nav class="rs-nav">
+        <div class="rs-nav-inner">
+            <a href="browse.html" class="rs-logo">readysounds.</a>
+            <div class="rs-nav-links">
+                <a href="browse.html">Browse</a>
+                <div class="nav-music-dropdown">
+                    <span class="nav-music-trigger active-page">Music</span>
+                    <div class="nav-music-menu">
+                        <a href="playlists.html">Playlists</a>
+                        <a href="compilations.html">Compilations</a>
+                    </div>
+                </div>
+                <a href="pricing.html">Pricing</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <div class="rs-nav-right">
+                <div class="profile-container" id="profileContainer">
+                    <div class="profile-icon" id="profileIcon" onclick="toggleProfileDropdown()">
+                        <span id="profileInitial">U</span>
+                    </div>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="profile-dropdown-header">My Media</div>
+                        <a href="favorites.html" class="profile-dropdown-item"><span>Favorites</span></a>
+                        <a href="my-playlists.html" class="profile-dropdown-item"><span>My Playlists</span></a>
+                        <div class="profile-dropdown-divider"></div>
+                        <a href="settings.html" class="profile-dropdown-item"><span>Account Settings</span></a>
+                        <div class="profile-dropdown-divider"></div>
+                        <a href="#" class="profile-dropdown-item" onclick="handleLogout(); return false;"><span>Sign Out</span></a>
+                    </div>
+                </div>
+                <button class="rs-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Panel Overlay -->
+    <div class="mobile-panel-overlay" id="mobilePanelOverlay" onclick="closeMobilePanel()"></div>
+    <!-- Mobile Slide Panel -->
+    <div class="mobile-panel" id="mobilePanel">
+        <button class="mobile-panel-close" onclick="closeMobilePanel()">✕</button>
+        <nav class="mobile-panel-nav">
+            <a href="browse.html">Browse</a>
+            <a href="playlists.html">Playlists</a>
+            <a href="compilations.html" class="active-page">Compilations</a>
+            <a href="pricing.html">Pricing</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+        <a href="pricing.html" class="mobile-panel-cta">Subscribe</a>
+        <div class="mobile-panel-auth">
+            <a href="signup.html?mode=signin" class="mobile-auth-login">Log In</a>
+            <a href="signup.html" class="mobile-auth-signup">Create Free Account</a>
+        </div>
+        <div class="mobile-panel-footer">
+            <a href="terms.html" style="color: rgba(255,255,255,0.4); font-size: 12px; text-decoration: none;">terms & conditions</a>
+        </div>
+    </div>
+
+    <div class="page-header">
+        <h1>Compilations</h1>
+        <p>Meet the artists behind Ready Sounds. Each pseudonym has a distinct sound — explore their music.</p>
+    </div>
+
+    <div class="compilations-grid">
+
+        <!-- Buck Moon -->
+        <a class="compilation-card" href="browse.html?artist=buck-moon">
+            <div class="compilation-thumb" style="background: linear-gradient(135deg, #0d1b2a, #1b3a5c, #2d6a9f);">
+                🌕
+            </div>
+            <div class="compilation-info">
+                <h3>Buck Moon</h3>
+                <div class="genres">
+                    <span class="genre-tag">Electronic</span>
+                    <span class="genre-tag">Indie</span>
+                    <span class="genre-tag">Pop</span>
+                    <span class="genre-tag">Alternative</span>
+                </div>
+                <span class="browse-link">Browse tracks →</span>
+            </div>
+        </a>
+
+        <!-- MallFlex -->
+        <a class="compilation-card" href="browse.html?artist=mallflex">
+            <div class="compilation-thumb" style="background: linear-gradient(135deg, #1a0a00, #7c3a00, #e65c00);">
+                🛍️
+            </div>
+            <div class="compilation-info">
+                <h3>MallFlex</h3>
+                <div class="genres">
+                    <span class="genre-tag">Funk</span>
+                    <span class="genre-tag">Dance</span>
+                    <span class="genre-tag">Pop</span>
+                </div>
+                <span class="browse-link">Browse tracks →</span>
+            </div>
+        </a>
+
+        <!-- Tag Along -->
+        <a class="compilation-card" href="browse.html?artist=tag-along">
+            <div class="compilation-thumb" style="background: linear-gradient(135deg, #0a1a0a, #1a3a2a, #2d7a5a);">
+                🏷️
+            </div>
+            <div class="compilation-info">
+                <h3>Tag Along</h3>
+                <div class="genres">
+                    <span class="genre-tag">Electronic</span>
+                    <span class="genre-tag">Synth-Based</span>
+                    <span class="genre-tag">Alternative</span>
+                    <span class="genre-tag">Indie</span>
+                </div>
+                <span class="browse-link">Browse tracks →</span>
+            </div>
+        </a>
+
+    </div>
+</body>
+</html>
