@@ -423,8 +423,8 @@
                 });
                 
                 const session = await response.json();
-                const stripe = Stripe('pk_live_51Ss8KQRzfMLCjnGKS8LlJqJNO3mlbehpSo19N1E6c8WhBqKCP5KvdbC8APag5Fp8jQ0pW6Bk9oSWaoXFdodwgS5X00HmOqYDwn');
-                await stripe.redirectToCheckout({ sessionId: session.id });
+                if (!session.url) throw new Error(session.error || 'No checkout URL returned');
+                window.location = session.url;
             } catch (error) {
                 console.error('Checkout error:', error);
                 alert('Unable to start checkout. Please try again.');
