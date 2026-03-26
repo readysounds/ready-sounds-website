@@ -159,8 +159,20 @@ async function loadTracksFromSupabase() {
         });
     });
 
+    // Weighted shuffle: real-estate-friendly moods/genres float to top, randomized each visit
+    const PREFERRED_MOODS = new Set(['uplifting', 'positive', 'happy', 'cheerful', 'inspiring', 'hopeful', 'bright', 'optimistic', 'feel-good', 'warm', 'motivating', 'upbeat', 'energetic', 'playful', 'fun', 'light', 'airy', 'joyful']);
+    const PREFERRED_GENRES = new Set(['pop', 'indie pop', 'indie', 'indie rock', 'acoustic']);
+    const shuffled = tracks.map(track => {
+        const moods = (track.moods || '').toLowerCase().split(',').map(m => m.trim());
+        const genre = (track.genre || '').toLowerCase();
+        let score = Math.random();
+        if (moods.some(m => PREFERRED_MOODS.has(m))) score += 1;
+        if (PREFERRED_GENRES.has(genre)) score += 0.5;
+        return { track, score };
+    }).sort((a, b) => b.score - a.score).map(s => s.track);
+
     // Render track list
-    container.innerHTML = tracks.map(track => renderTrackGroup(track)).join('');
+    container.innerHTML = shuffled.map(track => renderTrackGroup(track)).join('');
 
     // Re-apply liked state for logged-in users
     if (typeof loadFavorites === 'function') loadFavorites();
