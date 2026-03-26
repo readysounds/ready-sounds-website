@@ -2948,6 +2948,74 @@
            TABLET LAYOUT - iPad / ≤768px
            ======================================== */
 
+        /* Featured Playlists */
+        .featured-playlists-section {
+            margin-bottom: 28px;
+        }
+        .featured-playlists-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .featured-playlists-title {
+            font-size: 0.85em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #aaa;
+        }
+        .featured-playlists-see-all {
+            font-size: 0.82em;
+            color: #888;
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+        .featured-playlists-see-all:hover { color: #fff; }
+        .featured-playlists-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+        }
+        .featured-playlists-scroll::-webkit-scrollbar { display: none; }
+        .featured-playlist-card {
+            flex: 0 0 auto;
+            width: 130px;
+            scroll-snap-align: start;
+            text-decoration: none;
+            color: inherit;
+        }
+        .featured-playlist-card img {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: block;
+            background: rgba(255,255,255,0.06);
+        }
+        .featured-playlist-card .fp-placeholder {
+            width: 130px;
+            height: 130px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+        }
+        .featured-playlist-card .fp-name {
+            margin-top: 7px;
+            font-size: 0.82em;
+            font-weight: 600;
+            color: #ddd;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         @media (max-width: 768px) {
             /* Show filter floating button */
             .mobile-filter-btn {
@@ -3714,6 +3782,15 @@
                 <div class="catalog-headline" style="padding: 0 0 32px 0;">
                     <h1 style="font-size: 1.3em; font-weight: 700; color: #fff; margin-bottom: 8px;">No middlemen. No algorithms. Just music.</h1>
                     <p style="color: #888; font-size: 0.95em; letter-spacing: 0.03em;">Human-made tracks, stems, and alternate versions — direct from the producer.</p>
+                </div>
+
+                <!-- Featured Playlists -->
+                <div class="featured-playlists-section" id="featuredPlaylistsSection" style="display:none;">
+                    <div class="featured-playlists-header">
+                        <span class="featured-playlists-title">Featured Playlists</span>
+                        <a href="playlists.html" class="featured-playlists-see-all">See all →</a>
+                    </div>
+                    <div class="featured-playlists-scroll" id="featuredPlaylistsScroll"></div>
                 </div>
 
                 <!-- Search -->

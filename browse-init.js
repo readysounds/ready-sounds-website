@@ -123,8 +123,9 @@ async function initAuth() {
     supabaseClient = await window.RS.waitForClient();
     await handleOAuthCallback();
 
-    // Load tracks from database
+    // Load tracks and featured playlists from database
     loadTracksFromSupabase();
+    loadFeaturedPlaylists();
 
     // Check authentication status
     async function checkAuth() {
@@ -274,6 +275,32 @@ function closeTrackPanel() {
 
 function handlePanelEsc(e) {
     if (e.key === 'Escape') closeTrackPanel();
+}
+
+// ── Featured Playlists ───────────────────────────────────────────────────────
+
+async function loadFeaturedPlaylists() {
+    const section = document.getElementById('featuredPlaylistsSection');
+    const scroll = document.getElementById('featuredPlaylistsScroll');
+    if (!section || !scroll || !supabaseClient) return;
+
+    const { data: playlists, error } = await supabaseClient
+        .from('curated_playlists')
+        .select('slug, name, cover_url')
+        .eq('is_active', true)
+        .order('sort_order')
+        .limit(12);
+
+    if (error || !playlists || playlists.length === 0) return;
+
+    scroll.innerHTML = playlists.map(p => {
+        const img = p.cover_url
+            ? `<img src="${p.cover_url}" alt="${p.name.replace(/"/g, '&quot;')}">`
+            : `<div class="fp-placeholder">🎵</div>`;
+        return `<a href="playlists.html#${p.slug}" class="featured-playlist-card">${img}<div class="fp-name">${p.name}</div></a>`;
+    }).join('');
+
+    section.style.display = 'block';
 }
 
 // ── Bootstrap ────────────────────────────────────────────────────────────────
