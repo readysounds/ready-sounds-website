@@ -3180,9 +3180,20 @@
             .track-genre,
             .track-moods,
             .track-bpm,
-            .track-duration,
-            .track-actions {
+            .track-duration {
                 display: none;
+            }
+
+            /* On mobile show only the heart button from track-actions */
+            .track-actions {
+                display: flex;
+            }
+            .track-actions .action-btn:not(.action-btn-like) {
+                display: none;
+            }
+            .action-btn-like {
+                font-size: 20px;
+                padding: 6px 10px;
             }
 
             .track-group {
@@ -3415,11 +3426,18 @@
             .track-genre,
             .track-moods,
             .track-bpm,
-            .track-duration,
-            .track-actions {
+            .track-duration {
                 display: none;
             }
-            
+
+            /* Keep heart button visible on phones too */
+            .track-actions {
+                display: flex;
+            }
+            .track-actions .action-btn:not(.action-btn-like) {
+                display: none;
+            }
+
             .alternates-container {
                 padding: 0;
                 margin-top: 6px;
