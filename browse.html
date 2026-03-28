@@ -357,23 +357,27 @@
         .mobile-filter-btn {
             display: none;
             position: fixed;
-            bottom: 80px;
-            right: 16px;
-            background: #9c27b0;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 56px;
-            height: 56px;
-            font-size: 24px;
+            bottom: 72px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e1e1e;
+            color: rgba(255,255,255,0.85);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 24px;
+            padding: 12px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
             cursor: pointer;
             z-index: 1000;
-            box-shadow: 0 4px 12px rgba(156, 39, 176, 0.4);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
             transition: all 0.2s;
+            white-space: nowrap;
         }
-        
+
         .mobile-filter-btn:active {
-            transform: scale(0.95);
+            transform: translateX(-50%) scale(0.97);
+            background: #2a2a2a;
         }
         
         .filter-modal-overlay {
@@ -3597,7 +3601,7 @@
 
     <!-- Mobile Filter Button -->
     <button class="mobile-filter-btn" id="mobileFilterBtn" onclick="openFilterModal()">
-        🎛️
+        ⚙ Filters
     </button>
 
     <!-- Filter Modal Overlay -->
