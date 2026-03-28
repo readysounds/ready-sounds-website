@@ -3297,28 +3297,30 @@
                 margin-bottom: 10px;
             }
             
-            /* Much tighter card layout - minimal height with arrow inline */
+            /* Flat list layout */
             .track-item {
                 display: grid;
-                grid-template-columns: 44px 1fr 24px;
-                gap: 8px;
-                padding: 6px;
-                background: rgba(255, 255, 255, 0.05);
-                border-radius: 8px;
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                margin-bottom: 6px;
+                grid-template-columns: 56px 1fr 32px 32px;
+                gap: 12px;
+                padding: 10px 4px;
+                background: none;
+                border-radius: 0;
+                border: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+                margin-bottom: 0;
                 align-items: center;
             }
-            
+
             .track-item:hover {
-                background: rgba(255, 255, 255, 0.05);
+                background: none;
             }
-            
+
             .track-item.alternate {
-                grid-template-columns: 38px 1fr;
-                padding: 5px;
-                margin: 5px 0 0 0;
-                background: rgba(255, 255, 255, 0.03);
+                grid-template-columns: 48px 1fr 32px;
+                padding: 8px 4px 8px 16px;
+                margin: 0;
+                background: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             }
             
             /* Play button overlays artwork on mobile */
@@ -3344,8 +3346,8 @@
             .track-artwork {
                 grid-column: 1;
                 grid-row: 1;
-                width: 44px;
-                height: 44px;
+                width: 56px;
+                height: 56px;
                 position: relative;
             }
             
@@ -3394,25 +3396,25 @@
                 display: none;
             }
             
-            /* Arrow in third column - compact */
+            /* Arrow in third column - flat */
             .expand-arrow {
                 grid-column: 3;
                 display: flex;
-                width: 24px;
-                height: 24px;
+                width: 32px;
+                height: 32px;
                 align-items: center;
                 justify-content: center;
-                color: rgba(255, 255, 255, 0.7);
-                font-size: 14px;
-                background: rgba(255, 255, 255, 0.08);
-                border-radius: 5px;
+                color: rgba(255, 255, 255, 0.35);
+                font-size: 12px;
+                background: none;
+                border-radius: 0;
                 flex-shrink: 0;
                 transition: all 0.2s;
             }
-            
+
             .track-item.main-track.expanded .expand-arrow {
                 transform: rotate(180deg);
-                background: rgba(156, 39, 176, 0.2);
+                background: none;
                 color: #9c27b0;
             }
             
@@ -3430,12 +3432,27 @@
                 display: none;
             }
 
-            /* Keep heart button visible on phones too */
+            /* Keep heart button visible on phones too - inline in grid */
             .track-actions {
                 display: flex;
+                grid-column: 4;
+                align-items: center;
+                justify-content: center;
             }
             .track-actions .action-btn:not(.action-btn-like) {
                 display: none;
+            }
+            .action-btn-like {
+                padding: 4px;
+                font-size: 18px;
+                background: none;
+                border: none;
+                color: rgba(255, 255, 255, 0.5);
+            }
+            .action-btn-like.liked {
+                color: #9c27b0;
+                background: none;
+                border: none;
             }
 
             .alternates-container {
