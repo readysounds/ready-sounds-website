@@ -84,6 +84,65 @@
             font-weight: 600;
         }
 
+        .nav-music-dropdown {
+            position: relative;
+        }
+
+        .nav-music-trigger {
+            color: #888;
+            font-size: 0.95em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.3s;
+            user-select: none;
+        }
+
+        .nav-music-trigger:hover {
+            color: #fff;
+        }
+
+        .nav-music-trigger::after {
+            content: '▾';
+            font-size: 0.8em;
+        }
+
+        .nav-music-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 12px);
+            left: 0;
+            background: #1a1a1a;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 8px 0;
+            min-width: 150px;
+            z-index: 100;
+        }
+
+        .nav-music-menu a {
+            display: block;
+            padding: 10px 16px;
+            color: #888 !important;
+            font-size: 0.95em;
+            text-decoration: none;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .nav-music-menu a:hover {
+            color: #fff !important;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .nav-music-dropdown.open .nav-music-menu {
+            display: block;
+        }
+
+        .nav-music-dropdown.open .nav-music-trigger {
+            color: #fff;
+        }
+
         .nav-signin {
             color: rgba(255,255,255,0.7);
             text-decoration: none;
@@ -757,6 +816,17 @@
         </div>
     </footer>
     <script>
+        // Music dropdown
+        const musicDropdown = document.querySelector('.nav-music-dropdown');
+        const musicTrigger = document.querySelector('.nav-music-trigger');
+        musicTrigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            musicDropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', function() {
+            musicDropdown.classList.remove('open');
+        });
+
         function toggleMobileMenu() {
             const panel = document.getElementById('mobilePanel');
             const overlay = document.getElementById('mobilePanelOverlay');
