@@ -193,6 +193,52 @@
             white-space: nowrap;
         }
 
+        /* CTA Banner */
+        .cta-banner {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(156, 39, 176, 0.08);
+            border: 1px solid rgba(156, 39, 176, 0.22);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+        }
+        .cta-banner-icon {
+            font-size: 1.4em;
+            flex-shrink: 0;
+        }
+        .cta-banner-text {
+            flex: 1;
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.4;
+        }
+        .cta-banner-text strong {
+            color: white;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .cta-banner-btn {
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: opacity 0.2s;
+        }
+        .cta-banner-btn:hover { opacity: 0.85; }
+        @media (max-width: 600px) {
+            .cta-banner { flex-wrap: wrap; gap: 10px; }
+            .cta-banner-btn { width: 100%; text-align: center; }
+        }
+
         /* Actions */
         .track-actions {
             display: flex;
@@ -457,6 +503,7 @@
             <span class="track-count" id="trackCount"></span>
         </header>
 
+        <div id="ctaBanner"></div>
         <div id="favoritesContainer"></div>
     </div>
 
@@ -707,7 +754,59 @@
             loadFavorites();
         }
 
-        document.addEventListener('DOMContentLoaded', loadFavorites);
+        // ── CTA Banner ────────────────────────────────────────────────────────
+        async function showCtaBanner() {
+            const banner = document.getElementById('ctaBanner');
+            if (!banner) return;
+
+            try {
+                const client = await window.RS.waitForClient();
+                const { data: { user } } = await client.auth.getUser();
+
+                if (!user) {
+                    // Not logged in — nudge to create account
+                    banner.innerHTML = `
+                        <div class="cta-banner">
+                            <div class="cta-banner-icon">🤍</div>
+                            <div class="cta-banner-text">
+                                <strong>Save your favorites permanently</strong>
+                                Create a free account so your list is never lost.
+                            </div>
+                            <a href="/signup.html" class="cta-banner-btn">Create Free Account</a>
+                        </div>`;
+                    return;
+                }
+
+                // Logged in — check subscription
+                const { data: profile } = await client
+                    .from('profiles')
+                    .select('subscription_status')
+                    .eq('email', user.email)
+                    .single();
+
+                if (!profile || profile.subscription_status !== 'active') {
+                    // Free user — nudge to subscribe
+                    banner.innerHTML = `
+                        <div class="cta-banner">
+                            <div class="cta-banner-icon">🎵</div>
+                            <div class="cta-banner-text">
+                                <strong>Ready to use these tracks?</strong>
+                                Subscribe to download and license everything you've saved.
+                            </div>
+                            <a href="/pricing.html" class="cta-banner-btn">See Plans</a>
+                        </div>`;
+                }
+                // Subscribed users see no banner
+
+            } catch (e) {
+                // Silently fail — banner stays empty
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFavorites();
+            showCtaBanner();
+        });
         window.RS.initNavAuth();
     </script>
 </body>
