@@ -22,200 +22,308 @@
     <style>
         body {
             padding: 20px;
+            padding-bottom: 100px; /* room for player bar */
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 900px;
             margin: 0 auto;
             padding-top: 80px;
         }
 
         .back-link {
             display: inline-block;
-            margin-bottom: 30px;
+            margin-bottom: 28px;
             color: #9c27b0;
             text-decoration: none;
-            font-size: 1.1em;
-            transition: color 0.3s;
+            font-size: 0.95em;
+            transition: color 0.2s;
         }
-
-        .back-link:hover {
-            color: #ba68c8;
-        }
+        .back-link:hover { color: #ba68c8; }
 
         header {
-            margin-bottom: 40px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
         }
 
         h1 {
-            font-size: 2em;
+            font-size: 1.8em;
             font-weight: 700;
-            margin-bottom: 4px;
             color: #ffffff;
+            margin: 0;
         }
 
-        .subtitle {
-            font-size: 1em;
-            color: #666;
+        .track-count {
+            font-size: 0.95em;
+            color: rgba(255,255,255,0.35);
+            font-weight: 400;
         }
 
+        /* ── Empty state ── */
         .empty-state {
             text-align: center;
             padding: 100px 20px;
         }
-
         .empty-state-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            opacity: 0.3;
+            font-size: 60px;
+            margin-bottom: 16px;
+            opacity: 0.25;
         }
-
         .empty-state-text {
-            font-size: 1.5em;
+            font-size: 1.2em;
             color: #666;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
-
         .browse-btn {
             display: inline-block;
             background: linear-gradient(135deg, #9c27b0, #4a148c);
             color: white;
-            padding: 14px 32px;
+            padding: 12px 28px;
             border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
-
         .browse-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(156, 39, 176, 0.4);
         }
 
-        .track-grid {
-            display: grid;
-            gap: 16px;
-        }
+        /* ── Track list ── */
+        .track-grid { display: grid; gap: 8px; }
 
         .track-item {
             background: rgba(26, 26, 26, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 10px;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
-            gap: 20px;
-            transition: all 0.3s;
+            gap: 14px;
+            transition: background 0.2s, border-color 0.2s;
+            cursor: pointer;
         }
-
         .track-item:hover {
-            background: rgba(156, 39, 176, 0.1);
-            border-color: rgba(156, 39, 176, 0.3);
-            transform: translateY(-2px);
+            background: rgba(156, 39, 176, 0.08);
+            border-color: rgba(156, 39, 176, 0.25);
+        }
+        .track-item.playing {
+            background: rgba(156, 39, 176, 0.12);
+            border-color: rgba(156, 39, 176, 0.4);
         }
 
-        .track-artwork {
-            width: 80px;
-            height: 80px;
-            border-radius: 8px;
-            overflow: hidden;
+        /* Artwork + play overlay */
+        .track-artwork-wrap {
+            position: relative;
+            width: 52px;
+            height: 52px;
             flex-shrink: 0;
+            border-radius: 6px;
+            overflow: hidden;
             background: rgba(156, 39, 176, 0.2);
+            cursor: pointer;
         }
-
-        .track-artwork img {
+        .track-artwork-wrap img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
+        }
+        .track-artwork-wrap .play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.45);
+            opacity: 0;
+            transition: opacity 0.15s;
+            font-size: 18px;
+            color: white;
+        }
+        .track-item:hover .play-overlay,
+        .track-item.playing .play-overlay { opacity: 1; }
+
+        /* Info */
+        .track-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .track-title-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 3px;
+        }
+        .track-artist {
+            font-size: 0.95em;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .track-name {
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .track-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .track-meta {
+            font-size: 0.8em;
+            color: rgba(255,255,255,0.35);
+            white-space: nowrap;
+        }
+        .mood-pill {
+            font-size: 0.72em;
+            color: rgba(156, 39, 176, 0.9);
+            background: rgba(156, 39, 176, 0.12);
+            border: 1px solid rgba(156, 39, 176, 0.25);
+            border-radius: 20px;
+            padding: 1px 8px;
+            white-space: nowrap;
         }
 
-        .play-btn {
-            width: 50px;
-            height: 50px;
+        /* Actions */
+        .track-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+            color: rgba(255,255,255,0.4);
+            font-size: 15px;
+            text-decoration: none;
+        }
+        .icon-btn:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
+        .icon-btn.unfavorite { color: #c2185b; }
+        .icon-btn.unfavorite:hover { background: rgba(194, 24, 91, 0.12); color: #e91e63; }
+
+        /* ── Player bar ── */
+        .player-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background: rgba(12, 12, 12, 0.97);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 0 20px;
+            z-index: 500;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        .player-bar.visible { transform: translateY(0); }
+
+        .pb-artwork {
+            width: 42px;
+            height: 42px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: rgba(156,39,176,0.2);
+        }
+        .pb-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .pb-title {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .pb-artist {
+            font-size: 0.75em;
+            color: rgba(255,255,255,0.45);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .pb-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .pb-btn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            padding: 6px 10px;
+            font-size: 16px;
+            border-radius: 6px;
+            transition: color 0.15s, background 0.15s;
+        }
+        .pb-btn:hover { color: white; background: rgba(255,255,255,0.08); }
+        .pb-play {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: linear-gradient(135deg, #9c27b0, #4a148c);
             border: none;
             color: white;
             cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s;
-            flex-shrink: 0;
-        }
-
-        .play-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.4);
-        }
-
-        .track-info {
-            flex: 1;
-        }
-
-        .track-title {
-            font-size: 1.2em;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .track-meta {
-            color: #888;
-            font-size: 0.95em;
-        }
-
-        .track-actions {
+            font-size: 14px;
             display: flex;
-            gap: 12px;
             align-items: center;
+            justify-content: center;
+            transition: opacity 0.15s;
         }
-
-        .action-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
+        .pb-play:hover { opacity: 0.85; }
+        .pb-progress-wrap {
+            flex: 2;
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .pb-progress-bar {
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
             cursor: pointer;
-            font-size: 0.95em;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
+            position: relative;
+        }
+        .pb-progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #9c27b0, #ba68c8);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        .pb-times {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.68em;
+            color: rgba(255,255,255,0.3);
         }
 
-        .action-btn:hover {
-            background: rgba(156, 39, 176, 0.2);
-            border-color: rgba(156, 39, 176, 0.3);
-        }
-
-        .unfavorite-btn {
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            transition: all 0.3s;
-            padding: 0;
-        }
-
-        .unfavorite-btn:hover {
-            transform: scale(1.2);
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2em;
-            }
-
-            .track-item {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .track-actions {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        /* ── Site nav ── */
+        /* ── Shared nav styles ── */
         .rs-nav {
             position: fixed;
             top: 0; left: 0; right: 0;
@@ -271,6 +379,9 @@
         @media (max-width: 768px) {
             .rs-nav-links { display: none; }
             .rs-menu-toggle { display: block; }
+            h1 { font-size: 1.4em; }
+            .pb-progress-wrap { display: none; }
+            .track-name { display: none; }
         }
     </style>
 </head>
@@ -333,109 +444,264 @@
     </div>
 
     <div class="container">
-        <a href="browse.html" class="back-link">← Back to Browse</a>
-        
+        <a href="browse.html" class="back-link">← Browse</a>
+
         <header>
             <h1>My Favorites</h1>
-            <p class="subtitle">Tracks you've loved</p>
+            <span class="track-count" id="trackCount"></span>
         </header>
 
         <div id="favoritesContainer"></div>
     </div>
 
-    <script>
-        const emptyState = `
-            <div class="empty-state">
-                <div class="empty-state-icon">🤍</div>
-                <div class="empty-state-text">You haven't favorited any tracks yet.</div>
-                <a href="browse.html" class="browse-btn">Browse Music</a>
+    <!-- Inline Player Bar -->
+    <div class="player-bar" id="playerBar">
+        <img class="pb-artwork" id="pbArtwork" src="" alt="">
+        <div class="pb-info">
+            <div class="pb-title" id="pbTitle"></div>
+            <div class="pb-artist" id="pbArtist"></div>
+        </div>
+        <div class="pb-controls">
+            <button class="pb-btn" onclick="playPrev()" title="Previous">&#9664;&#9664;</button>
+            <button class="pb-play" id="pbPlayBtn" onclick="togglePlayPause()">▶</button>
+            <button class="pb-btn" onclick="playNext()" title="Next">&#9654;&#9654;</button>
+        </div>
+        <div class="pb-progress-wrap">
+            <div class="pb-progress-bar" id="pbProgressBar" onclick="seekFromBar(event)">
+                <div class="pb-progress-fill" id="pbProgressFill"></div>
             </div>
-        `;
+            <div class="pb-times">
+                <span id="pbCurrentTime">0:00</span>
+                <span id="pbDuration">0:00</span>
+            </div>
+        </div>
+    </div>
 
+    <script>
+        // ── State ─────────────────────────────────────────────────────────────
+        let tracks = [];          // ordered list of track objects
+        let currentIndex = -1;
+        let audio = null;
+
+        // ── Helpers ───────────────────────────────────────────────────────────
         function escHtml(str) {
             if (!str) return '';
             return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
+        const fmt = s => {
+            const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+            return `${m}:${sec.toString().padStart(2,'0')}`;
+        };
+
+        // ── Load & render ─────────────────────────────────────────────────────
         async function loadFavorites() {
             const favoriteIds = JSON.parse(localStorage.getItem('readysounds_favorites') || '[]');
             const container = document.getElementById('favoritesContainer');
 
             if (favoriteIds.length === 0) {
-                container.innerHTML = emptyState;
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">♡</div>
+                        <div class="empty-state-text">You haven't favorited any tracks yet.</div>
+                        <a href="browse.html" class="browse-btn">Browse Music</a>
+                    </div>`;
                 return;
             }
 
-            container.innerHTML = '<div style="text-align:center;padding:60px;color:#888;">Loading...</div>';
+            container.innerHTML = '<div style="text-align:center;padding:60px;color:#555;">Loading…</div>';
 
             try {
                 const client = await window.RS.waitForClient();
-                const { data: tracks, error } = await client
+                const { data, error } = await client
                     .from('tracks')
-                    .select('id, title, artist, genre, bpm, duration, artwork_url')
+                    .select('id, title, artist, genre, bpm, duration, moods, artwork_url, stream_url')
                     .in('id', favoriteIds)
                     .eq('is_active', true);
 
                 if (error) throw error;
-
-                if (!tracks || tracks.length === 0) {
-                    container.innerHTML = emptyState;
+                if (!data || data.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">♡</div>
+                            <div class="empty-state-text">You haven't favorited any tracks yet.</div>
+                            <a href="browse.html" class="browse-btn">Browse Music</a>
+                        </div>`;
                     return;
                 }
 
-                // Index by id so we can render in localStorage order
+                // Preserve localStorage order
                 const trackMap = {};
-                tracks.forEach(t => { trackMap[t.id] = t; });
+                data.forEach(t => { trackMap[t.id] = t; });
+                tracks = favoriteIds.map(id => trackMap[id]).filter(Boolean);
 
-                let html = '<div class="track-grid">';
-                favoriteIds.forEach(trackId => {
-                    const track = trackMap[trackId];
-                    if (!track) return;
-                    const displayTitle = `${escHtml(track.artist)} \u2014 &quot;${escHtml(track.title)}&quot;`;
-                    html += `
-                        <div class="track-item">
-                            <div class="track-artwork">
-                                ${track.artwork_url ? `<img src="${escHtml(track.artwork_url)}" alt="${displayTitle}">` : ''}
-                            </div>
-                            <button class="play-btn" onclick="playTrack(${track.id})">▶</button>
-                            <div class="track-info">
-                                <div class="track-title">${displayTitle}</div>
-                                <div class="track-meta">${escHtml(track.genre || '')}${track.bpm ? ' · ' + escHtml(String(track.bpm)) + ' BPM' : ''}${track.duration ? ' · ' + escHtml(track.duration) : ''}</div>
-                            </div>
-                            <div class="track-actions">
-                                <a href="browse.html#track-${track.id}" class="action-btn">View Track</a>
-                                <button class="unfavorite-btn" onclick="removeFavorite(${track.id})">❤️</button>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                container.innerHTML = html;
+                document.getElementById('trackCount').textContent =
+                    tracks.length === 1 ? '1 track' : `${tracks.length} tracks`;
+
+                renderTracks(container);
 
             } catch (err) {
                 console.error('Error loading favorites:', err);
-                container.innerHTML = '<div style="text-align:center;padding:60px;color:#888;">Error loading favorites. Please try again.</div>';
+                container.innerHTML = '<div style="text-align:center;padding:60px;color:#666;">Error loading favorites. Please try again.</div>';
             }
         }
 
+        function renderTracks(container) {
+            let html = '<div class="track-grid">';
+            tracks.forEach((track, i) => {
+                const moods = (track.moods || '').split(',').map(m => m.trim()).filter(Boolean).slice(0, 3);
+                const moodHtml = moods.map(m => `<span class="mood-pill">${escHtml(m)}</span>`).join('');
+                const metaParts = [];
+                if (track.genre) metaParts.push(escHtml(track.genre));
+                if (track.bpm)   metaParts.push(`${track.bpm} BPM`);
+                if (track.duration) metaParts.push(escHtml(track.duration));
+
+                html += `
+                    <div class="track-item" id="track-item-${track.id}" data-index="${i}" onclick="playIndex(${i})">
+                        <div class="track-artwork-wrap">
+                            ${track.artwork_url ? `<img src="${escHtml(track.artwork_url)}" alt="">` : ''}
+                            <div class="play-overlay" id="play-overlay-${track.id}">▶</div>
+                        </div>
+                        <div class="track-info">
+                            <div class="track-title-row">
+                                <span class="track-artist">${escHtml(track.artist)}</span>
+                                <span class="track-name">"${escHtml(track.title)}"</span>
+                            </div>
+                            <div class="track-meta-row">
+                                <span class="track-meta">${metaParts.join(' · ')}</span>
+                                ${moodHtml}
+                            </div>
+                        </div>
+                        <div class="track-actions" onclick="event.stopPropagation()">
+                            <a href="browse.html#track-${track.id}" class="icon-btn" title="Open in Browse">↗</a>
+                            <button class="icon-btn unfavorite" onclick="removeFavorite(${track.id})" title="Remove from favorites">♥</button>
+                        </div>
+                    </div>`;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // ── Playback ──────────────────────────────────────────────────────────
+        function playIndex(index) {
+            if (index < 0 || index >= tracks.length) return;
+
+            const track = tracks[index];
+            if (!track.stream_url) return;
+
+            // If same track, toggle play/pause
+            if (currentIndex === index && audio) {
+                togglePlayPause();
+                return;
+            }
+
+            // Stop current
+            if (audio) { audio.pause(); audio = null; }
+            clearActiveStates();
+
+            currentIndex = index;
+            audio = new Audio(track.stream_url);
+            audio.preload = 'auto';
+
+            audio.addEventListener('playing', () => {
+                updatePlayOverlay(track.id, true);
+                document.getElementById('pbPlayBtn').textContent = '⏸';
+            });
+            audio.addEventListener('pause', () => {
+                updatePlayOverlay(track.id, false);
+                document.getElementById('pbPlayBtn').textContent = '▶';
+            });
+            audio.addEventListener('timeupdate', updateProgress);
+            audio.addEventListener('ended', () => {
+                clearActiveStates();
+                if (currentIndex < tracks.length - 1) {
+                    playIndex(currentIndex + 1);
+                } else {
+                    document.getElementById('pbPlayBtn').textContent = '▶';
+                    document.getElementById('pbProgressFill').style.width = '0%';
+                }
+            });
+
+            audio.play().catch(console.error);
+
+            // Update player bar
+            document.getElementById('pbTitle').textContent  = `"${track.title}"`;
+            document.getElementById('pbArtist').textContent = track.artist || '';
+            const pbArt = document.getElementById('pbArtwork');
+            pbArt.src = track.artwork_url || '';
+            document.getElementById('playerBar').classList.add('visible');
+            document.getElementById('pbPlayBtn').textContent = '⏸';
+
+            // Highlight active card
+            document.querySelectorAll('.track-item').forEach(el => el.classList.remove('playing'));
+            const activeItem = document.getElementById(`track-item-${track.id}`);
+            if (activeItem) activeItem.classList.add('playing');
+        }
+
+        function updatePlayOverlay(trackId, isPlaying) {
+            document.querySelectorAll('.play-overlay').forEach(el => {
+                el.textContent = '▶';
+            });
+            const overlay = document.getElementById(`play-overlay-${trackId}`);
+            if (overlay) overlay.textContent = isPlaying ? '⏸' : '▶';
+        }
+
+        function clearActiveStates() {
+            document.querySelectorAll('.track-item').forEach(el => el.classList.remove('playing'));
+            document.querySelectorAll('.play-overlay').forEach(el => { el.textContent = '▶'; });
+        }
+
+        function togglePlayPause() {
+            if (!audio) return;
+            if (audio.paused) { audio.play(); }
+            else { audio.pause(); }
+        }
+
+        function playNext() {
+            if (currentIndex < tracks.length - 1) playIndex(currentIndex + 1);
+        }
+
+        function playPrev() {
+            if (audio && audio.currentTime > 3) {
+                audio.currentTime = 0;
+            } else if (currentIndex > 0) {
+                playIndex(currentIndex - 1);
+            }
+        }
+
+        function updateProgress() {
+            if (!audio || isNaN(audio.duration)) return;
+            const pct = (audio.currentTime / audio.duration) * 100;
+            document.getElementById('pbProgressFill').style.width = pct + '%';
+            document.getElementById('pbCurrentTime').textContent = fmt(audio.currentTime);
+            document.getElementById('pbDuration').textContent    = fmt(audio.duration);
+        }
+
+        function seekFromBar(e) {
+            if (!audio || isNaN(audio.duration)) return;
+            const bar  = document.getElementById('pbProgressBar');
+            const rect = bar.getBoundingClientRect();
+            audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+        }
+
+        // ── Favorites management ──────────────────────────────────────────────
         function removeFavorite(trackId) {
+            // Stop audio if this track is playing
+            if (currentIndex >= 0 && tracks[currentIndex]?.id === trackId) {
+                if (audio) { audio.pause(); audio = null; }
+                document.getElementById('playerBar').classList.remove('visible');
+                currentIndex = -1;
+            }
+
             let favorites = JSON.parse(localStorage.getItem('readysounds_favorites') || '[]');
             favorites = favorites.filter(id => id !== trackId);
             localStorage.setItem('readysounds_favorites', JSON.stringify(favorites));
             loadFavorites();
         }
 
-        function playTrack(trackId) {
-            window.location.href = `browse.html?play=${trackId}`;
-        }
-
         document.addEventListener('DOMContentLoaded', loadFavorites);
-
-        // Init nav auth using shared module
         window.RS.initNavAuth();
     </script>
 </body>
