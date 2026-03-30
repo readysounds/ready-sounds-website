@@ -42,21 +42,46 @@
     // can also call it directly.
 
     function updateNavAuth(session) {
-        var authButtons     = document.getElementById('authButtons');
+        var authButtons      = document.getElementById('authButtons');
         var profileContainer = document.getElementById('profileContainer');
-        var profileInitial  = document.getElementById('profileInitial');
-        var mobilePanelAuth = document.getElementById('mobilePanelAuthBtns');
+        var profileInitial   = document.getElementById('profileInitial');
+        var mobilePanelAuth  = document.getElementById('mobilePanelAuthBtns');
 
         if (session && session.user) {
             if (authButtons)      authButtons.style.display = 'none';
-            if (profileContainer) profileContainer.style.display = 'block';
+            if (profileContainer) profileContainer.style.display = 'flex';
             if (profileInitial)   profileInitial.textContent = session.user.email.charAt(0).toUpperCase();
             if (mobilePanelAuth)  mobilePanelAuth.style.display = 'none';
+            injectMobileUserSection(session.user);
         } else {
             if (authButtons)      authButtons.style.display = 'flex';
             if (profileContainer) profileContainer.style.display = 'none';
             if (mobilePanelAuth)  mobilePanelAuth.style.display = '';
+            removeMobileUserSection();
         }
+    }
+
+    function injectMobileUserSection(user) {
+        if (document.getElementById('mobilePanelUserSection')) return; // already present
+        var panel = document.getElementById('mobilePanel');
+        if (!panel) return;
+        var section = document.createElement('div');
+        section.id = 'mobilePanelUserSection';
+        section.className = 'mobile-panel-user-section';
+        section.innerHTML =
+            '<div class="mobile-panel-user-header">My Account</div>' +
+            '<a href="/favorites.html" class="mobile-panel-user-link">Favorites</a>' +
+            '<a href="/my-playlists.html" class="mobile-panel-user-link">My Playlists</a>' +
+            '<a href="/settings.html" class="mobile-panel-user-link">Account Settings</a>' +
+            '<a href="#" class="mobile-panel-user-link signout" onclick="handleLogout(); return false;">Sign Out</a>';
+        var footer = panel.querySelector('.mobile-panel-footer');
+        if (footer) panel.insertBefore(section, footer);
+        else panel.appendChild(section);
+    }
+
+    function removeMobileUserSection() {
+        var section = document.getElementById('mobilePanelUserSection');
+        if (section) section.remove();
     }
 
     // ── initNavAuth ───────────────────────────────────────────────────────────
