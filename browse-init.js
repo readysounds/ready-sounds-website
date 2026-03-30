@@ -140,7 +140,7 @@ async function initAuth() {
         if (session && session.user) {
             // User is logged in - show profile dropdown
             if (authButtons) authButtons.style.display = 'none';
-            if (profileContainer) profileContainer.style.display = 'block';
+            if (profileContainer) profileContainer.style.display = 'flex';
             updateMobilePanelAuth(true);
 
             // Set profile initial (first letter of email)
