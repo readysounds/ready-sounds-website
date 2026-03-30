@@ -704,6 +704,8 @@
                 }
                 renderPlaylistGrid();
                 loadUserPlaylists();
+                const hash = window.location.hash.slice(1);
+                if (hash) showPlaylist(hash);
             } catch (err) {
                 console.error('Error loading data:', err);
             }
