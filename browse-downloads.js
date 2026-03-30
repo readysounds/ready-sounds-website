@@ -540,10 +540,16 @@ async function isUserLoggedIn() {
 
 // Show login prompt modal
 function showLoginPrompt(action) {
-    const message = `Create a free account to ${action}!`;
-    const shouldSignUp = confirm(`${message}\n\nClick OK to create an account, or Cancel to go back.`);
+    const modal = document.getElementById('loginPromptModal');
+    const overlay = document.getElementById('loginPromptOverlay');
+    const msg = document.getElementById('loginPromptMessage');
+    if (!modal) return;
+    msg.textContent = `Create a free account to ${action}!`;
+    overlay.classList.add('active');
+    modal.classList.add('active');
+}
 
-    if (shouldSignUp) {
-        window.location.href = '/signup.html';
-    }
+function closeLoginPrompt() {
+    document.getElementById('loginPromptOverlay').classList.remove('active');
+    document.getElementById('loginPromptModal').classList.remove('active');
 }
