@@ -9,6 +9,15 @@ let activeFilters = {
     duration: []
 };
 
+// Toggle sidebar on tablet
+function toggleTabletSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const btn = document.getElementById('tabletFilterToggle');
+    const isOpen = sidebar.classList.toggle('tablet-open');
+    btn.classList.toggle('active', isOpen);
+    btn.querySelector('span').textContent = isOpen ? '▲' : '▼';
+}
+
 // Toggle filter section dropdown
 function toggleFilterSection(titleElement) {
     const section = titleElement.parentElement;

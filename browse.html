@@ -352,6 +352,33 @@
         .sidebar-title {
             display: none;
         }
+
+        /* Tablet Filters Toggle Button */
+        .tablet-filter-toggle {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+        }
+        .tablet-filter-toggle:hover {
+            border-color: rgba(156, 39, 176, 0.4);
+            color: #9c27b0;
+            background: rgba(156, 39, 176, 0.08);
+        }
+        .tablet-filter-toggle.active {
+            border-color: rgba(156, 39, 176, 0.5);
+            color: #9c27b0;
+            background: rgba(156, 39, 176, 0.1);
+        }
         
         /* Mobile Filter Button & Modal */
         .mobile-filter-btn {
@@ -3284,6 +3311,23 @@
         }
 
         /* ========================================
+           TABLET LAYOUT - iPad (769px to 1024px)
+           ======================================== */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+            .sidebar.tablet-open {
+                display: block;
+                width: 220px;
+                flex-shrink: 0;
+            }
+            .tablet-filter-toggle {
+                display: flex;
+            }
+        }
+
+        /* ========================================
            MOBILE LAYOUT - Phones Only (480px and below)
            ======================================== */
         /* Tablet and small desktop - show hamburger to save space */
@@ -3885,6 +3929,10 @@
             
             <!-- Main Content Area -->
             <div class="main-content">
+                <!-- Tablet Filter Toggle -->
+                <button class="tablet-filter-toggle" id="tabletFilterToggle" onclick="toggleTabletSidebar()">
+                    <span>▼</span> Filters
+                </button>
                 <!-- Catalog Headline -->
                 <div class="catalog-headline" style="padding: 0 0 32px 0;">
                     <h1 style="font-size: 1.3em; font-weight: 700; color: #fff; margin-bottom: 8px;">No middlemen. No algorithms. Just music.</h1>
