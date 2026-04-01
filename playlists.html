@@ -629,6 +629,79 @@
             box-shadow: 0 8px 20px rgba(156, 39, 176, 0.4);
         }
 
+        .track-btn-license {
+            background: transparent;
+            border: 1px solid rgba(156, 39, 176, 0.5);
+            color: rgba(255,255,255,0.75);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .track-btn-license:hover {
+            border-color: #9c27b0;
+            color: white;
+            background: rgba(156, 39, 176, 0.15);
+        }
+
+        .playlist-pricing-nudge {
+            margin-top: 28px;
+            padding: 20px 24px;
+            background: rgba(156, 39, 176, 0.08);
+            border: 1px solid rgba(156, 39, 176, 0.25);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .playlist-pricing-nudge p {
+            font-size: 0.95em;
+            color: rgba(255,255,255,0.7);
+            margin: 0;
+        }
+
+        .playlist-pricing-nudge strong {
+            color: white;
+        }
+
+        .playlist-pricing-nudge a {
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .playlist-pricing-nudge a:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(156, 39, 176, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .playlist-pricing-nudge {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .playlist-pricing-nudge a {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
         @media (max-width: 768px) {
             .playlist-grid {
                 grid-template-columns: 1fr;
@@ -1023,7 +1096,7 @@
                             <div class="track-duration-col">${escapeHtml(track.duration)}</div>
                             <div class="track-mood-col">${moodTags}</div>
                             <div class="track-actions">
-                                <button class="track-btn" onclick="playTrack(${trackId}); return false;">▶ Play</button>
+                                <a href="pricing.html" class="track-btn-license" onclick="event.stopPropagation()">License</a>
                             </div>
                         </div>
                     `;
@@ -1088,7 +1161,7 @@
                         <div class="track-duration-col">${escapeHtml(track.duration)}</div>
                         <div class="track-mood-col">${moodTags}</div>
                         <div class="track-actions">
-                            <button class="track-btn" onclick="playTrack(${trackId}); return false;">▶ Play</button>
+                            <a href="pricing.html" class="track-btn-license" onclick="event.stopPropagation()">License</a>
                         </div>
                     </div>
                 `;
@@ -1121,6 +1194,10 @@
                             <span></span>
                         </div>
                         ${tracksHTML || '<p style="color:#888;padding:20px">No tracks in this playlist.</p>'}
+                    </div>
+                    <div class="playlist-pricing-nudge">
+                        <p><strong>Ready to use these tracks?</strong> Get unlimited access to the full catalog.</p>
+                        <a href="pricing.html">View pricing →</a>
                     </div>
                 </div>
             `;
