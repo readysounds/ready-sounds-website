@@ -521,6 +521,33 @@
             object-fit: cover;
         }
 
+        .track-play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.45);
+            color: white;
+            font-size: 16px;
+            border-radius: 6px;
+            opacity: 0;
+            transition: opacity 0.15s;
+            pointer-events: none;
+        }
+
+        .track-item:hover .track-play-overlay {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .track-play-overlay {
+                opacity: 1;
+                background: rgba(0, 0, 0, 0.5);
+                font-size: 13px;
+            }
+        }
+
         .track-item.playing .track-artwork::after {
             content: '♪';
             position: absolute;
@@ -986,6 +1013,7 @@
                         <div class="track-item" data-track-id="${trackId}" onclick="playTrack(${trackId})">
                             <div class="track-artwork">
                                 <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.trackTitle)}">
+                                <div class="track-play-overlay">▶</div>
                             </div>
                             <div class="track-info">
                                 <div class="track-title">${escapeHtml(track.trackTitle)}</div>
@@ -1050,6 +1078,7 @@
                     <div class="track-item" data-track-id="${trackId}" onclick="playTrack(${trackId})">
                         <div class="track-artwork">
                             <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.trackTitle)}">
+                            <div class="track-play-overlay">▶</div>
                         </div>
                         <div class="track-info">
                             <div class="track-title">${escapeHtml(track.trackTitle)}</div>
