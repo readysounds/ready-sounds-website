@@ -470,7 +470,7 @@
 
         .track-list-header {
             display: grid;
-            grid-template-columns: 60px minmax(200px, 1fr) 80px minmax(70px, 160px) 110px;
+            grid-template-columns: 60px minmax(200px, 1fr) 80px minmax(70px, 160px) 140px;
             align-items: center;
             padding: 6px 12px 10px;
             border-bottom: 1px solid rgba(255,255,255,0.08);
@@ -488,7 +488,7 @@
 
         .track-item {
             display: grid;
-            grid-template-columns: 60px minmax(200px, 1fr) 80px minmax(70px, 160px) 110px;
+            grid-template-columns: 60px minmax(200px, 1fr) 80px minmax(70px, 160px) 140px;
             align-items: center;
             padding: 8px 12px;
             border-radius: 8px;
@@ -607,7 +607,54 @@
         .track-actions {
             display: flex;
             justify-content: flex-end;
-            gap: 10px;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn-fav {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.4);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 6px;
+            line-height: 1;
+            transition: color 0.2s, transform 0.15s;
+            flex-shrink: 0;
+        }
+        .action-btn-fav:hover { color: #9c27b0; transform: scale(1.15); }
+        .action-btn-fav.favorited { color: #9c27b0; }
+
+        .player-modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 18px 24px 0;
+            flex-shrink: 0;
+        }
+        .player-modal-action-btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.65);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .player-modal-action-btn:hover {
+            background: rgba(156,39,176,0.25);
+            border-color: #9c27b0;
+            color: white;
+        }
+        .player-modal-action-btn.active {
+            color: #9c27b0;
+            border-color: #9c27b0;
+            background: rgba(156,39,176,0.2);
         }
 
         .track-btn {
@@ -737,7 +784,25 @@
             }
 
             .track-item {
-                flex-wrap: wrap;
+                grid-template-columns: 52px 1fr auto;
+            }
+
+            .track-list-header {
+                display: none;
+            }
+
+            .track-duration-col,
+            .track-mood-col {
+                display: none;
+            }
+
+            .track-actions {
+                gap: 6px;
+            }
+
+            .track-btn-license {
+                padding: 6px 10px;
+                font-size: 0.8em;
             }
         }
 
@@ -924,6 +989,10 @@
             <div class="player-modal-title" id="playerModalTitle">Select a track</div>
             <div class="player-modal-artist" id="playerModalArtist"></div>
         </div>
+        <div class="player-modal-actions">
+            <button class="player-modal-action-btn" id="playerModalFavBtn" onclick="toggleFavoriteFromModal()" title="Favorite">♡</button>
+            <button class="player-modal-action-btn" id="playerModalDlBtn" onclick="downloadFromModal()" title="Download">⬇</button>
+        </div>
         <div class="player-modal-waveform" id="playerModalWaveform" onclick="seekFromPlayerModal(event)">
             <div class="player-modal-waveform-bars" id="playerModalWaveformBars"></div>
         </div>
@@ -956,6 +1025,97 @@
 
     <script>
         let supabaseClient = null;
+        let currentPlayingTrackId = null;
+
+        // ── Favorites ──────────────────────────────────────────────────────────
+        let favorites = JSON.parse(localStorage.getItem('readysounds_favorites') || '[]');
+
+        function toggleFavorite(trackId) {
+            const idx = favorites.indexOf(trackId);
+            if (idx > -1) { favorites.splice(idx, 1); } else { favorites.push(trackId); }
+            localStorage.setItem('readysounds_favorites', JSON.stringify(favorites));
+            updateFavoriteIcons();
+            syncFavoriteToSupabase(trackId, idx === -1);
+        }
+
+        function updateFavoriteIcons() {
+            document.querySelectorAll('.action-btn-fav').forEach(btn => {
+                const id = parseInt(btn.getAttribute('data-track-id'));
+                const isFav = favorites.includes(id);
+                btn.textContent = isFav ? '♥' : '♡';
+                btn.classList.toggle('favorited', isFav);
+            });
+            const modalBtn = document.getElementById('playerModalFavBtn');
+            if (modalBtn && currentPlayingTrackId !== null) {
+                const isFav = favorites.includes(currentPlayingTrackId);
+                modalBtn.textContent = isFav ? '♥' : '♡';
+                modalBtn.classList.toggle('active', isFav);
+            }
+        }
+
+        async function syncFavoriteToSupabase(trackId, isAdding) {
+            if (!supabaseClient) return;
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) return;
+                if (isAdding) {
+                    await supabaseClient.from('user_favorites').insert({ user_id: user.id, track_id: trackId });
+                } else {
+                    await supabaseClient.from('user_favorites').delete().eq('user_id', user.id).eq('track_id', trackId);
+                }
+            } catch (err) { console.error('Error syncing favorite:', err); }
+        }
+
+        async function loadFavorites() {
+            favorites = JSON.parse(localStorage.getItem('readysounds_favorites') || '[]');
+            updateFavoriteIcons();
+            if (!supabaseClient) return;
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) return;
+                const { data } = await supabaseClient.from('user_favorites').select('track_id').eq('user_id', user.id);
+                if (data) {
+                    favorites = [...new Set([...favorites, ...data.map(r => r.track_id)])];
+                    localStorage.setItem('readysounds_favorites', JSON.stringify(favorites));
+                    updateFavoriteIcons();
+                }
+            } catch (err) { console.error('Error loading favorites:', err); }
+        }
+
+        function toggleFavoriteFromModal() {
+            if (currentPlayingTrackId !== null) toggleFavorite(currentPlayingTrackId);
+        }
+
+        // ── Download from modal ────────────────────────────────────────────────
+        async function downloadFromModal() {
+            if (currentPlayingTrackId === null) return;
+            const track = trackDatabase[currentPlayingTrackId];
+            if (!track || !track.url) return;
+            if (!supabaseClient) { window.location.href = 'signup.html'; return; }
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) { window.location.href = 'signup.html'; return; }
+                const { data: profile } = await supabaseClient.from('profiles').select('subscription_status').eq('email', user.email).single();
+                if (!profile || profile.subscription_status !== 'active') { window.location.href = 'pricing.html'; return; }
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                const urlObj = new URL(track.url);
+                const filePath = urlObj.pathname.substring(1).replace('/audio/', '/downloads/');
+                const filename = filePath.split('/').pop();
+                const btn = document.getElementById('playerModalDlBtn');
+                if (btn) btn.textContent = '…';
+                const response = await fetch('/.netlify/functions/download', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+                    body: JSON.stringify({ filePath, trackId: currentPlayingTrackId, trackTitle: track.trackTitle, trackArtist: track.artist, fileFormat: 'MP3' })
+                });
+                if (btn) btn.textContent = '⬇';
+                if (!response.ok) { alert('Download failed. Please try again.'); return; }
+                const { downloadUrl } = await response.json();
+                const link = document.createElement('a');
+                link.href = downloadUrl; link.download = filename;
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            } catch (err) { console.error('Download error:', err); alert('Download failed. Please try again.'); }
+        }
 
         async function initSupabase() {
             supabaseClient = await window.RS.waitForClient();
@@ -990,6 +1150,7 @@
                 }
                 renderPlaylistGrid();
                 loadUserPlaylists();
+                loadFavorites();
                 const hash = window.location.hash.slice(1);
                 if (hash) showPlaylist(hash);
             } catch (err) {
@@ -1096,6 +1257,7 @@
                             <div class="track-duration-col">${escapeHtml(track.duration)}</div>
                             <div class="track-mood-col">${moodTags}</div>
                             <div class="track-actions">
+                                <button class="action-btn-fav" data-track-id="${trackId}" onclick="toggleFavorite(${trackId}); event.stopPropagation();">♡</button>
                                 <a href="pricing.html" class="track-btn-license" onclick="event.stopPropagation()">License</a>
                             </div>
                         </div>
@@ -1165,6 +1327,7 @@
                         <div class="track-duration-col">${escapeHtml(track.duration)}</div>
                         <div class="track-mood-col">${moodTags}</div>
                         <div class="track-actions">
+                            <button class="action-btn-fav" data-track-id="${trackId}" onclick="toggleFavorite(${trackId}); event.stopPropagation();">♡</button>
                             <a href="pricing.html" class="track-btn-license" onclick="event.stopPropagation()">License</a>
                         </div>
                     </div>
@@ -1293,6 +1456,7 @@
         function playTrack(trackId) {
             const track = trackDatabase[trackId];
             if (!track) return;
+            currentPlayingTrackId = trackId;
             audioElement.src = track.url;
             // Update desktop bar
             document.getElementById('nowPlayingTitle').textContent  = track.trackTitle;
@@ -1314,6 +1478,7 @@
             document.querySelectorAll('.track-item.playing').forEach(el => el.classList.remove('playing'));
             const activeItem = document.querySelector(`.track-item[data-track-id="${trackId}"]`);
             if (activeItem) activeItem.classList.add('playing');
+            updateFavoriteIcons();
         }
 
         function togglePlayPause() {
