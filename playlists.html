@@ -387,6 +387,7 @@
             border-radius: 8px;
             transition: background 0.2s;
             border: 1px solid transparent;
+            cursor: pointer;
         }
 
         .track-item:hover {
@@ -813,7 +814,7 @@
                     const moodTags = (track.moods || '').split(',').slice(0, 2).map(m => m.trim()).filter(Boolean)
                         .map(m => `<span class="track-mood-tag">${escapeHtml(m)}</span>`).join('');
                     tracksHTML += `
-                        <div class="track-item" data-track-id="${trackId}">
+                        <div class="track-item" data-track-id="${trackId}" onclick="playTrack(${trackId})">
                             <div class="track-artwork">
                                 <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.trackTitle)}">
                             </div>
@@ -877,7 +878,7 @@
                 const moodTags = (track.moods || '').split(',').slice(0, 2).map(m => m.trim()).filter(Boolean)
                     .map(m => `<span class="track-mood-tag">${escapeHtml(m)}</span>`).join('');
                 return `
-                    <div class="track-item" data-track-id="${trackId}">
+                    <div class="track-item" data-track-id="${trackId}" onclick="playTrack(${trackId})">
                         <div class="track-artwork">
                             <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.trackTitle)}">
                         </div>
