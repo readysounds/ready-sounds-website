@@ -806,6 +806,45 @@
             }
         }
 
+        /* ── Login prompt modal ── */
+        .login-prompt-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2100;
+        }
+        .login-prompt-overlay.active { display: block; }
+        .login-prompt-modal {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1a1a1a;
+            border: 1px solid rgba(156,39,176,0.3);
+            border-radius: 12px;
+            padding: 28px 24px 24px;
+            width: 320px;
+            z-index: 2101;
+            text-align: center;
+        }
+        .login-prompt-modal.active { display: block; }
+        .login-prompt-icon { font-size: 2em; margin-bottom: 12px; }
+        .login-prompt-modal h3 { font-size: 1.1em; color: white; margin: 0 0 8px; }
+        .login-prompt-modal p { font-size: 0.9em; color: rgba(255,255,255,0.6); margin: 0 0 20px; line-height: 1.4; }
+        .login-prompt-actions { display: flex; gap: 10px; justify-content: center; }
+        .login-prompt-cancel {
+            background: rgba(255,255,255,0.08); border: none; color: rgba(255,255,255,0.7);
+            padding: 9px 18px; border-radius: 8px; cursor: pointer; font-size: 0.9em;
+        }
+        .login-prompt-cancel:hover { background: rgba(255,255,255,0.14); }
+        .login-prompt-signup {
+            background: linear-gradient(135deg, #9c27b0, #4a148c); border: none; color: white;
+            padding: 9px 18px; border-radius: 8px; cursor: pointer; font-size: 0.9em;
+            font-weight: 600; text-decoration: none; display: inline-block;
+        }
+        .login-prompt-signup:hover { opacity: 0.9; }
+
         /* ── Site nav ── */
         .rs-nav {
             position: fixed;
@@ -1021,6 +1060,17 @@
         </div>
     </div>
 
+    <div class="login-prompt-overlay" id="loginPromptOverlay" onclick="closeLoginPrompt()"></div>
+    <div class="login-prompt-modal" id="loginPromptModal">
+        <div class="login-prompt-icon">♡</div>
+        <h3>Save your favorites</h3>
+        <p>Create a free account to save tracks, build playlists, and access your favorites anywhere.</p>
+        <div class="login-prompt-actions">
+            <button class="login-prompt-cancel" onclick="closeLoginPrompt()">Maybe later</button>
+            <a class="login-prompt-signup" href="signup.html">Create Free Account</a>
+        </div>
+    </div>
+
     <audio id="audioElement"></audio>
 
     <script>
@@ -1030,10 +1080,19 @@
         // ── Favorites ──────────────────────────────────────────────────────────
         let favorites = JSON.parse(localStorage.getItem('readysounds_favorites') || '[]');
 
+        function showLoginPrompt() {
+            document.getElementById('loginPromptOverlay').classList.add('active');
+            document.getElementById('loginPromptModal').classList.add('active');
+        }
+        function closeLoginPrompt() {
+            document.getElementById('loginPromptOverlay').classList.remove('active');
+            document.getElementById('loginPromptModal').classList.remove('active');
+        }
+
         async function toggleFavorite(trackId) {
-            if (!supabaseClient) { window.location.href = 'signup.html'; return; }
+            if (!supabaseClient) { showLoginPrompt(); return; }
             const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) { window.location.href = 'signup.html'; return; }
+            if (!user) { showLoginPrompt(); return; }
             const idx = favorites.indexOf(trackId);
             if (idx > -1) { favorites.splice(idx, 1); } else { favorites.push(trackId); }
             localStorage.setItem('readysounds_favorites', JSON.stringify(favorites));
