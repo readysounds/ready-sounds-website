@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/favicon.svg?v=2">
     <link rel="icon" type="image/png" href="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/favicon.png?v=2">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>readysounds. — Playlists</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/supabase.js"></script>
@@ -28,6 +28,7 @@
             backdrop-filter: blur(20px);
             border-top: 1px solid rgba(156, 39, 176, 0.3);
             padding: 12px 24px;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
             z-index: 999;
             transform: translateY(100%);
             transition: transform 0.3s ease;
@@ -218,7 +219,7 @@
         .player-modal-time { font-size: 12px; color: rgba(255,255,255,0.38); }
         .player-modal-controls {
             display: flex; align-items: center; justify-content: center;
-            gap: 44px; padding: 24px 28px 40px; margin-top: auto; flex-shrink: 0;
+            gap: 44px; padding: 24px 28px max(40px, calc(20px + env(safe-area-inset-bottom))); margin-top: auto; flex-shrink: 0;
         }
         .player-ctrl-btn {
             background: none; border: none; color: rgba(255,255,255,0.75);
