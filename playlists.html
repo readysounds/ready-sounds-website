@@ -1030,7 +1030,10 @@
         // ── Favorites ──────────────────────────────────────────────────────────
         let favorites = JSON.parse(localStorage.getItem('readysounds_favorites') || '[]');
 
-        function toggleFavorite(trackId) {
+        async function toggleFavorite(trackId) {
+            if (!supabaseClient) { window.location.href = 'signup.html'; return; }
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) { window.location.href = 'signup.html'; return; }
             const idx = favorites.indexOf(trackId);
             if (idx > -1) { favorites.splice(idx, 1); } else { favorites.push(trackId); }
             localStorage.setItem('readysounds_favorites', JSON.stringify(favorites));
