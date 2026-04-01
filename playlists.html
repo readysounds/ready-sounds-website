@@ -18,122 +18,228 @@
         }
 
         /* Fixed Audio Player */
-        .audio-player {
+        /* ── Now Playing Bar ── */
+        .now-playing-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: #1a1a1a;
+            background: rgba(15, 15, 15, 0.98);
+            backdrop-filter: blur(20px);
             border-top: 1px solid rgba(156, 39, 176, 0.3);
-            padding: 16px 24px;
-            display: none;
-            z-index: 1000;
+            padding: 12px 24px;
+            z-index: 999;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
         }
-
-        .audio-player.active {
-            display: block;
-        }
-
-        .player-content {
+        .now-playing-bar.visible { transform: translateY(0); }
+        .now-playing-content {
             max-width: 1400px;
             margin: 0 auto;
-            display: flex;
+            display: grid;
+            grid-template-columns: minmax(180px, 1fr) minmax(280px, 2fr) minmax(140px, 1fr);
+            gap: 24px;
             align-items: center;
-            gap: 20px;
         }
-
-        .player-track-info {
-            flex: 1;
+        .now-playing-center {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 16px;
+            gap: 6px;
         }
-
-        .player-artwork {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            overflow: hidden;
-            background: rgba(156, 39, 176, 0.2);
-        }
-
-        .player-artwork img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .player-details h3 {
-            font-size: 1em;
-            margin-bottom: 4px;
-        }
-
-        .player-details p {
-            font-size: 0.9em;
-            color: #888;
-        }
-
-        .player-controls {
+        .now-playing-right {
             display: flex;
+            justify-content: flex-end;
             align-items: center;
-            gap: 16px;
         }
-
-        .player-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #9c27b0, #4a148c);
-            border: none;
-            color: white;
+        .now-playing-volume { display: flex; align-items: center; gap: 8px; }
+        .volume-icon {
+            font-size: 15px;
             cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            opacity: 0.6;
+            transition: opacity 0.15s;
+            user-select: none;
+            line-height: 1;
         }
-
-        .player-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.4);
-        }
-
-        .player-btn-small {
-            width: 36px;
-            height: 36px;
-            font-size: 16px;
-            background: rgba(156, 39, 176, 0.3);
-        }
-
-        .player-progress {
-            flex: 2;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .progress-bar {
-            flex: 1;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
+        .volume-icon:hover { opacity: 1; }
+        .volume-slider {
+            width: 80px;
+            height: 3px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #9c27b0 100%, rgba(255,255,255,0.15) 100%);
+            border-radius: 2px;
+            outline: none;
             cursor: pointer;
-            position: relative;
         }
-
-        .progress-fill {
-            height: 100%;
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 11px; height: 11px;
+            background: white; border-radius: 50%; cursor: pointer;
+        }
+        .volume-slider::-moz-range-thumb {
+            width: 11px; height: 11px;
+            background: white; border-radius: 50%; cursor: pointer; border: none;
+        }
+        .now-playing-track-info { display: flex; gap: 12px; align-items: center; min-width: 0; }
+        .now-playing-artwork {
+            width: 48px; height: 48px;
+            border-radius: 6px; overflow: hidden; flex-shrink: 0;
             background: linear-gradient(135deg, #9c27b0, #4a148c);
-            border-radius: 3px;
-            width: 0%;
-            transition: width 0.1s;
         }
-
-        .time {
-            font-size: 0.85em;
-            color: #888;
-            min-width: 45px;
+        .now-playing-artwork img { width: 100%; height: 100%; object-fit: cover; }
+        .now-playing-details { min-width: 0; }
+        .now-playing-title {
+            font-size: 14px; font-weight: 600; color: white;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .now-playing-artist { font-size: 12px; color: rgba(255,255,255,0.5); }
+        .now-playing-controls { display: flex; gap: 8px; justify-content: center; }
+        .now-playing-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%; background: #9c27b0;
+            border: none; color: white; font-size: 14px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        #nowPlayingPrevBtn, #nowPlayingNextBtn {
+            width: 36px; height: 36px; font-size: 13px;
+            background: rgba(156,39,176,0.8);
+        }
+        #nowPlayingPrevBtn:hover, #nowPlayingNextBtn:hover { background: #9c27b0; }
+        .now-playing-btn:hover { background: #7b1fa2; transform: scale(1.05); }
+        .now-playing-progress-container { display: flex; align-items: center; gap: 12px; width: 100%; }
+        .now-playing-time {
+            font-size: 12px; color: rgba(255,255,255,0.6);
+            min-width: 40px; text-align: center;
+        }
+        .now-playing-progress-bar {
+            flex: 1; width: 100%; height: 4px;
+            background: rgba(255,255,255,0.1); border-radius: 2px;
+            cursor: pointer; position: relative; transition: height 0.15s;
+        }
+        .now-playing-progress-bar:hover { height: 5px; }
+        .now-playing-progress-fill {
+            height: 100%; background: #9c27b0; border-radius: 2px;
+            width: 0%; transition: width 0.1s linear; position: relative;
+        }
+        .now-playing-progress-bar:hover .now-playing-progress-fill::after {
+            content: ''; position: absolute; right: -5px; top: 50%;
+            transform: translateY(-50%); width: 11px; height: 11px;
+            background: white; border-radius: 50%; display: block;
+        }
+        /* ── Mobile Mini Player ── */
+        .now-playing-mini { display: none; align-items: center; gap: 12px; }
+        .mini-artwork {
+            width: 52px; height: 52px;
+            border-radius: 6px; overflow: hidden; flex-shrink: 0;
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+        }
+        .mini-artwork img { width: 100%; height: 100%; object-fit: cover; }
+        .mini-info { flex: 1; min-width: 0; }
+        .mini-title {
+            font-size: 14px; font-weight: 600; color: white;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .mini-artist {
+            font-size: 12px; color: rgba(255,255,255,0.5);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .mini-expand-btn {
+            background: none; border: none; color: rgba(255,255,255,0.55);
+            font-size: 20px; cursor: pointer; padding: 8px 6px; line-height: 1;
+            flex-shrink: 0; transition: color 0.2s;
+        }
+        .mini-expand-btn:hover { color: white; }
+        .mini-play-btn {
+            width: 42px; height: 42px;
+            border-radius: 50%; background: #9c27b0;
+            border: none; color: white; font-size: 15px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: background 0.2s;
+        }
+        .mini-play-btn:hover { background: #7b1fa2; }
+        /* ── Full Player Modal ── */
+        .player-modal {
+            position: fixed; inset: 0; background: #0d0d0d;
+            z-index: 3500; transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .player-modal.open { transform: translateY(0); }
+        .player-modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 24px 4px; flex-shrink: 0;
+        }
+        .player-modal-close {
+            background: none; border: none; color: rgba(255,255,255,0.6);
+            font-size: 28px; cursor: pointer; padding: 4px 6px; line-height: 1; transition: color 0.2s;
+        }
+        .player-modal-close:hover { color: white; }
+        .player-modal-label {
+            font-size: 12px; font-weight: 700; letter-spacing: 2px;
+            color: white; text-transform: uppercase;
+        }
+        .player-modal-more {
+            background: none; border: none; color: rgba(255,255,255,0.6);
+            font-size: 22px; cursor: pointer; padding: 4px 6px;
+            line-height: 1; transition: color 0.2s; letter-spacing: 2px;
+        }
+        .player-modal-more:hover { color: white; }
+        .player-modal-artwork-wrap {
+            width: calc(100% - 48px); max-width: 340px;
+            margin: 20px auto 0; aspect-ratio: 1;
+            border-radius: 14px; overflow: hidden;
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            box-shadow: 0 24px 64px rgba(0,0,0,0.7); flex-shrink: 0;
+        }
+        .player-modal-artwork-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .player-modal-info { text-align: center; padding: 22px 24px 0; flex-shrink: 0; }
+        .player-modal-title {
+            font-size: 26px; font-weight: 700; color: white; letter-spacing: -0.5px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .player-modal-artist { font-size: 17px; color: rgba(255,255,255,0.45); margin-top: 4px; }
+        .player-modal-waveform {
+            margin: 22px 24px 0; flex-shrink: 0; cursor: pointer; position: relative;
+        }
+        .player-modal-waveform-bars {
+            display: flex; align-items: flex-end; gap: 2px; height: 48px; width: 100%;
+        }
+        .player-modal-waveform-bar {
+            flex: 1; background: rgba(255,255,255,0.18); border-radius: 1px;
+            min-height: 4px; transition: background 0.05s;
+        }
+        .player-modal-waveform-bar.played { background: rgba(255,255,255,0.88); }
+        .player-modal-times {
+            display: flex; justify-content: space-between;
+            padding: 6px 2px 0; flex-shrink: 0; margin: 0 24px;
+        }
+        .player-modal-time { font-size: 12px; color: rgba(255,255,255,0.38); }
+        .player-modal-controls {
+            display: flex; align-items: center; justify-content: center;
+            gap: 44px; padding: 24px 28px 40px; margin-top: auto; flex-shrink: 0;
+        }
+        .player-ctrl-btn {
+            background: none; border: none; color: rgba(255,255,255,0.75);
+            cursor: pointer; padding: 8px; transition: color 0.2s, transform 0.12s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .player-ctrl-btn:hover { color: white; }
+        .player-ctrl-btn:active { transform: scale(0.87); }
+        .player-ctrl-play {
+            width: 72px; height: 72px;
+            border-radius: 50%; background: white;
+            border: none; color: #0d0d0d; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.15s, background 0.2s; flex-shrink: 0;
+        }
+        .player-ctrl-play:hover { background: #e8e8e8; }
+        .player-ctrl-play:active { transform: scale(0.93); }
+        @media (max-width: 768px) {
+            .now-playing-content { display: none; }
+            .now-playing-mini { display: flex; }
+            .now-playing-bar { padding: 10px 14px; }
         }
 
         .container {
@@ -655,33 +761,96 @@
         <div id="playlistDetails"></div>
     </div>
 
-    <!-- Audio Player -->
-    <div class="audio-player" id="audioPlayer">
-        <div class="player-content">
-            <div class="player-track-info">
-                <div class="player-artwork">
-                    <img src="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/primum-electronic-cover.jpg" alt="Track" id="playerArtwork">
+    <!-- Now Playing Bar -->
+    <div class="now-playing-bar" id="nowPlayingBar">
+        <!-- Desktop layout -->
+        <div class="now-playing-content">
+            <div class="now-playing-track-info">
+                <div class="now-playing-artwork">
+                    <img id="nowPlayingArtwork" src="" alt="Album art">
                 </div>
-                <div class="player-details">
-                    <h3 id="playerTitle">Track Title</h3>
-                    <p id="playerMeta">Artist</p>
+                <div class="now-playing-details">
+                    <div class="now-playing-title" id="nowPlayingTitle">Select a track to play</div>
+                    <div class="now-playing-artist" id="nowPlayingArtist"></div>
                 </div>
             </div>
-            <div class="player-controls">
-                <button class="player-btn player-btn-small" onclick="previousTrack()">⏮</button>
-                <button class="player-btn" id="playPauseBtn" onclick="togglePlayPause()">▶</button>
-                <button class="player-btn player-btn-small" onclick="nextTrack()">⏭</button>
-            </div>
-            <div class="player-progress">
-                <span class="time" id="currentTime">0:00</span>
-                <div class="progress-bar" id="progressBar" onclick="seek(event)">
-                    <div class="progress-fill" id="progressFill"></div>
+            <div class="now-playing-center">
+                <div class="now-playing-controls">
+                    <button class="now-playing-btn" id="nowPlayingPrevBtn" onclick="previousTrack()" title="Previous">⏮</button>
+                    <button class="now-playing-btn" id="nowPlayingPlayBtn" onclick="togglePlayPause()">▶</button>
+                    <button class="now-playing-btn" id="nowPlayingNextBtn" onclick="nextTrack()" title="Next">⏭</button>
                 </div>
-                <span class="time" id="duration">0:00</span>
+                <div class="now-playing-progress-container">
+                    <div class="now-playing-time" id="nowPlayingCurrentTime">0:00</div>
+                    <div class="now-playing-progress-bar" onclick="seekFromPlayer(event)">
+                        <div class="now-playing-progress-fill" id="nowPlayingProgressFill"></div>
+                    </div>
+                    <div class="now-playing-time" id="nowPlayingDuration">0:00</div>
+                </div>
+            </div>
+            <div class="now-playing-right">
+                <div class="now-playing-volume">
+                    <span class="volume-icon" id="volumeIcon" onclick="toggleMute()">🔊</span>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" step="1" value="100" oninput="setVolume(this.value)">
+                </div>
             </div>
         </div>
+        <!-- Mobile mini bar -->
+        <div class="now-playing-mini">
+            <div class="mini-artwork">
+                <img id="miniArtwork" src="" alt="Album art">
+            </div>
+            <div class="mini-info">
+                <div class="mini-title" id="miniTitle">Select a track</div>
+                <div class="mini-artist" id="miniArtist"></div>
+            </div>
+            <button class="mini-expand-btn" onclick="openPlayerModal()" title="Expand player">⌃</button>
+            <button class="mini-play-btn" id="miniPlayBtn" onclick="togglePlayPause()">▶</button>
+        </div>
     </div>
-    
+
+    <!-- Full Player Modal -->
+    <div class="player-modal" id="playerModal">
+        <div class="player-modal-header">
+            <button class="player-modal-close" onclick="closePlayerModal()">⌄</button>
+            <span class="player-modal-label">Now Playing</span>
+            <span style="width:40px"></span>
+        </div>
+        <div class="player-modal-artwork-wrap">
+            <img id="playerModalArtwork" src="" alt="Album art">
+        </div>
+        <div class="player-modal-info">
+            <div class="player-modal-title" id="playerModalTitle">Select a track</div>
+            <div class="player-modal-artist" id="playerModalArtist"></div>
+        </div>
+        <div class="player-modal-waveform" id="playerModalWaveform" onclick="seekFromPlayerModal(event)">
+            <div class="player-modal-waveform-bars" id="playerModalWaveformBars"></div>
+        </div>
+        <div class="player-modal-times">
+            <span class="player-modal-time" id="playerModalCurrentTime">0:00</span>
+            <span class="player-modal-time" id="playerModalDuration">0:00</span>
+        </div>
+        <div class="player-modal-controls">
+            <button class="player-ctrl-btn" onclick="previousTrack()" title="Previous">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="5" y="5" width="2.5" height="14" rx="1.25"/>
+                    <path d="M18.5 5.5 8 12l10.5 6.5z"/>
+                </svg>
+            </button>
+            <button class="player-ctrl-play" id="playerModalPlayBtn" onclick="togglePlayPause()">
+                <svg id="playerModalPlayIcon" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5.5v13l11-6.5z"/>
+                </svg>
+            </button>
+            <button class="player-ctrl-btn" onclick="nextTrack()" title="Next">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="16.5" y="5" width="2.5" height="14" rx="1.25"/>
+                    <path d="M5.5 18.5 16 12 5.5 5.5z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
     <audio id="audioElement"></audio>
 
     <script>
@@ -937,11 +1106,75 @@
 
         // Audio Player Functionality
         const audioElement = document.getElementById('audioElement');
-        const audioPlayer = document.getElementById('audioPlayer');
-        const playPauseBtn = document.getElementById('playPauseBtn');
-        const progressFill = document.getElementById('progressFill');
-        const currentTimeEl = document.getElementById('currentTime');
-        const durationEl = document.getElementById('duration');
+        const SVG_PLAY  = '<path d="M8 5.5v13l11-6.5z"/>';
+        const SVG_PAUSE = '<rect x="6" y="5" width="4" height="14" rx="1.5"/><rect x="14" y="5" width="4" height="14" rx="1.5"/>';
+
+        function syncPlayButtons(playing) {
+            const desktopBtn = document.getElementById('nowPlayingPlayBtn');
+            const miniBtn    = document.getElementById('miniPlayBtn');
+            const modalIcon  = document.getElementById('playerModalPlayIcon');
+            if (desktopBtn) desktopBtn.textContent = playing ? '⏸' : '▶';
+            if (miniBtn)    miniBtn.textContent    = playing ? '⏸' : '▶';
+            if (modalIcon) modalIcon.innerHTML = playing ? SVG_PAUSE : SVG_PLAY;
+        }
+
+        function buildModalWaveform() {
+            const container = document.getElementById('playerModalWaveformBars');
+            if (!container || container.children.length > 0) return;
+            const heights = [30,45,60,75,85,70,55,65,80,90,85,70,60,50,40,35,45,60,75,85,80,65,55,45,35,30,40,55,70,80,75,60,50,40,30,35,50,65,75,80];
+            container.innerHTML = heights.map(h => `<div class="player-modal-waveform-bar" style="height:${h}%"></div>`).join('');
+        }
+
+        function updateModalWaveform(percent) {
+            const bars = document.querySelectorAll('.player-modal-waveform-bar');
+            const playedCount = Math.round((percent / 100) * bars.length);
+            bars.forEach((bar, i) => bar.classList.toggle('played', i < playedCount));
+        }
+
+        function setVolume(val) {
+            const v = parseInt(val);
+            audioElement.volume = v / 100;
+            const slider = document.getElementById('volumeSlider');
+            if (slider) slider.style.background = `linear-gradient(to right, #9c27b0 ${v}%, rgba(255,255,255,0.15) ${v}%)`;
+            const icon = document.getElementById('volumeIcon');
+            if (icon) icon.textContent = v === 0 ? '🔇' : v < 50 ? '🔉' : '🔊';
+        }
+
+        function toggleMute() {
+            const slider = document.getElementById('volumeSlider');
+            if (!slider) return;
+            if (parseInt(slider.value) > 0) {
+                slider._prev = slider.value;
+                slider.value = 0;
+            } else {
+                slider.value = slider._prev || 100;
+            }
+            setVolume(slider.value);
+        }
+
+        function openPlayerModal() {
+            document.getElementById('playerModal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+            buildModalWaveform();
+        }
+
+        function closePlayerModal() {
+            document.getElementById('playerModal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function seekFromPlayer(event) {
+            const bar  = event.currentTarget;
+            const rect = bar.getBoundingClientRect();
+            audioElement.currentTime = ((event.clientX - rect.left) / rect.width) * audioElement.duration;
+        }
+
+        function seekFromPlayerModal(event) {
+            const waveform = document.getElementById('playerModalWaveform');
+            const rect     = waveform.getBoundingClientRect();
+            const percent  = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+            audioElement.currentTime = percent * audioElement.duration;
+        }
 
         let currentPlaylist = [];
         let currentTrackIndex = 0;
@@ -950,12 +1183,23 @@
             const track = trackDatabase[trackId];
             if (!track) return;
             audioElement.src = track.url;
-            document.getElementById('playerTitle').textContent = track.title;
-            document.getElementById('playerMeta').textContent = track.meta;
-            document.getElementById('playerArtwork').src = track.artwork;
-            audioPlayer.classList.add('active');
+            // Update desktop bar
+            document.getElementById('nowPlayingTitle').textContent  = track.trackTitle;
+            document.getElementById('nowPlayingArtist').textContent = track.artist;
+            document.getElementById('nowPlayingArtwork').src = track.artwork;
+            // Update mini bar
+            document.getElementById('miniTitle').textContent  = track.trackTitle;
+            document.getElementById('miniArtist').textContent = track.artist;
+            document.getElementById('miniArtwork').src = track.artwork;
+            // Update modal
+            document.getElementById('playerModalTitle').textContent  = track.trackTitle;
+            document.getElementById('playerModalArtist').textContent = track.artist;
+            document.getElementById('playerModalArtwork').src = track.artwork;
+            // Show bar and play
+            document.getElementById('nowPlayingBar').classList.add('visible');
+            buildModalWaveform();
             audioElement.play();
-            playPauseBtn.textContent = '\u23F8';
+            syncPlayButtons(true);
             document.querySelectorAll('.track-item.playing').forEach(el => el.classList.remove('playing'));
             const activeItem = document.querySelector(`.track-item[data-track-id="${trackId}"]`);
             if (activeItem) activeItem.classList.add('playing');
@@ -964,10 +1208,10 @@
         function togglePlayPause() {
             if (audioElement.paused) {
                 audioElement.play();
-                playPauseBtn.textContent = '\u23F8';
+                syncPlayButtons(true);
             } else {
                 audioElement.pause();
-                playPauseBtn.textContent = '\u25B6';
+                syncPlayButtons(false);
             }
         }
 
@@ -983,14 +1227,6 @@
             playTrack(currentPlaylist[currentTrackIndex]);
         }
 
-        function seek(event) {
-            const bar = event.currentTarget;
-            const clickX = event.offsetX;
-            const width = bar.offsetWidth;
-            const percentage = clickX / width;
-            audioElement.currentTime = audioElement.duration * percentage;
-        }
-
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
@@ -998,18 +1234,23 @@
         }
 
         audioElement.addEventListener('timeupdate', () => {
-            if (audioElement.duration) {
-                const percentage = (audioElement.currentTime / audioElement.duration) * 100;
-                progressFill.style.width = percentage + '%';
-                currentTimeEl.textContent = formatTime(audioElement.currentTime);
-            }
-        });
-
-        audioElement.addEventListener('loadedmetadata', () => {
-            durationEl.textContent = formatTime(audioElement.duration);
+            if (!audioElement.duration) return;
+            const pct = (audioElement.currentTime / audioElement.duration) * 100;
+            const cur = formatTime(audioElement.currentTime);
+            const dur = formatTime(audioElement.duration);
+            const fill = document.getElementById('nowPlayingProgressFill');
+            if (fill) fill.style.width = pct + '%';
+            const ct = document.getElementById('nowPlayingCurrentTime');
+            if (ct) ct.textContent = cur;
+            const dt = document.getElementById('nowPlayingDuration');
+            if (dt) dt.textContent = dur;
+            document.getElementById('playerModalCurrentTime').textContent = cur;
+            document.getElementById('playerModalDuration').textContent    = dur;
+            updateModalWaveform(pct);
         });
 
         audioElement.addEventListener('ended', () => {
+            syncPlayButtons(false);
             nextTrack();
         });
 
