@@ -24,26 +24,23 @@ function updateCartCount() {
 function addToCart(event, trackId) {
     event.stopPropagation();
 
-    // Get track info from the DOM
-    const trackElement = event.target.closest('.track-item');
-    if (!trackElement) {
-        console.error('Could not find track element');
-        return;
+    // Prefer trackData lookup (works from track panel and track list)
+    let title, artist;
+    const td = trackData[trackId];
+    if (td) {
+        title = td.title || td.trackTitle || 'Track';
+        artist = td.artist || '';
+    } else {
+        // Fall back to DOM traversal (track list buttons)
+        const trackElement = event.target.closest('.track-item');
+        if (!trackElement) return;
+        const titleElement = trackElement.querySelector('.track-title');
+        if (!titleElement) return;
+        let raw = titleElement.textContent.trim().replace(/\d+\s+versions?/i, '').trim();
+        const parts = raw.split(' - ');
+        title = raw;
+        artist = parts.length > 1 ? parts[0].trim() : '';
     }
-
-    const titleElement = trackElement.querySelector('.track-title');
-    if (!titleElement) {
-        console.error('Could not find track title');
-        return;
-    }
-
-    // Get title and clean up the versions badge
-    let title = titleElement.textContent.trim();
-    title = title.replace(/\d+\s+versions?/i, '').trim();
-
-    // Extract artist from title (format is "Artist - Track")
-    const parts = title.split(' - ');
-    const artist = parts.length > 1 ? parts[0].trim() : 'Buck Moon';
 
     // Check if already in cart
     const existingItem = cart.find(item => item.id === trackId);

@@ -517,9 +517,9 @@ function addToCartFromModal() {
         updateCartCount();
         closeDownloadPrompt();
 
-        // Go straight to checkout
+        // Open cart
         setTimeout(() => {
-            proceedToCheckout();
+            openCart();
         }, 300);
     }
 }
