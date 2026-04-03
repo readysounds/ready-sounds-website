@@ -249,7 +249,7 @@ function openTrackPanel(event, trackId) {
         ${specs ? `<div class="track-panel-specs">${escHtml(specs)}</div>` : ''}
         <div class="track-panel-actions">
             <button class="track-panel-btn-primary" onclick="downloadTrack(event, ${trackId})">↓ Download</button>
-            <button class="track-panel-btn-secondary" onclick="addToCart(event, ${trackId})">Add to Cart</button>
+            <button class="track-panel-btn-secondary" onclick="addToCart(event, ${trackId})">Buy License</button>
         </div>
         <hr class="track-panel-divider">
         <div class="track-panel-meta-grid">
