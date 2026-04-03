@@ -79,7 +79,7 @@ function renderTrackGroup(track) {
                 <img src="${track.artwork_url || ''}" alt="${escHtml(track.artist)}" onerror="this.style.display='none'; this.parentElement.innerHTML='&#127925;';">
             </div>
             <div class="track-info track-info-clickable" onclick="openTrackPanel(event, ${track.id})">
-                <span class="track-title">${escHtml(track.title)}${hasAlts ? `<span class="versions-badge" onclick="event.stopPropagation(); toggleAlternates(event, 'alternates-${track.id}')">${versionsCount} versions</span>` : ''}</span>
+                <span class="track-title"><span class="track-title-text">${escHtml(track.title)}</span>${hasAlts ? `<span class="versions-badge" onclick="event.stopPropagation(); toggleAlternates(event, 'alternates-${track.id}')">${versionsCount} versions</span>` : ''}</span>
                 <span class="track-artist">${escHtml(track.artist)}</span>
             </div>
             <div class="expand-arrow">▾</div>
