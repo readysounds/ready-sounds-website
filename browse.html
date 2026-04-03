@@ -3089,6 +3089,94 @@
             padding-bottom: 4px;
         }
         .featured-playlists-scroll::-webkit-scrollbar { display: none; }
+        /* Recently Played */
+        .recently-played-section {
+            margin-bottom: 28px;
+        }
+        .rp-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .rp-heading {
+            font-size: 0.85em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #aaa;
+        }
+        .rp-clear {
+            font-size: 0.82em;
+            color: #888;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            transition: color 0.15s;
+        }
+        .rp-clear:hover { color: #fff; }
+        .rp-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+        }
+        .rp-scroll::-webkit-scrollbar { display: none; }
+        .rp-card {
+            flex: 0 0 auto;
+            width: 88px;
+            scroll-snap-align: start;
+            cursor: pointer;
+        }
+        .rp-artwork {
+            width: 88px;
+            height: 88px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            background: rgba(255,255,255,0.06);
+            margin-bottom: 6px;
+        }
+        .rp-artwork img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .rp-artwork-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+        .rp-play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.45);
+            color: white;
+            font-size: 20px;
+            opacity: 0;
+            transition: opacity 0.15s;
+            border-radius: 8px;
+        }
+        .rp-card:hover .rp-play-overlay,
+        .rp-card:active .rp-play-overlay { opacity: 1; }
+        .rp-title {
+            font-size: 11px;
+            color: rgba(255,255,255,0.75);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.3;
+        }
+
         .featured-playlist-card {
             flex: 0 0 auto;
             width: 130px;
@@ -3967,6 +4055,15 @@
                     <div class="featured-playlists-scroll" id="featuredPlaylistsScroll"></div>
                 </div>
 
+                <!-- Recently Played -->
+                <div class="recently-played-section" id="recentlyPlayedSection" style="display:none;">
+                    <div class="rp-header">
+                        <span class="rp-heading">Recently Played</span>
+                        <button class="rp-clear" onclick="clearRecentlyPlayed()">Clear</button>
+                    </div>
+                    <div class="rp-scroll"></div>
+                </div>
+
                 <!-- Search -->
                 <div class="search-section">
                     <div class="search-box">
@@ -4146,6 +4243,7 @@
     <script src="/browse-playlists.js"></script>
     <script src="/browse-downloads.js"></script>
     <script src="/browse-favorites.js"></script>
+    <script src="/browse-recently-played.js"></script>
     <script src="/browse-init.js"></script>
 
     <!-- Track Detail Panel -->

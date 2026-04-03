@@ -401,6 +401,9 @@ function playTrack(event, trackId) {
         });
         button.textContent = '⏸';
 
+        // Record in recently played
+        if (typeof addToRecentlyPlayed === 'function') addToRecentlyPlayed(trackId);
+
         // Update player bar
         updateNowPlayingBar(trackId);
 

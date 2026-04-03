@@ -176,4 +176,7 @@ async function loadTracksFromSupabase() {
 
     // Re-apply liked state for logged-in users
     if (typeof loadFavorites === 'function') loadFavorites();
+
+    // Render recently played (now that trackData is populated)
+    if (typeof renderRecentlyPlayed === 'function') renderRecentlyPlayed();
 }
