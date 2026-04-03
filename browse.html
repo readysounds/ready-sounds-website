@@ -3882,6 +3882,27 @@
         </div>
     </div>
 
+    <!-- License Picker Modal -->
+    <div class="download-overlay" id="licensePickerOverlay" onclick="closeLicensePicker()"></div>
+    <div class="download-modal" id="licensePickerModal">
+        <button class="download-close" onclick="closeLicensePicker()">×</button>
+        <div class="download-content">
+            <h2 class="download-title">Choose a License</h2>
+            <p class="download-subtitle" id="licensePickerTrackTitle" style="font-weight:600; color:#fff; margin-bottom:20px;"></p>
+            <div class="license-options" style="display:flex; gap:12px; margin-bottom:24px;">
+                <button class="license-btn license-picker-btn" onclick="confirmBuyLicense('individual')">
+                    Individual
+                    <span class="license-price">$10</span>
+                </button>
+                <button class="license-btn license-picker-btn" onclick="confirmBuyLicense('business')">
+                    Business
+                    <span class="license-price">$125</span>
+                </button>
+            </div>
+            <p class="download-info"><a href="/license.html" target="_blank" style="color:#9c27b0;">View license details →</a></p>
+        </div>
+    </div>
+
     <!-- Download Options Modal (for subscribers) -->
     <div class="download-overlay" id="downloadOptionsOverlay" onclick="closeDownloadOptions()"></div>
     <div class="download-modal" id="downloadOptionsModal">

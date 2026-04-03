@@ -71,23 +71,47 @@ function addToCart(event, trackId) {
     }, 1500);
 }
 
-// Add to cart and immediately proceed to Stripe checkout
+// Show license picker modal before checkout
+let _buyLicenseTrackId = null;
+
 function buyLicense(event, trackId) {
     event.stopPropagation();
     const td = trackData[trackId];
     if (!td) return;
 
-    // Add to cart if not already there
-    if (!cart.find(item => item.id === trackId)) {
-        cart.push({
-            id: trackId,
-            title: td.title || td.trackTitle || 'Track',
-            artist: td.artist || '',
-            license: 'individual',
-            price: 10
-        });
-        updateCartCount();
-    }
+    _buyLicenseTrackId = trackId;
+
+    const title = document.getElementById('licensePickerTrackTitle');
+    if (title) title.textContent = td.title || td.trackTitle || 'Track';
+
+    document.getElementById('licensePickerOverlay').classList.add('visible');
+    document.getElementById('licensePickerModal').classList.add('visible');
+}
+
+function closeLicensePicker() {
+    document.getElementById('licensePickerOverlay').classList.remove('visible');
+    document.getElementById('licensePickerModal').classList.remove('visible');
+    _buyLicenseTrackId = null;
+}
+
+function confirmBuyLicense(licenseType) {
+    if (!_buyLicenseTrackId) return;
+    const trackId = _buyLicenseTrackId;
+    const td = trackData[trackId];
+    if (!td) return;
+
+    closeLicensePicker();
+
+    // Remove any existing cart entry for this track, then add with chosen license
+    cart = cart.filter(item => item.id !== trackId);
+    cart.push({
+        id: trackId,
+        title: td.title || td.trackTitle || 'Track',
+        artist: td.artist || '',
+        license: licenseType,
+        price: licenseType === 'individual' ? 10 : 125
+    });
+    updateCartCount();
 
     proceedToCheckout();
 }
