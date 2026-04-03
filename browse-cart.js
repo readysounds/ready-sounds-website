@@ -71,6 +71,27 @@ function addToCart(event, trackId) {
     }, 1500);
 }
 
+// Add to cart and immediately proceed to Stripe checkout
+function buyLicense(event, trackId) {
+    event.stopPropagation();
+    const td = trackData[trackId];
+    if (!td) return;
+
+    // Add to cart if not already there
+    if (!cart.find(item => item.id === trackId)) {
+        cart.push({
+            id: trackId,
+            title: td.title || td.trackTitle || 'Track',
+            artist: td.artist || '',
+            license: 'individual',
+            price: 10
+        });
+        updateCartCount();
+    }
+
+    proceedToCheckout();
+}
+
 function removeFromCart(trackId) {
     cart = cart.filter(item => item.id !== trackId);
     updateCartCount();
