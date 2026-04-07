@@ -49,10 +49,10 @@ exports.handler = async (event, context) => {
 
     const token = authHeader.replace('Bearer ', '');
 
-    // Initialize Supabase client (server-side, anon key)
+    // Initialize Supabase admin client (service role key bypasses RLS for auth + profile checks)
     const supabase = createClient(
       process.env.SUPABASE_URL,
-      process.env.SUPABASE_ANON_KEY
+      process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
     // Verify the user's session
