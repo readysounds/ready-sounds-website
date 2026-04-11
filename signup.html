@@ -17,6 +17,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/supabase.js"></script>
     <script src="/nav.js"></script>
@@ -360,6 +361,8 @@
                     </label>
                 </div>
 
+                <div id="turnstileWidget" class="cf-turnstile" data-sitekey="0x4AAAAAAC8MH0qls2bg2qJC" style="margin-bottom:8px"></div>
+
                 <button type="submit" class="submit-btn" id="submitBtn">Create Account</button>
             </form>
         </div>
@@ -405,6 +408,7 @@
                 termsField.style.display = 'none';
                 termsField.querySelector('input').required = false;
                 forgotLink.style.display = 'block';
+                document.getElementById('turnstileWidget').style.display = 'none';
                 submitBtn.textContent = 'Sign In';
                 dividerText.textContent = 'or sign in with email';
                 document.getElementById('password').minLength = 1;
@@ -418,6 +422,7 @@
                 termsField.style.display = '';
                 termsField.querySelector('input').required = true;
                 forgotLink.style.display = 'none';
+                document.getElementById('turnstileWidget').style.display = '';
                 submitBtn.textContent = 'Create Account';
                 dividerText.textContent = 'or sign up with email';
                 document.getElementById('password').minLength = 8;
@@ -538,22 +543,31 @@
                         return;
                     }
 
-                    const { data, error } = await supabaseClient.auth.signUp({
-                        email,
-                        password,
-                        options: { data: { full_name: fullName } }
+                    const cfToken = typeof turnstile !== 'undefined' ? turnstile.getResponse() : null;
+                    if (!cfToken) {
+                        showError('Please wait for the security check to complete.');
+                        setLoading(submitBtn, false);
+                        return;
+                    }
+
+                    const res = await fetch('/.netlify/functions/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password, fullName, cfToken }),
                     });
+                    const result = await res.json();
 
-                    if (error) throw error;
-
-                    if (data.user) {
-                        if (data.user.identities && data.user.identities.length === 0) {
+                    if (!res.ok) {
+                        if (typeof turnstile !== 'undefined') turnstile.reset();
+                        if (result.error && result.error.includes('already registered')) {
                             showError('This email is already registered. Sign in instead.');
                         } else {
-                            showSuccess('Account created! Check your email to verify your account.');
-                            this.reset();
-                            setTimeout(() => { window.location.href = '/browse.html'; }, 2500);
+                            throw new Error(result.error || 'Signup failed');
                         }
+                    } else {
+                        showSuccess('Account created! Check your email to verify your account.');
+                        this.reset();
+                        setTimeout(() => { window.location.href = '/browse.html'; }, 2500);
                     }
                 }
             } catch (err) {
