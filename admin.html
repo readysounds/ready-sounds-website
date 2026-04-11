@@ -1534,19 +1534,36 @@
                         const lastDl = u.last_download
                             ? new Date(u.last_download).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
                             : '—';
-                        return `<tr>
+                        const rowId = 'dl-expand-' + u.id;
+                        const hasDownloads = u.download_count > 0;
+                        const dlRows = hasDownloads ? u.downloads.map(d => {
+                            const dlDate = new Date(d.downloaded_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                            return `<tr style="background:rgba(255,255,255,0.02)">
+                                <td colspan="2" style="padding:8px 16px 8px 32px;font-size:12px;color:rgba(255,255,255,0.6)">${escAdm(d.track_title)} <span style="color:rgba(255,255,255,0.3)">— ${escAdm(d.track_artist)}</span></td>
+                                <td style="padding:8px 12px;font-size:12px;color:rgba(255,255,255,0.4)">${escAdm(d.version_title)}</td>
+                                <td style="padding:8px 12px"><span class="dl-format-badge">${escAdm(d.file_format)}</span></td>
+                                <td colspan="3" style="padding:8px 12px;font-size:12px;color:rgba(255,255,255,0.35)">${dlDate}</td>
+                            </tr>`;
+                        }).join('') : '';
+                        return `<tr style="cursor:${hasDownloads ? 'pointer' : 'default'}" onclick="${hasDownloads ? `toggleUserDownloads('${rowId}')` : ''}">
                             <td style="font-weight:500">${escAdm(u.full_name) || '<span style="color:rgba(255,255,255,0.25)">—</span>'}</td>
                             <td class="dl-email">${escAdm(u.email)}</td>
                             <td>${u.subscription_plan ? `<span class="dl-plan-badge">${escAdm(u.subscription_plan)}</span>` : '<span style="color:rgba(255,255,255,0.2);font-size:12px">—</span>'}</td>
                             <td>${statusBadge(u.subscription_status)}</td>
-                            <td style="color:rgba(255,255,255,0.7)">${u.download_count || '—'}</td>
+                            <td style="color:rgba(255,255,255,0.7)">${hasDownloads ? `<span style="text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">${u.download_count}</span>` : '—'}</td>
                             <td class="dl-date">${lastDl}</td>
                             <td class="dl-date">${joined}</td>
-                        </tr>`;
+                        </tr>
+                        <tr id="${rowId}" style="display:none">${dlRows ? `<td colspan="7" style="padding:0"><table style="width:100%;border-collapse:collapse">${dlRows}</table></td>` : ''}</tr>`;
                     }).join('')}
                 </tbody>
             </table>
         `;
+    }
+
+    function toggleUserDownloads(rowId) {
+        const row = document.getElementById(rowId);
+        if (row) row.style.display = row.style.display === 'none' ? '' : 'none';
     }
 
     function escAdm(str) {

@@ -56,23 +56,25 @@ exports.handler = async (event) => {
         const profileMap = {};
         (profiles || []).forEach(p => { profileMap[p.id] = p; });
 
-        // Fetch download counts and last download per user
-        const { data: dlAgg } = await supabase
+        // Fetch all downloads with full detail
+        const { data: allDownloads } = await supabase
           .from('downloads')
-          .select('user_id, downloaded_at');
+          .select('user_id, track_title, track_artist, version_title, file_format, downloaded_at')
+          .order('downloaded_at', { ascending: false });
 
         const dlMap = {};
-        (dlAgg || []).forEach(d => {
-          if (!dlMap[d.user_id]) dlMap[d.user_id] = { count: 0, last: null };
+        (allDownloads || []).forEach(d => {
+          if (!dlMap[d.user_id]) dlMap[d.user_id] = { count: 0, last: null, downloads: [] };
           dlMap[d.user_id].count++;
           if (!dlMap[d.user_id].last || d.downloaded_at > dlMap[d.user_id].last) {
             dlMap[d.user_id].last = d.downloaded_at;
           }
+          dlMap[d.user_id].downloads.push(d);
         });
 
         const users = (authData.users || []).map(u => {
           const profile = profileMap[u.id] || {};
-          const dl = dlMap[u.id] || { count: 0, last: null };
+          const dl = dlMap[u.id] || { count: 0, last: null, downloads: [] };
           return {
             id: u.id,
             email: u.email,
@@ -82,6 +84,7 @@ exports.handler = async (event) => {
             subscription_plan: profile.subscription_plan || null,
             download_count: dl.count,
             last_download: dl.last,
+            downloads: dl.downloads,
           };
         }).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
