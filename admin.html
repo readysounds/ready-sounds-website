@@ -763,14 +763,14 @@
     <div id="playlistList"><div class="empty-list">Enter your admin key above to load playlists.</div></div>
 </div>
 
-<!-- Downloads Section -->
+<!-- Users Section -->
 <div class="section-divider" style="margin-top:40px">
-    <h2>Downloads</h2>
+    <h2>Users</h2>
     <hr>
 </div>
 
 <div class="card" id="downloadsCard">
-    <div class="empty-list">Enter your admin key above to load downloads.</div>
+    <div class="empty-list">Enter your admin key above to load users.</div>
 </div>
 
 </div> <!-- /adminContent -->
@@ -1418,68 +1418,77 @@
     }
 
     // ── Init ────────────────────────────────────────────────────────
-    // ── Downloads ────────────────────────────────────────────────────
+    // ── Users ────────────────────────────────────────────────────────
     async function loadDownloads() {
         if (!getKey()) return;
         const card = document.getElementById('downloadsCard');
         card.innerHTML = '<div class="empty-list">Loading…</div>';
 
-        const res = await fetch(`${ADMIN_FN}?table=downloads`, {
+        const res = await fetch(`${ADMIN_FN}?table=users`, {
             headers: { 'x-admin-key': getKey() }
         });
         if (!res.ok) {
-            card.innerHTML = '<div class="empty-list">Failed to load downloads.</div>';
+            card.innerHTML = '<div class="empty-list">Failed to load users.</div>';
             return;
         }
-        const downloads = await res.json();
+        const users = await res.json();
 
-        if (!downloads.length) {
-            card.innerHTML = '<div class="empty-list">No downloads yet.</div>';
+        if (!users.length) {
+            card.innerHTML = '<div class="empty-list">No users yet.</div>';
             return;
         }
 
-        // Compute stats
-        const uniqueUsers = new Set(downloads.map(d => d.user_id)).size;
-        const trackCounts = {};
-        downloads.forEach(d => { trackCounts[d.track_title] = (trackCounts[d.track_title] || 0) + 1; });
-        const topTrack = Object.entries(trackCounts).sort((a, b) => b[1] - a[1])[0];
+        const activeCount = users.filter(u => u.subscription_status === 'active').length;
+        const totalDownloads = users.reduce((sum, u) => sum + u.download_count, 0);
+
+        const statusBadge = (status) => {
+            if (status === 'active') return `<span class="dl-plan-badge" style="background:rgba(46,160,67,0.15);border-color:rgba(46,160,67,0.3);color:#56d364">active</span>`;
+            if (status === 'expired') return `<span class="dl-plan-badge" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:rgba(255,255,255,0.3)">expired</span>`;
+            if (status === 'past_due') return `<span class="dl-plan-badge" style="background:rgba(210,153,34,0.15);border-color:rgba(210,153,34,0.3);color:#e3b341">past due</span>`;
+            return `<span style="color:rgba(255,255,255,0.2);font-size:12px">—</span>`;
+        };
 
         card.innerHTML = `
             <div class="dl-stats">
                 <div class="dl-stat">
-                    <div class="dl-stat-value">${downloads.length}</div>
-                    <div class="dl-stat-label">Total Downloads</div>
+                    <div class="dl-stat-value">${users.length}</div>
+                    <div class="dl-stat-label">Total Users</div>
                 </div>
                 <div class="dl-stat">
-                    <div class="dl-stat-value">${uniqueUsers}</div>
-                    <div class="dl-stat-label">Unique Users</div>
+                    <div class="dl-stat-value">${activeCount}</div>
+                    <div class="dl-stat-label">Active Subscribers</div>
                 </div>
-                <div class="dl-stat" style="flex:2">
-                    <div class="dl-stat-value" style="font-size:16px;margin-bottom:6px">${escAdm(topTrack[0])}</div>
-                    <div class="dl-stat-label">Top Track &nbsp;·&nbsp; ${topTrack[1]} download${topTrack[1] !== 1 ? 's' : ''}</div>
+                <div class="dl-stat">
+                    <div class="dl-stat-value">${totalDownloads}</div>
+                    <div class="dl-stat-label">Total Downloads</div>
                 </div>
             </div>
             <table class="dl-table">
                 <thead>
                     <tr>
-                        <th>User</th>
-                        <th>Track</th>
-                        <th>Version</th>
-                        <th>Format</th>
+                        <th>Name</th>
+                        <th>Email</th>
                         <th>Plan</th>
-                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Downloads</th>
+                        <th>Last Download</th>
+                        <th>Joined</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${downloads.map(d => {
-                        const date = new Date(d.downloaded_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                    ${users.map(u => {
+                        const joined = new Date(u.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                        const lastDl = u.last_download
+                            ? new Date(u.last_download).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+                            : '—';
                         return `<tr>
-                            <td class="dl-email">${escAdm(d.user_email)}</td>
-                            <td><strong>${escAdm(d.track_title)}</strong><br><span style="color:rgba(255,255,255,0.35);font-size:11px">${escAdm(d.track_artist)}</span></td>
-                            <td>${escAdm(d.version_title)}</td>
-                            <td><span class="dl-format-badge">${escAdm(d.file_format)}</span></td>
-                            <td><span class="dl-plan-badge">${escAdm(d.subscription_plan)}</span></td>
-                            <td class="dl-date">${date}</td>
+                            <td style="font-weight:500">${escAdm(u.full_name) || '<span style="color:rgba(255,255,255,0.25)">—</span>'}</td>
+                            <td class="dl-email">${escAdm(u.email)}</td>
+                            <td>${u.subscription_plan ? `<span class="dl-plan-badge">${escAdm(u.subscription_plan)}</span>` : '<span style="color:rgba(255,255,255,0.2);font-size:12px">—</span>'}</td>
+                            <td>${statusBadge(u.subscription_status)}</td>
+                            <td style="color:rgba(255,255,255,0.7)">${u.download_count || '—'}</td>
+                            <td class="dl-date">${lastDl}</td>
+                            <td class="dl-date">${joined}</td>
                         </tr>`;
                     }).join('')}
                 </tbody>

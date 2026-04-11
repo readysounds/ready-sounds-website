@@ -43,30 +43,49 @@ exports.handler = async (event) => {
         return { statusCode: 200, headers, body: JSON.stringify(data) };
       }
 
-      if (params.table === 'downloads') {
-        const { data: downloads, error } = await supabase
-          .from('downloads')
-          .select('*')
-          .order('downloaded_at', { ascending: false })
-          .limit(100);
-        if (error) throw error;
+      if (params.table === 'users') {
+        // Fetch all auth users (includes user_metadata.full_name)
+        const { data: authData, error: authError } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+        if (authError) throw authError;
 
-        // Enrich with user email from profiles
-        const userIds = [...new Set(downloads.map(d => d.user_id))];
+        // Fetch all profiles for subscription info
         const { data: profiles } = await supabase
           .from('profiles')
-          .select('id, email')
-          .in('id', userIds);
+          .select('id, email, subscription_status, subscription_plan');
 
         const profileMap = {};
-        (profiles || []).forEach(p => { profileMap[p.id] = p.email; });
+        (profiles || []).forEach(p => { profileMap[p.id] = p; });
 
-        const enriched = downloads.map(d => ({
-          ...d,
-          user_email: profileMap[d.user_id] || d.user_id
-        }));
+        // Fetch download counts and last download per user
+        const { data: dlAgg } = await supabase
+          .from('downloads')
+          .select('user_id, downloaded_at');
 
-        return { statusCode: 200, headers, body: JSON.stringify(enriched) };
+        const dlMap = {};
+        (dlAgg || []).forEach(d => {
+          if (!dlMap[d.user_id]) dlMap[d.user_id] = { count: 0, last: null };
+          dlMap[d.user_id].count++;
+          if (!dlMap[d.user_id].last || d.downloaded_at > dlMap[d.user_id].last) {
+            dlMap[d.user_id].last = d.downloaded_at;
+          }
+        });
+
+        const users = (authData.users || []).map(u => {
+          const profile = profileMap[u.id] || {};
+          const dl = dlMap[u.id] || { count: 0, last: null };
+          return {
+            id: u.id,
+            email: u.email,
+            full_name: u.user_metadata?.full_name || '',
+            created_at: u.created_at,
+            subscription_status: profile.subscription_status || null,
+            subscription_plan: profile.subscription_plan || null,
+            download_count: dl.count,
+            last_download: dl.last,
+          };
+        }).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+        return { statusCode: 200, headers, body: JSON.stringify(users) };
       }
 
       if (params.track_id) {
