@@ -43,6 +43,32 @@ exports.handler = async (event) => {
         return { statusCode: 200, headers, body: JSON.stringify(data) };
       }
 
+      if (params.table === 'downloads') {
+        const { data: downloads, error } = await supabase
+          .from('downloads')
+          .select('*')
+          .order('downloaded_at', { ascending: false })
+          .limit(100);
+        if (error) throw error;
+
+        // Enrich with user email from profiles
+        const userIds = [...new Set(downloads.map(d => d.user_id))];
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, email')
+          .in('id', userIds);
+
+        const profileMap = {};
+        (profiles || []).forEach(p => { profileMap[p.id] = p.email; });
+
+        const enriched = downloads.map(d => ({
+          ...d,
+          user_email: profileMap[d.user_id] || d.user_id
+        }));
+
+        return { statusCode: 200, headers, body: JSON.stringify(enriched) };
+      }
+
       if (params.track_id) {
         // Return alternates for a specific track
         const { data, error } = await supabase

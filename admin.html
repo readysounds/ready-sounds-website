@@ -416,6 +416,98 @@
             border: none;
             border-top: 1px solid rgba(255,255,255,0.08);
         }
+
+        /* Downloads section */
+        .dl-stats {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .dl-stat {
+            flex: 1;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 10px;
+            padding: 16px 18px;
+        }
+
+        .dl-stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .dl-stat-label {
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: rgba(255,255,255,0.35);
+        }
+
+        .dl-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .dl-table th {
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: rgba(255,255,255,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            white-space: nowrap;
+        }
+
+        .dl-table td {
+            padding: 11px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            vertical-align: middle;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .dl-table tr:last-child td { border-bottom: none; }
+        .dl-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .dl-email {
+            color: rgba(255,255,255,0.55);
+            font-size: 12px;
+        }
+
+        .dl-plan-badge {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            background: rgba(156,39,176,0.12);
+            border: 1px solid rgba(156,39,176,0.25);
+            color: #ba68c8;
+        }
+
+        .dl-format-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.5);
+        }
+
+        .dl-date {
+            color: rgba(255,255,255,0.35);
+            font-size: 12px;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -671,6 +763,16 @@
     <div id="playlistList"><div class="empty-list">Enter your admin key above to load playlists.</div></div>
 </div>
 
+<!-- Downloads Section -->
+<div class="section-divider" style="margin-top:40px">
+    <h2>Downloads</h2>
+    <hr>
+</div>
+
+<div class="card" id="downloadsCard">
+    <div class="empty-list">Enter your admin key above to load downloads.</div>
+</div>
+
 </div> <!-- /adminContent -->
 
 <script>
@@ -691,6 +793,7 @@
         lockKeySection();
         loadTrackList();
         loadPlaylistList();
+        loadDownloads();
         fetchNextSortOrder();
     }
 
@@ -1315,6 +1418,80 @@
     }
 
     // ── Init ────────────────────────────────────────────────────────
+    // ── Downloads ────────────────────────────────────────────────────
+    async function loadDownloads() {
+        if (!getKey()) return;
+        const card = document.getElementById('downloadsCard');
+        card.innerHTML = '<div class="empty-list">Loading…</div>';
+
+        const res = await fetch(`${ADMIN_FN}?table=downloads`, {
+            headers: { 'x-admin-key': getKey() }
+        });
+        if (!res.ok) {
+            card.innerHTML = '<div class="empty-list">Failed to load downloads.</div>';
+            return;
+        }
+        const downloads = await res.json();
+
+        if (!downloads.length) {
+            card.innerHTML = '<div class="empty-list">No downloads yet.</div>';
+            return;
+        }
+
+        // Compute stats
+        const uniqueUsers = new Set(downloads.map(d => d.user_id)).size;
+        const trackCounts = {};
+        downloads.forEach(d => { trackCounts[d.track_title] = (trackCounts[d.track_title] || 0) + 1; });
+        const topTrack = Object.entries(trackCounts).sort((a, b) => b[1] - a[1])[0];
+
+        card.innerHTML = `
+            <div class="dl-stats">
+                <div class="dl-stat">
+                    <div class="dl-stat-value">${downloads.length}</div>
+                    <div class="dl-stat-label">Total Downloads</div>
+                </div>
+                <div class="dl-stat">
+                    <div class="dl-stat-value">${uniqueUsers}</div>
+                    <div class="dl-stat-label">Unique Users</div>
+                </div>
+                <div class="dl-stat" style="flex:2">
+                    <div class="dl-stat-value" style="font-size:16px;margin-bottom:6px">${escAdm(topTrack[0])}</div>
+                    <div class="dl-stat-label">Top Track &nbsp;·&nbsp; ${topTrack[1]} download${topTrack[1] !== 1 ? 's' : ''}</div>
+                </div>
+            </div>
+            <table class="dl-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Track</th>
+                        <th>Version</th>
+                        <th>Format</th>
+                        <th>Plan</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${downloads.map(d => {
+                        const date = new Date(d.downloaded_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                        return `<tr>
+                            <td class="dl-email">${escAdm(d.user_email)}</td>
+                            <td><strong>${escAdm(d.track_title)}</strong><br><span style="color:rgba(255,255,255,0.35);font-size:11px">${escAdm(d.track_artist)}</span></td>
+                            <td>${escAdm(d.version_title)}</td>
+                            <td><span class="dl-format-badge">${escAdm(d.file_format)}</span></td>
+                            <td><span class="dl-plan-badge">${escAdm(d.subscription_plan)}</span></td>
+                            <td class="dl-date">${date}</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    function escAdm(str) {
+        if (!str) return '—';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
         if (sessionStorage.getItem(AUTH_SESSION_KEY) === '1') {
             showAdmin();
@@ -1325,6 +1502,7 @@
             lockKeySection();
             loadTrackList();
             loadPlaylistList();
+            loadDownloads();
             fetchNextSortOrder();
         }
     });
