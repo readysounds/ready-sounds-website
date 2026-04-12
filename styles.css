@@ -3,15 +3,95 @@
  * Included on every page. Page-specific styles live in each file's <style> block.
  *
  * Contents
+ * 0. Site Header & Nav
  * 1. CSS Variables
  * 2. Reset & Base
  * 3. Mobile Menu Toggle
  * 4. Mobile Slide Panel
  * 5. Profile Dropdown
  * 6. Auth Buttons (nav-level)
- * 7. Base Button Components
- * 8. Footer
+ * 7. Music Nav Dropdown
+ * 8. Base Button Components
+ * 9. Footer
  */
+
+/* ── 0. Site Header & Nav ────────────────────────────────────────────────── */
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10, 10, 10, 0.98);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 1000;
+    padding: 16px 0;
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 600;
+    color: white;
+    text-transform: lowercase;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.header-nav {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-left: 32px;
+}
+
+.nav-item {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    background: none;
+    font-family: inherit;
+    line-height: inherit;
+}
+
+.nav-item:hover {
+    color: #9c27b0;
+    background: rgba(156, 39, 176, 0.1);
+    border-color: rgba(156, 39, 176, 0.3);
+}
+
+.nav-item.active {
+    color: white;
+    background: rgba(156, 39, 176, 0.15);
+    border-color: rgba(156, 39, 176, 0.5);
+}
+
+@media (max-width: 768px) {
+    .header-nav > a.nav-item,
+    .header-nav > .nav-music-dropdown,
+    .header-nav > .auth-buttons,
+    .header-nav > .profile-container,
+    .header-nav > .cart-icon {
+        display: none;
+    }
+    .header-nav > .mobile-menu-toggle { display: block; }
+    .header-content { padding: 0 20px; }
+}
 
 /* ── 1. CSS Variables ─────────────────────────────────────────────────────── */
 
@@ -97,48 +177,145 @@ body {
 }
 .mobile-panel.open { right: 0; }
 
+.mobile-panel-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 36px;
+}
+
 .mobile-panel-close {
-    align-self: flex-end;
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.55);
-    font-size: 28px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 30px;
     cursor: pointer;
-    margin-bottom: 32px;
+    padding: 4px 8px;
     line-height: 1;
+    transition: color 0.2s;
 }
+.mobile-panel-close:hover { color: white; }
 
-.mobile-panel-nav a {
-    display: block;
-    color: var(--color-text);
-    text-decoration: none;
-    font-size: 28px;
-    font-weight: 700;
-    padding: 14px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-}
-.mobile-panel-nav a:hover,
-.mobile-panel-nav a.active-page { color: var(--color-purple); }
-
-.mobile-panel-cta {
-    display: block;
-    background: var(--color-purple);
-    color: var(--color-text);
-    text-align: center;
-    padding: 16px;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 16px;
-    text-decoration: none;
-    margin-top: 32px;
-}
-
-.mobile-panel-auth {
+.mobile-panel-nav {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 2px;
+}
+
+.mobile-panel-link {
+    font-size: 30px;
+    font-weight: 700;
+    color: white;
+    text-decoration: none;
+    padding: 8px 0;
+    letter-spacing: -0.5px;
+    transition: color 0.2s;
+}
+.mobile-panel-link:hover,
+.mobile-panel-link.active { color: var(--color-purple); }
+
+.mobile-panel-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 24px 0;
+}
+
+.mobile-panel-expandable {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.75);
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: var(--font-sans);
+}
+.mobile-panel-expandable:hover { color: white; }
+
+.mobile-panel-chevron {
+    font-size: 16px;
+    transition: transform 0.2s;
+    opacity: 0.6;
+}
+.mobile-panel-expandable.open .mobile-panel-chevron { transform: rotate(180deg); }
+
+.mobile-panel-submenu {
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    padding-bottom: 8px;
+}
+.mobile-panel-submenu.open { display: flex; }
+
+.mobile-panel-sublink {
+    font-size: 17px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+.mobile-panel-sublink:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.mobile-panel-subscribe {
+    display: block;
+    text-align: center;
+    background: var(--color-purple);
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 16px;
+    border-radius: 12px;
+    margin-top: 28px;
+    transition: background 0.2s;
+}
+.mobile-panel-subscribe:hover { background: var(--color-purple-mid); }
+
+.mobile-panel-auth-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     margin-top: 16px;
 }
+
+.mobile-panel-auth-btn {
+    display: block;
+    text-align: center;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.mobile-panel-auth-btn.login {
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.mobile-panel-auth-btn.login:hover {
+    border-color: rgba(156, 39, 176, 0.5);
+    color: var(--color-purple);
+}
+.mobile-panel-auth-btn.signup {
+    color: white;
+    background: var(--color-purple);
+    border: 1px solid var(--color-purple);
+}
+.mobile-panel-auth-btn.signup:hover { background: var(--color-purple-mid); }
+
+/* Legacy aliases kept for any older mobile panels */
+.mobile-panel-auth { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
 
 .mobile-auth-login {
     display: block;

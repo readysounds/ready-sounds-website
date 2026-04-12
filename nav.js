@@ -28,7 +28,15 @@
         if (e.key === 'Escape') closeMobilePanel();
     });
 
+    function togglePanelSection(section) {
+        var submenu = document.getElementById(section + 'Submenu');
+        var btn = document.getElementById(section + 'Btn');
+        if (submenu) submenu.classList.toggle('open');
+        if (btn) btn.classList.toggle('open');
+    }
+
     // Expose to global scope for inline onclick handlers
     window.toggleMobileMenu = toggleMobileMenu;
     window.closeMobilePanel = closeMobilePanel;
+    window.togglePanelSection = togglePanelSection;
 }());
