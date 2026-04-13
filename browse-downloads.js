@@ -5,6 +5,23 @@
 let currentDownloadTrackId = null;
 let currentDownloadTrackInfo = null;
 
+// Check if user has purchased a specific track individually
+async function hasPurchasedTrack(trackId) {
+    try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) return false;
+        const { data } = await supabaseClient
+            .from('downloads')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('track_id', trackId)
+            .limit(1);
+        return data && data.length > 0;
+    } catch (e) {
+        return false;
+    }
+}
+
 // Check if user has active subscription
 async function hasActiveSubscription() {
     try {
@@ -54,12 +71,18 @@ async function downloadTrack(event, trackId) {
     const hasSubscription = await hasActiveSubscription();
 
     if (hasSubscription) {
-        // User has subscription - show download options modal
         showDownloadOptions(trackId);
         return;
     }
 
-    // No subscription - show the purchase modal
+    // Check if user has purchased this track individually
+    const hasPurchase = await hasPurchasedTrack(trackId);
+    if (hasPurchase) {
+        showDownloadOptions(trackId);
+        return;
+    }
+
+    // No access - show the purchase modal
     // Store the track ID and info for the cart button in the modal
     currentDownloadTrackId = trackId;
 

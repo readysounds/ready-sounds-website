@@ -68,28 +68,53 @@ exports.handler = async (event, context) => {
 
     console.log('Authenticated user:', user.email);
 
-    // Check if user has an active subscription (stored in profiles table)
-    const { data: profile, error: subError } = await supabase
+    // Parse the request body early so we have trackId for the purchase check
+    const body = JSON.parse(event.body);
+    const { filePath, trackId, trackTitle, trackArtist, versionTitle, fileFormat } = body;
+
+    // Check access: active subscription OR prior per-track purchase of this track
+    const { data: profile } = await supabase
       .from('profiles')
-      .select('*')
+      .select('subscription_plan')
       .eq('email', user.email)
       .eq('subscription_status', 'active')
       .single();
 
-    if (subError || !profile) {
-      console.log('Subscription check failed:', subError);
-      return {
-        statusCode: 403,
-        headers,
-        body: JSON.stringify({ error: 'No active subscription found' })
-      };
+    let subscriptionPlan = profile?.subscription_plan || null;
+    let isPerTrackPurchase = false;
+
+    if (!profile) {
+      // No active subscription — check for a per-track purchase
+      if (!trackId) {
+        return {
+          statusCode: 403,
+          headers,
+          body: JSON.stringify({ error: 'No active subscription found' })
+        };
+      }
+
+      const { data: purchase } = await supabase
+        .from('downloads')
+        .select('subscription_plan')
+        .eq('user_id', user.id)
+        .eq('track_id', trackId)
+        .limit(1)
+        .single();
+
+      if (!purchase) {
+        return {
+          statusCode: 403,
+          headers,
+          body: JSON.stringify({ error: 'No active subscription or purchased license for this track' })
+        };
+      }
+
+      subscriptionPlan = purchase.subscription_plan;
+      isPerTrackPurchase = true;
+      console.log('Per-track purchase verified for track:', trackId);
+    } else {
+      console.log('User has active subscription:', subscriptionPlan);
     }
-
-    console.log('User has active subscription:', profile.subscription_plan);
-
-    // Parse the request body
-    const body = JSON.parse(event.body);
-    const { filePath, trackId, trackTitle, trackArtist, versionTitle, fileFormat } = body;
 
     if (!filePath) {
       return {
@@ -121,33 +146,35 @@ exports.handler = async (event, context) => {
 
     console.log('Generated signed URL successfully');
 
-    // Log the download record using a user-authenticated client (respects RLS)
-    const licenseId = generateLicenseId();
-    try {
-      const userSupabase = createClient(
-        process.env.SUPABASE_URL,
-        process.env.SUPABASE_ANON_KEY,
-        { global: { headers: { Authorization: `Bearer ${token}` } } }
-      );
+    // Log the download record for subscribers (per-track buyers already have one from the webhook)
+    let licenseId = generateLicenseId();
+    if (!isPerTrackPurchase) {
+      try {
+        const userSupabase = createClient(
+          process.env.SUPABASE_URL,
+          process.env.SUPABASE_ANON_KEY,
+          { global: { headers: { Authorization: `Bearer ${token}` } } }
+        );
 
-      const derivedFormat = fileFormat || (filePath.toLowerCase().endsWith('.wav') ? 'WAV' : 'MP3');
-      const derivedTitle = trackTitle || filePath.split('/').pop().replace(/\.(mp3|wav)$/i, '').replace(/-/g, ' ');
+        const derivedFormat = fileFormat || (filePath.toLowerCase().endsWith('.wav') ? 'WAV' : 'MP3');
+        const derivedTitle = trackTitle || filePath.split('/').pop().replace(/\.(mp3|wav)$/i, '').replace(/-/g, ' ');
 
-      await userSupabase.from('downloads').insert({
-        user_id: user.id,
-        track_id: trackId || null,
-        track_title: derivedTitle,
-        track_artist: trackArtist || 'Ready Sounds',
-        version_title: versionTitle || 'Full Track',
-        file_format: derivedFormat,
-        subscription_plan: profile.subscription_plan,
-        license_id: licenseId,
-      });
+        await userSupabase.from('downloads').insert({
+          user_id: user.id,
+          track_id: trackId || null,
+          track_title: derivedTitle,
+          track_artist: trackArtist || 'Ready Sounds',
+          version_title: versionTitle || 'Full Track',
+          file_format: derivedFormat,
+          subscription_plan: subscriptionPlan,
+          license_id: licenseId,
+        });
 
-      console.log('Download logged with license ID:', licenseId);
-    } catch (logError) {
-      // Non-fatal: log the error but still return the download URL
-      console.error('Failed to log download:', logError.message);
+        console.log('Download logged with license ID:', licenseId);
+      } catch (logError) {
+        // Non-fatal: log the error but still return the download URL
+        console.error('Failed to log download:', logError.message);
+      }
     }
 
     return {
