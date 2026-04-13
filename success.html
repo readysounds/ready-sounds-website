@@ -212,19 +212,19 @@
             <span class="status-loading"></span>activating your account...
         </p>
 
-        <div class="info-box">
-            <div class="info-row">
+        <div class="info-box" id="infoBox">
+            <div class="info-row" id="rowDownloads">
                 <span class="info-icon">📥</span>
                 <div class="info-text">
                     <strong>Unlimited downloads</strong>
                     Browse the full catalog and download any track, including WAV files and stems.
                 </div>
             </div>
-            <div class="info-row">
+            <div class="info-row" id="rowLicense">
                 <span class="info-icon">♾️</span>
                 <div class="info-text">
                     <strong>Perpetual license</strong>
-                    Content you create while subscribed stays licensed forever, even after cancellation.
+                    Content you create stays licensed forever — no expiry, no strings.
                 </div>
             </div>
             <div class="info-row">
@@ -236,7 +236,7 @@
             </div>
         </div>
 
-        <div class="actions">
+        <div class="actions" id="actions">
             <a href="browse.html" class="btn-primary">browse the catalog →</a>
             <a href="account.html" class="btn-secondary">view your account</a>
         </div>
@@ -247,6 +247,25 @@
         const supabaseUrl = 'https://pfqvrxfazumlydjepwib.supabase.co';
         const supabaseKey = 'sb_publishable_1oBqgAQj0xzb5-eosyfcBg_9dKxNZfa';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        function showPerTrackState() {
+            // Update subtitle
+            document.querySelector('.subtitle').innerHTML =
+                'Your license is confirmed. Find your certificate in My Downloads.';
+            // Swap info box to per-track messaging
+            document.getElementById('rowDownloads').innerHTML = `
+                <span class="info-icon">📜</span>
+                <div class="info-text">
+                    <strong>License certificates ready</strong>
+                    Your license certificates are available in My Downloads.
+                </div>
+            `;
+            // Update primary CTA
+            document.getElementById('actions').innerHTML = `
+                <a href="downloads.html" class="btn-primary">view my downloads →</a>
+                <a href="browse.html" class="btn-secondary">continue browsing</a>
+            `;
+        }
 
         // Poll for subscription activation (webhook may take a few seconds)
         async function checkSubscriptionStatus() {
@@ -277,8 +296,9 @@
                     } else if (attempts < maxAttempts) {
                         setTimeout(poll, 2000);
                     } else {
-                        // Webhook may still be processing — that's fine
+                        // No subscription activated — this was a per-track purchase
                         statusEl.innerHTML = '';
+                        showPerTrackState();
                     }
                 };
 

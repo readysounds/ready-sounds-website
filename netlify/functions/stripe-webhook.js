@@ -81,6 +81,16 @@ exports.handler = async (event) => {
   }
 };
 
+function generateLicenseId() {
+  const year = new Date().getFullYear();
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let suffix = '';
+  for (let i = 0; i < 8; i++) {
+    suffix += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return `RS-${year}-${suffix}`;
+}
+
 // Handle successful checkout session
 async function handleCheckoutSessionCompleted(session) {
   console.log('Checkout session completed:', session.id);
@@ -94,23 +104,101 @@ async function handleCheckoutSessionCompleted(session) {
     return;
   }
 
-  // Update user profile with Stripe customer ID and subscription ID
-  const { error } = await supabase
-    .from('profiles')
-    .update({
-      stripe_customer_id: customerId,
-      stripe_subscription_id: subscriptionId,
-      subscription_status: 'active',
-      updated_at: new Date().toISOString()
-    })
-    .eq('email', customerEmail);
+  if (subscriptionId) {
+    // Subscription checkout — update profile
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        stripe_customer_id: customerId,
+        stripe_subscription_id: subscriptionId,
+        subscription_status: 'active',
+        updated_at: new Date().toISOString()
+      })
+      .eq('email', customerEmail);
 
-  if (error) {
-    console.error('Error updating profile after checkout:', error);
-    throw error;
+    if (error) {
+      console.error('Error updating profile after checkout:', error);
+      throw error;
+    }
+    console.log(`Subscription profile updated for ${customerEmail}`);
+  } else {
+    // Per-track one-time payment — fulfill licenses
+    await handlePerTrackPurchase(session, customerEmail, customerId);
+  }
+}
+
+// Fulfill a per-track purchase by creating download records
+async function handlePerTrackPurchase(session, customerEmail, customerId) {
+  const trackIds = (session.metadata?.trackIds || '').split(',').filter(Boolean);
+  const licenses = (session.metadata?.licenses || '').split(',').filter(Boolean);
+
+  if (trackIds.length === 0) {
+    console.error('No trackIds in per-track purchase metadata for session:', session.id);
+    return;
   }
 
-  console.log(`Profile updated for ${customerEmail}`);
+  // Look up the user's UUID via their profile
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', customerEmail)
+    .single();
+
+  if (profileError || !profile) {
+    console.error('Could not find profile for email:', customerEmail, profileError);
+    return;
+  }
+
+  const userId = profile.id;
+
+  // Look up track details from Supabase
+  const trackIdInts = trackIds.map(id => parseInt(id, 10)).filter(id => !isNaN(id));
+  const { data: tracks, error: tracksError } = await supabase
+    .from('tracks')
+    .select('id, title, artist')
+    .in('id', trackIdInts);
+
+  if (tracksError) {
+    console.error('Error fetching track details:', tracksError);
+    throw tracksError;
+  }
+
+  const tracksById = Object.fromEntries((tracks || []).map(t => [t.id, t]));
+  const now = new Date().toISOString();
+
+  const downloadRecords = trackIdInts.map((trackId, i) => {
+    const track = tracksById[trackId] || {};
+    const license = licenses[i] || 'individual';
+    const planKey = license === 'business' ? 'business_yearly' : 'individual_monthly';
+    return {
+      user_id: userId,
+      track_id: trackId,
+      track_title: track.title || 'Unknown Track',
+      track_artist: track.artist || 'Unknown Artist',
+      version_title: 'Full Track',
+      file_format: 'MP3',
+      subscription_plan: planKey,
+      license_id: generateLicenseId(),
+      downloaded_at: now
+    };
+  });
+
+  const { error: insertError } = await supabase
+    .from('downloads')
+    .insert(downloadRecords);
+
+  if (insertError) {
+    console.error('Error creating download records for per-track purchase:', insertError);
+    throw insertError;
+  }
+
+  // Store Stripe customer ID on the profile
+  await supabase
+    .from('profiles')
+    .update({ stripe_customer_id: customerId, updated_at: now })
+    .eq('email', customerEmail);
+
+  console.log(`Per-track purchase fulfilled for ${customerEmail}: ${trackIdInts.length} track(s)`);
 }
 
 // Handle subscription created
