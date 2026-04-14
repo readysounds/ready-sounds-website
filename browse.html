@@ -3534,7 +3534,7 @@
             }
 
             .track-item.alternate {
-                grid-template-columns: 48px 1fr 32px;
+                grid-template-columns: 48px 1fr 32px 32px;
                 padding: 8px 4px 8px 16px;
                 margin: 0;
                 background: none;
@@ -3655,27 +3655,23 @@
                 display: none;
             }
 
-            /* Keep heart button visible on phones too - inline in grid */
+            /* On phones show only the ··· button in grid column 4 */
             .track-actions {
                 display: flex;
                 grid-column: 4;
                 align-items: center;
                 justify-content: center;
             }
-            .track-actions .action-btn:not(.action-btn-like) {
+            .track-actions .action-btn:not(.action-btn-more) {
                 display: none;
             }
-            .action-btn-like {
-                padding: 4px;
-                font-size: 18px;
+            .action-btn-more {
+                padding: 4px 6px;
+                font-size: 14px;
                 background: none;
                 border: none;
                 color: rgba(255, 255, 255, 0.5);
-            }
-            .action-btn-like.liked {
-                color: #9c27b0;
-                background: none;
-                border: none;
+                letter-spacing: 1px;
             }
 
             .alternates-container {
