@@ -116,9 +116,9 @@ function escAttr(str) {
 // Copy a shareable link for a track to the clipboard
 function copyTrackLink(event, trackId) {
     event.stopPropagation();
+    const btn = event.currentTarget;
     const url = `${window.location.origin}${window.location.pathname}#track-${trackId}`;
     navigator.clipboard.writeText(url).then(() => {
-        const btn = event.currentTarget;
         const orig = btn.innerHTML;
         btn.innerHTML = '✓';
         setTimeout(() => { btn.innerHTML = orig; }, 1500);
