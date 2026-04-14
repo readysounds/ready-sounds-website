@@ -242,3 +242,9 @@ function updatePlaylistButton(trackId, button) {
     }
 }
 
+// Close any open menus when clicking outside
+document.addEventListener('click', () => {
+    if (currentPlaylistMenu) { currentPlaylistMenu.remove(); currentPlaylistMenu = null; }
+    document.querySelectorAll('.more-menu').forEach(m => m.remove());
+});
+

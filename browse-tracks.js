@@ -47,7 +47,7 @@ function renderAlternate(alt, track) {
         <div class="track-duration">${escHtml(alt.duration || '')}</div>
         <div class="track-actions">
             <button class="action-btn action-btn-playlist" onclick="openPlaylistMenu(event, ${domId})">+</button>
-            <button class="action-btn action-btn-share" onclick="copyTrackLink(event, ${domId})" title="Copy link">&#128279;</button>
+            <button class="action-btn action-btn-more" onclick="openMoreMenu(event, ${domId})" title="More">•••</button>
             <button class="action-btn action-btn-download" onclick="downloadTrack(event, ${domId})">&#11015;</button>
         </div>
     </div>`;
@@ -96,7 +96,7 @@ function renderTrackGroup(track) {
                 <button class="action-btn action-btn-like" data-track-id="${track.id}" onclick="toggleLike(event, ${track.id})">&#129293;</button>
                 <button class="action-btn action-btn-primary" onclick="addToCart(event, ${track.id})">cart</button>
                 <button class="action-btn action-btn-playlist" onclick="openPlaylistMenu(event, ${track.id})">+</button>
-                <button class="action-btn action-btn-share" onclick="copyTrackLink(event, ${track.id})" title="Copy link">&#128279;</button>
+                <button class="action-btn action-btn-more" onclick="openMoreMenu(event, ${track.id})" title="More">•••</button>
                 <button class="action-btn action-btn-download" onclick="downloadTrack(event, ${track.id})">&#11015;</button>
             </div>
         </div>
@@ -113,16 +113,45 @@ function escAttr(str) {
     return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
 }
 
-// Copy a shareable link for a track to the clipboard
-function copyTrackLink(event, trackId) {
+// ── More menu (···) ─────────────────────────────────────────────────────────
+
+function openMoreMenu(event, trackId) {
     event.stopPropagation();
     const btn = event.currentTarget;
-    const url = `${window.location.origin}${window.location.pathname}#track-${trackId}`;
-    navigator.clipboard.writeText(url).then(() => {
-        const orig = btn.innerHTML;
-        btn.innerHTML = '✓';
-        setTimeout(() => { btn.innerHTML = orig; }, 1500);
-    });
+    const actionsContainer = btn.closest('.track-actions');
+
+    // Close playlist menu if open
+    if (typeof currentPlaylistMenu !== 'undefined' && currentPlaylistMenu) {
+        currentPlaylistMenu.remove();
+        currentPlaylistMenu = null;
+    }
+
+    // Toggle: close if this menu is already open
+    const existing = actionsContainer.querySelector('.more-menu');
+    if (existing) { existing.remove(); return; }
+
+    // Close any other open more menus
+    document.querySelectorAll('.more-menu').forEach(m => m.remove());
+
+    actionsContainer.style.position = 'relative';
+
+    const menu = document.createElement('div');
+    menu.className = 'playlist-menu more-menu open';
+
+    const shareItem = document.createElement('div');
+    shareItem.className = 'playlist-menu-item';
+    shareItem.innerHTML = '&#11014;&nbsp; Share';
+    shareItem.onclick = (e) => {
+        e.stopPropagation();
+        const url = `${window.location.origin}${window.location.pathname}#track-${trackId}`;
+        navigator.clipboard.writeText(url).then(() => {
+            menu.remove();
+            if (typeof showToast === 'function') showToast('Link copied');
+        });
+    };
+    menu.appendChild(shareItem);
+
+    actionsContainer.appendChild(menu);
 }
 
 // ── Supabase track loader ────────────────────────────────────────────────────
