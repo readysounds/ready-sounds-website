@@ -187,21 +187,26 @@ async function initAuth() {
 
 function handleTrackAutoPlay() {
     const hash = window.location.hash;
-    if (hash && hash.startsWith('#track-')) {
-        const trackId = parseInt(hash.replace('#track-', ''));
-        if (trackId) {
-            // Wait a moment for DOM to be ready
-            setTimeout(() => {
-                const trackButton = document.querySelector(`[data-track-id="${trackId}"]`);
-                if (trackButton) {
-                    // Scroll to track
-                    trackButton.closest('.track-group')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Play the track
-                    playTrack(null, trackId);
-                }
-            }, 500);
-        }
+    if (!hash || !hash.startsWith('#track-')) return;
+
+    const trackId = parseInt(hash.replace('#track-', ''));
+    if (!trackId) return;
+
+    const trackEl = document.querySelector(`.track-item[data-track-id="${trackId}"]`);
+    if (!trackEl) return;
+
+    // If this is an alternate, expand its parent container
+    const altContainer = trackEl.closest('.alternates-container');
+    if (altContainer) {
+        altContainer.classList.add('expanded');
+        const mainTrack = altContainer.previousElementSibling;
+        if (mainTrack) mainTrack.classList.add('expanded');
     }
+
+    // Scroll to track and play via the play button
+    trackEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const playBtn = trackEl.querySelector('.track-play');
+    if (playBtn) playBtn.click();
 }
 
 // ── Track Detail Panel ───────────────────────────────────────────────────────
@@ -306,11 +311,7 @@ async function loadFeaturedPlaylists() {
 // ── Bootstrap ────────────────────────────────────────────────────────────────
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        initAuth();
-        handleTrackAutoPlay();
-    });
+    document.addEventListener('DOMContentLoaded', initAuth);
 } else {
     initAuth();
-    handleTrackAutoPlay();
 }
