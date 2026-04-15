@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/favicon.svg?v=2">
+    <link rel="icon" type="image/png"     href="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/favicon.png?v=2">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>readysounds.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/supabase.js"></script>
+    <script src="/nav.js"></script>
+    <script src="/auth.js"></script>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { background: #0a0a0a; color: white; font-family: 'Inter', sans-serif; margin: 0; }
+        .main { margin-top: 72px; padding: 40px 0 140px; min-height: 80vh; }
+        .container { max-width: 960px; margin: 0 auto; padding: 0 32px; }
+
+        /* ── Back link ── */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 32px;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: white; }
+
+        /* ── States ── */
+        .track-loading, .track-not-found {
+            text-align: center;
+            padding: 80px 20px;
+            color: rgba(255,255,255,0.4);
+            font-size: 15px;
+        }
+        .track-not-found a { color: #9c27b0; text-decoration: none; }
+
+        /* ── Hero ── */
+        .track-hero {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 40px;
+            align-items: start;
+            margin-bottom: 48px;
+        }
+        .track-hero-artwork {
+            width: 220px;
+            height: 220px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            flex-shrink: 0;
+        }
+        .track-hero-artwork img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+        .track-hero-info { padding-top: 4px; }
+        .track-hero-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.5px;
+            margin: 0 0 6px;
+            line-height: 1.1;
+        }
+        .track-hero-artist {
+            font-size: 16px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+        }
+        .track-hero-specs {
+            font-size: 13px;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 28px;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Hero actions ── */
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 32px;
+        }
+        .hero-play-btn {
+            background: #9c27b0;
+            border: none;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .hero-play-btn:hover { background: #7b1fa2; transform: translateY(-1px); }
+        .hero-play-btn.playing { background: rgba(156,39,176,0.6); }
+        .hero-action-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .hero-action-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .hero-like-btn.liked { color: #9c27b0; border-color: #9c27b0; }
+
+        /* ── Metadata ── */
+        .meta-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .meta-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
+        .meta-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 80px;
+        }
+        .meta-tag {
+            background: rgba(156,39,176,0.12);
+            border: 1px solid rgba(156,39,176,0.25);
+            color: rgba(255,255,255,0.7);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .meta-value {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* ── Versions ── */
+        .versions-section { margin-top: 40px; }
+        .versions-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 12px;
+        }
+        .alt-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .alt-row:last-child { border-bottom: none; }
+        .alt-play {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: rgba(156,39,176,0.2);
+            border: 1px solid rgba(156,39,176,0.4);
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .alt-play:hover { background: #9c27b0; border-color: #9c27b0; }
+        .alt-title {
+            flex: 1;
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+            font-weight: 500;
+        }
+        .alt-duration {
+            font-size: 12px;
+            color: rgba(255,255,255,0.35);
+            min-width: 36px;
+            text-align: right;
+        }
+        .alt-download {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.5);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .alt-download:hover { border-color: rgba(255,255,255,0.3); color: white; }
+
+        /* ── Player bar (same as browse) ── */
+        .now-playing-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(15,15,15,0.98);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(156,39,176,0.3);
+            padding: 12px 24px;
+            z-index: 999;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        .now-playing-bar.visible { transform: translateY(0); }
+        .now-playing-content {
+            max-width: 1400px; margin: 0 auto;
+            display: grid;
+            grid-template-columns: minmax(180px,1fr) minmax(280px,2fr) minmax(140px,1fr);
+            gap: 24px; align-items: center;
+        }
+        .now-playing-center { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .now-playing-right { display: flex; justify-content: flex-end; align-items: center; }
+        .now-playing-volume { display: flex; align-items: center; gap: 8px; }
+        .volume-icon { font-size: 15px; cursor: pointer; opacity: 0.6; transition: opacity 0.15s; user-select: none; }
+        .volume-icon:hover { opacity: 1; }
+        .volume-slider {
+            width: 80px; height: 3px; -webkit-appearance: none; appearance: none;
+            background: linear-gradient(to right, #9c27b0 100%, rgba(255,255,255,0.15) 100%);
+            border-radius: 2px; outline: none; cursor: pointer;
+        }
+        .volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 11px; height: 11px; background: white; border-radius: 50%; cursor: pointer; }
+        .volume-slider::-moz-range-thumb { width: 11px; height: 11px; background: white; border-radius: 50%; cursor: pointer; border: none; }
+        .now-playing-track-info { display: flex; gap: 12px; align-items: center; min-width: 0; }
+        .now-playing-artwork { width: 48px; height: 48px; border-radius: 6px; overflow: hidden; flex-shrink: 0; background: linear-gradient(135deg,#9c27b0,#4a148c); }
+        .now-playing-artwork img { width: 100%; height: 100%; object-fit: cover; }
+        .now-playing-details { min-width: 0; }
+        .now-playing-title { font-size: 14px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .now-playing-artist { font-size: 12px; color: rgba(255,255,255,0.5); }
+        .now-playing-controls { display: flex; gap: 8px; justify-content: center; }
+        .now-playing-btn { width: 40px; height: 40px; border-radius: 50%; background: #9c27b0; border: none; color: white; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        #nowPlayingPrevBtn, #nowPlayingNextBtn { width: 36px; height: 36px; font-size: 13px; background: rgba(156,39,176,0.8); }
+        #nowPlayingPrevBtn:hover, #nowPlayingNextBtn:hover { background: #9c27b0; }
+        .now-playing-btn:hover { background: #7b1fa2; transform: scale(1.05); }
+        .now-playing-progress-container { display: flex; align-items: center; gap: 12px; width: 100%; }
+        .now-playing-time { font-size: 12px; color: rgba(255,255,255,0.6); min-width: 40px; text-align: center; }
+        .now-playing-progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; cursor: pointer; position: relative; transition: height 0.15s; }
+        .now-playing-progress-bar:hover { height: 5px; }
+        .now-playing-progress-fill { height: 100%; background: #9c27b0; border-radius: 2px; width: 0%; transition: width 0.1s linear; position: relative; }
+        .now-playing-progress-bar:hover .now-playing-progress-fill::after { content:''; position:absolute; right:-5px; top:50%; transform:translateY(-50%); width:11px; height:11px; background:white; border-radius:50%; display:block; }
+        /* Mini player */
+        .now-playing-mini { display: none; align-items: center; gap: 12px; }
+        .mini-artwork { width: 52px; height: 52px; border-radius: 6px; overflow: hidden; flex-shrink: 0; background: linear-gradient(135deg,#9c27b0,#4a148c); }
+        .mini-artwork img { width: 100%; height: 100%; object-fit: cover; }
+        .mini-info { flex: 1; min-width: 0; }
+        .mini-title { font-size: 14px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-artist { font-size: 12px; color: rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-expand-btn { background: none; border: none; color: rgba(255,255,255,0.55); font-size: 20px; cursor: pointer; padding: 8px 6px; line-height: 1; flex-shrink: 0; transition: color 0.2s; }
+        .mini-expand-btn:hover { color: white; }
+        .mini-play-btn { width: 42px; height: 42px; border-radius: 50%; background: #9c27b0; border: none; color: white; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s; }
+        .mini-play-btn:hover { background: #7b1fa2; }
+        @media (max-width: 768px) { .now-playing-content { display: none; } .now-playing-mini { display: flex; } .now-playing-bar { padding: 10px 14px; } }
+        /* Full player modal */
+        .player-modal { position: fixed; inset: 0; background: #0d0d0d; z-index: 3500; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; overflow: hidden; }
+        .player-modal.open { transform: translateY(0); }
+        .player-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 4px; flex-shrink: 0; }
+        .player-modal-close { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 28px; cursor: pointer; padding: 4px 6px; line-height: 1; transition: color 0.2s; }
+        .player-modal-close:hover { color: white; }
+        .player-modal-label { font-size: 12px; font-weight: 700; letter-spacing: 2px; color: white; text-transform: uppercase; }
+        .player-modal-more { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 22px; cursor: pointer; padding: 4px 6px; line-height: 1; transition: color 0.2s; letter-spacing: 2px; }
+        .player-modal-more:hover { color: white; }
+        .player-modal-artwork-wrap { width: calc(100% - 48px); max-width: 340px; margin: 20px auto 0; aspect-ratio: 1; border-radius: 14px; overflow: hidden; background: linear-gradient(135deg,#9c27b0,#4a148c); box-shadow: 0 24px 64px rgba(0,0,0,0.7); flex-shrink: 0; }
+        .player-modal-artwork-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .player-modal-info { text-align: center; padding: 22px 24px 0; flex-shrink: 0; }
+        .player-modal-title { font-size: 26px; font-weight: 700; color: white; letter-spacing: -0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .player-modal-artist { font-size: 17px; color: rgba(255,255,255,0.45); margin-top: 4px; }
+        .player-modal-waveform { margin: 22px 24px 0; flex-shrink: 0; cursor: pointer; position: relative; }
+        .player-modal-waveform-bars { display: flex; align-items: flex-end; gap: 2px; height: 48px; width: 100%; }
+        .player-modal-waveform-bar { flex: 1; background: rgba(255,255,255,0.18); border-radius: 1px; min-height: 4px; transition: background 0.05s; }
+        .player-modal-waveform-bar.played { background: rgba(255,255,255,0.88); }
+        .player-modal-times { display: flex; justify-content: space-between; padding: 6px 2px 0; flex-shrink: 0; margin: 0 24px; }
+        .player-modal-time { font-size: 12px; color: rgba(255,255,255,0.38); }
+        .player-modal-controls { display: flex; align-items: center; justify-content: center; gap: 44px; padding: 24px 28px 40px; margin-top: auto; flex-shrink: 0; }
+        .player-ctrl-btn { background: none; border: none; color: rgba(255,255,255,0.75); cursor: pointer; padding: 8px; transition: color 0.2s, transform 0.12s; display: flex; align-items: center; justify-content: center; }
+        .player-ctrl-btn:hover { color: white; }
+        .player-ctrl-btn:active { transform: scale(0.87); }
+        .player-ctrl-play { width: 72px; height: 72px; border-radius: 50%; background: white; border: none; color: #0d0d0d; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.15s, background 0.2s; flex-shrink: 0; }
+        .player-ctrl-play:hover { background: #e8e8e8; }
+        .player-ctrl-play:active { transform: scale(0.93); }
+
+        /* ── Modals ── */
+        .cart-overlay { position: fixed; top:0; left:0; width:100%; height:100vh; background: rgba(0,0,0,0.7); z-index: 1999; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .cart-overlay.open { opacity: 1; pointer-events: all; }
+        .cart-modal { position: fixed; top:0; right:-100%; width:100%; max-width:500px; height:100vh; background:#0a0a0a; border-left:1px solid rgba(255,255,255,0.1); z-index:2000; transition:right 0.3s; display:flex; flex-direction:column; box-shadow:-4px 0 20px rgba(0,0,0,0.5); }
+        .cart-modal.open { right: 0; }
+        .cart-header { padding:24px; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center; }
+        .cart-title { font-size:24px; font-weight:600; margin:0; }
+        .cart-close { background:none; border:none; color:rgba(255,255,255,0.7); font-size:28px; cursor:pointer; padding:4px; line-height:1; transition:color 0.2s; }
+        .cart-close:hover { color:white; }
+        .cart-body { flex:1; overflow-y:auto; padding:24px; }
+        .cart-empty { text-align:center; padding:60px 20px; color:rgba(255,255,255,0.5); }
+        .cart-empty-icon { font-size:64px; margin-bottom:16px; opacity:0.3; }
+        .cart-footer { padding:24px; border-top:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.3); }
+        .cart-total { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; font-size:18px; }
+        .cart-total-label { color:rgba(255,255,255,0.7); }
+        .cart-total-amount { font-size:24px; font-weight:700; color:#9c27b0; }
+        .cart-checkout-btn { width:100%; padding:16px; background:#9c27b0; border:none; border-radius:8px; color:white; font-size:16px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+        .cart-checkout-btn:hover { background:#7b1fa2; }
+        .cart-item { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px; margin-bottom:16px; }
+        .cart-item-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+        .cart-item-info { flex:1; }
+        .cart-item-title { font-size:16px; font-weight:600; color:white; margin-bottom:4px; }
+        .cart-item-artist { font-size:13px; color:rgba(255,255,255,0.5); }
+        .cart-item-remove { background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; padding:4px; font-size:18px; transition:color 0.2s; }
+        .cart-item-remove:hover { color:#ff4444; }
+        .cart-item-license { margin-top:12px; }
+        .license-label { font-size:12px; color:rgba(255,255,255,0.6); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; }
+        .license-options { display:flex; gap:8px; }
+        .license-btn { flex:1; padding:10px 16px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:rgba(255,255,255,0.7); font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; text-align:center; }
+        .license-btn:hover { background:rgba(255,255,255,0.08); border-color:rgba(156,39,176,0.3); }
+        .license-btn.active { background:rgba(156,39,176,0.2); border-color:#9c27b0; color:#9c27b0; }
+        .license-price { display:block; font-size:16px; font-weight:600; margin-top:4px; }
+        .download-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:3000; display:none; }
+        .download-overlay.visible { display:block; }
+        .download-modal { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.9); background:#1a1a1a; border-radius:16px; border:1px solid rgba(156,39,176,0.3); padding:48px 40px; max-width:540px; width:90%; z-index:3001; opacity:0; transition:all 0.3s; display:none; }
+        .download-modal.visible { display:block; opacity:1; transform:translate(-50%,-50%) scale(1); }
+        .download-close { position:absolute; top:16px; right:16px; background:none; border:none; color:rgba(255,255,255,0.5); font-size:32px; cursor:pointer; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:8px; transition:all 0.2s; }
+        .download-close:hover { background:rgba(255,255,255,0.05); color:white; }
+        .download-content { text-align:center; }
+        .download-title { font-size:32px; font-weight:700; color:white; margin-bottom:16px; line-height:1.2; }
+        .download-subtitle { font-size:16px; color:rgba(255,255,255,0.6); margin-bottom:24px; line-height:1.5; }
+        .download-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:24px; }
+        .download-btn-primary { background:#9c27b0; border:none; color:white; padding:14px 28px; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer; transition:background 0.2s; }
+        .download-btn-primary:hover { background:#7b1fa2; }
+        .download-btn-secondary { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:white; padding:14px 28px; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+        .download-btn-secondary:hover { background:rgba(255,255,255,0.12); }
+        .download-info { font-size:13px; color:rgba(255,255,255,0.4); }
+        .download-options-list { display:flex; flex-direction:column; gap:10px; margin:16px 0; text-align:left; }
+        .download-option { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:14px 18px; cursor:pointer; transition:all 0.2s; font-size:14px; color:rgba(255,255,255,0.8); display:flex; justify-content:space-between; align-items:center; }
+        .download-option:hover { background:rgba(156,39,176,0.12); border-color:rgba(156,39,176,0.3); color:white; }
+        .login-prompt-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); z-index:4000; display:none; }
+        .login-prompt-overlay.active { display:block; }
+        .login-prompt-modal { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#1a1a1a; border:1px solid rgba(156,39,176,0.3); border-radius:16px; padding:40px 32px; max-width:400px; width:90%; z-index:4001; text-align:center; display:none; }
+        .login-prompt-modal.active { display:block; }
+        .login-prompt-icon { font-size:40px; margin-bottom:16px; }
+        .login-prompt-modal h3 { font-size:20px; font-weight:700; margin:0 0 8px; }
+        .login-prompt-modal p { font-size:14px; color:rgba(255,255,255,0.5); margin:0 0 24px; }
+        .login-prompt-actions { display:flex; gap:10px; justify-content:center; }
+        .login-prompt-cancel { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.7); padding:10px 20px; border-radius:8px; font-size:14px; cursor:pointer; transition:all 0.2s; }
+        .login-prompt-cancel:hover { background:rgba(255,255,255,0.1); }
+        .login-prompt-signup { background:#9c27b0; color:white; padding:10px 20px; border-radius:8px; font-size:14px; font-weight:600; text-decoration:none; transition:background 0.2s; }
+        .login-prompt-signup:hover { background:#7b1fa2; }
+        .create-playlist-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:4000; display:none; }
+        .create-playlist-overlay.active { display:block; }
+        .create-playlist-modal { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#1a1a1a; border:1px solid rgba(156,39,176,0.3); border-radius:16px; padding:32px; max-width:400px; width:90%; z-index:4001; display:none; }
+        .create-playlist-modal.active { display:block; }
+        .create-playlist-modal h3 { font-size:20px; font-weight:700; margin:0 0 20px; }
+        .create-playlist-input { width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:8px; color:white; padding:12px 16px; font-size:15px; font-family:inherit; outline:none; box-sizing:border-box; }
+        .create-playlist-input:focus { border-color:#9c27b0; }
+        .create-playlist-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:16px; }
+        .create-playlist-cancel { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.7); padding:10px 18px; border-radius:8px; font-size:14px; cursor:pointer; }
+        .create-playlist-confirm { background:#9c27b0; border:none; color:white; padding:10px 18px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; }
+        .create-playlist-confirm:hover { background:#7b1fa2; }
+        /* Toast */
+        .toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); background:rgba(30,30,30,0.95); border:1px solid rgba(255,255,255,0.12); color:white; padding:10px 20px; border-radius:8px; font-size:14px; z-index:5000; opacity:0; transition:all 0.25s; pointer-events:none; white-space:nowrap; }
+        .toast.visible { opacity:1; transform:translateX(-50%) translateY(0); }
+        /* Playlist menu */
+        .playlist-menu { position:absolute; bottom:50px; right:0; background:#1a1a1a; border:1px solid rgba(156,39,176,0.3); border-radius:8px; padding:8px 0; min-width:200px; max-height:300px; overflow-y:auto; z-index:1000; display:none; box-shadow:0 4px 20px rgba(0,0,0,0.5); }
+        .playlist-menu.open { display:block; }
+        .playlist-menu-item { padding:10px 16px; color:rgba(255,255,255,0.8); cursor:pointer; transition:all 0.2s; font-size:14px; display:flex; align-items:center; gap:8px; }
+        .playlist-menu-item:hover { background:rgba(156,39,176,0.1); color:white; }
+        .playlist-menu-item.create-new { color:#9c27b0; font-weight:600; border-bottom:1px solid rgba(255,255,255,0.08); }
+        .more-menu { min-width: 160px; }
+        /* License picker */
+        .license-picker-btn { flex:1; padding:10px 16px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:rgba(255,255,255,0.7); font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; text-align:center; }
+        .license-picker-btn:hover { background:rgba(156,39,176,0.2); border-color:#9c27b0; color:#9c27b0; }
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            .container { padding: 0 16px; }
+            .track-hero { grid-template-columns: 1fr; gap: 24px; }
+            .track-hero-artwork { width: 100%; height: auto; aspect-ratio: 1; }
+            .track-hero-title { font-size: 26px; }
+            .main { padding: 24px 0 120px; }
+            .back-link { margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">readysounds.</a>
+            <nav class="header-nav" id="headerNav">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()">☰</button>
+                <a href="browse.html" class="nav-item">Browse</a>
+                <div class="nav-music-dropdown">
+                    <span class="nav-item nav-music-trigger">Music</span>
+                    <div class="nav-music-menu">
+                        <a href="playlists.html">Playlists</a>
+                        <a href="compilations.html">Compilations</a>
+                    </div>
+                </div>
+                <a href="pricing.html" class="nav-item">Pricing</a>
+                <a href="terms.html" class="nav-item">Terms &amp; Conditions</a>
+                <div class="cart-icon" id="cartBtn">Cart (0)</div>
+                <div class="auth-buttons" id="authButtons">
+                    <a href="signup.html" class="auth-btn auth-btn-login"  id="loginBtn">Log In</a>
+                    <a href="signup.html" class="auth-btn auth-btn-signup" id="signupBtn">Create Free Account</a>
+                </div>
+                <div class="profile-container" id="profileContainer">
+                    <div class="profile-icon" id="profileIcon" onclick="toggleProfileDropdown()">
+                        <span id="profileInitial">U</span>
+                    </div>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="profile-dropdown-header">My Media</div>
+                        <a href="favorites.html"    class="profile-dropdown-item"><span>Favorites</span></a>
+                        <a href="my-playlists.html" class="profile-dropdown-item"><span>My Playlists</span></a>
+                        <a href="downloads.html"    class="profile-dropdown-item"><span>My Downloads</span></a>
+                        <div class="profile-dropdown-divider"></div>
+                        <a href="settings.html"     class="profile-dropdown-item"><span>Account Settings</span></a>
+                        <div class="profile-dropdown-divider"></div>
+                        <a href="#" class="profile-dropdown-item" id="logoutBtn" onclick="handleLogout(); return false;"><span>Sign Out</span></a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-panel-overlay" id="mobilePanelOverlay" onclick="closeMobilePanel()"></div>
+    <div class="mobile-panel" id="mobilePanel">
+        <div class="mobile-panel-header">
+            <button class="mobile-panel-close" onclick="closeMobilePanel()">✕</button>
+        </div>
+        <nav class="mobile-panel-nav">
+            <a href="browse.html"        class="mobile-panel-link">Browse</a>
+            <a href="playlists.html"     class="mobile-panel-link">Playlists</a>
+            <a href="compilations.html"  class="mobile-panel-link">Compilations</a>
+            <a href="pricing.html"       class="mobile-panel-link">Pricing</a>
+        </nav>
+        <div class="mobile-panel-divider"></div>
+        <button class="mobile-panel-expandable" id="myMediaBtn" onclick="togglePanelSection('myMedia')">
+            <span>My Media</span><span class="mobile-panel-chevron">▾</span>
+        </button>
+        <div class="mobile-panel-submenu" id="myMediaSubmenu">
+            <a href="favorites.html"    class="mobile-panel-sublink">Favorites</a>
+            <a href="my-playlists.html" class="mobile-panel-sublink">My Playlists</a>
+            <a href="downloads.html"    class="mobile-panel-sublink">My Downloads</a>
+        </div>
+        <button class="mobile-panel-expandable" id="accountBtn" onclick="togglePanelSection('account')" style="display:none;">
+            <span>Account</span><span class="mobile-panel-chevron">▾</span>
+        </button>
+        <div class="mobile-panel-submenu" id="accountSubmenu">
+            <a href="settings.html"  class="mobile-panel-sublink">Settings</a>
+            <a href="#" class="mobile-panel-sublink" onclick="handleLogout(); closeMobilePanel(); return false;">Sign Out</a>
+        </div>
+        <a href="pricing.html" class="mobile-panel-subscribe">Subscribe</a>
+        <div class="mobile-panel-auth-btns" id="mobilePanelAuthBtns">
+            <a href="signup.html" class="mobile-panel-auth-btn login">Log In</a>
+            <a href="signup.html" class="mobile-panel-auth-btn signup">Create Free Account</a>
+        </div>
+        <div class="mobile-panel-footer">
+            <a href="terms.html" class="mobile-panel-footer-link">Terms &amp; Conditions</a>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <main class="main">
+        <div class="container">
+            <a href="browse.html" class="back-link">← Browse all tracks</a>
+
+            <div id="trackLoading" class="track-loading">Loading…</div>
+            <div id="trackNotFound" class="track-not-found" style="display:none">
+                Track not found. <a href="browse.html">Browse all tracks →</a>
+            </div>
+            <div id="trackContent" style="display:none">
+                <!-- Hero -->
+                <div class="track-hero" id="trackHero"></div>
+
+                <!-- Versions -->
+                <div class="versions-section" id="versionsSection" style="display:none">
+                    <div class="versions-label">Versions</div>
+                    <div id="versionsList"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Now Playing Bar -->
+    <div class="now-playing-bar" id="nowPlayingBar">
+        <div class="now-playing-content">
+            <div class="now-playing-track-info">
+                <div class="now-playing-artwork"><img id="nowPlayingArtwork" src="" alt=""></div>
+                <div class="now-playing-details">
+                    <div class="now-playing-title"  id="nowPlayingTitle">Select a track to play</div>
+                    <div class="now-playing-artist" id="nowPlayingArtist"></div>
+                </div>
+            </div>
+            <div class="now-playing-center">
+                <div class="now-playing-controls">
+                    <button class="now-playing-btn" id="nowPlayingPrevBtn" onclick="playPreviousTrack()" title="Previous">⏮</button>
+                    <button class="now-playing-btn" id="nowPlayingPlayBtn" onclick="togglePlayPause()">▶</button>
+                    <button class="now-playing-btn" id="nowPlayingNextBtn" onclick="playNextTrackManual()" title="Next">⏭</button>
+                </div>
+                <div class="now-playing-progress-container">
+                    <div class="now-playing-time" id="nowPlayingCurrentTime">0:00</div>
+                    <div class="now-playing-progress-bar" onclick="seekFromPlayer(event)">
+                        <div class="now-playing-progress-fill" id="nowPlayingProgressFill"></div>
+                    </div>
+                    <div class="now-playing-time" id="nowPlayingDuration">0:00</div>
+                </div>
+            </div>
+            <div class="now-playing-right">
+                <div class="now-playing-volume">
+                    <span class="volume-icon" id="volumeIcon" onclick="toggleMute()">🔊</span>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" step="1" value="100" oninput="setVolume(this.value)">
+                </div>
+            </div>
+        </div>
+        <div class="now-playing-mini">
+            <div class="mini-artwork"><img id="miniArtwork" src="" alt=""></div>
+            <div class="mini-info">
+                <div class="mini-title"  id="miniTitle">Select a track</div>
+                <div class="mini-artist" id="miniArtist"></div>
+            </div>
+            <button class="mini-expand-btn" onclick="openPlayerModal()" title="Expand">⌃</button>
+            <button class="mini-play-btn" id="miniPlayBtn" onclick="togglePlayPause()">▶</button>
+        </div>
+    </div>
+
+    <!-- Full Player Modal -->
+    <div class="player-modal" id="playerModal">
+        <div class="player-modal-header">
+            <button class="player-modal-close" onclick="closePlayerModal()">⌄</button>
+            <span class="player-modal-label">Now Playing</span>
+            <button class="player-modal-more">•••</button>
+        </div>
+        <div class="player-modal-artwork-wrap">
+            <img id="playerModalArtwork" src="" alt="">
+        </div>
+        <div class="player-modal-info">
+            <div class="player-modal-title"  id="playerModalTitle">Select a track</div>
+            <div class="player-modal-artist" id="playerModalArtist"></div>
+        </div>
+        <div class="player-modal-waveform" id="playerModalWaveform" onclick="seekFromPlayerModal(event)">
+            <div class="player-modal-waveform-bars" id="playerModalWaveformBars"></div>
+        </div>
+        <div class="player-modal-times">
+            <span class="player-modal-time" id="playerModalCurrentTime">0:00</span>
+            <span class="player-modal-time" id="playerModalDuration">0:00</span>
+        </div>
+        <div class="player-modal-controls">
+            <button class="player-ctrl-btn" onclick="playPreviousTrack()">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="2.5" height="14" rx="1.25"/><path d="M18.5 5.5 8 12l10.5 6.5z"/></svg>
+            </button>
+            <button class="player-ctrl-play" id="playerModalPlayBtn" onclick="togglePlayPause()">
+                <svg id="playerModalPlayIcon" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
+            </button>
+            <button class="player-ctrl-btn" onclick="playNextTrackManual()">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><rect x="16.5" y="5" width="2.5" height="14" rx="1.25"/><path d="M5.5 18.5 16 12 5.5 5.5z"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Cart -->
+    <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-header">
+            <h2 class="cart-title">Your Cart</h2>
+            <button class="cart-close" onclick="closeCart()">×</button>
+        </div>
+        <div class="cart-body" id="cartBody">
+            <div class="cart-empty"><div class="cart-empty-icon">🛒</div><p>Your cart is empty</p></div>
+        </div>
+        <div class="cart-footer" id="cartFooter" style="display:none;">
+            <div class="cart-total">
+                <span class="cart-total-label">Total:</span>
+                <span class="cart-total-amount" id="cartTotal">$0</span>
+            </div>
+            <button class="cart-checkout-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <!-- Download prompt -->
+    <div class="download-overlay" id="downloadOverlay" onclick="closeDownloadPrompt()"></div>
+    <div class="download-modal" id="downloadModal">
+        <button class="download-close" onclick="closeDownloadPrompt()">×</button>
+        <div class="download-content">
+            <h2 class="download-title">Ready to Download?</h2>
+            <p class="download-subtitle">Create a free account to get started — then choose a plan to download tracks.</p>
+            <div class="download-actions">
+                <button class="download-btn-primary"   onclick="window.location.href='/signup.html'">Sign Up Free</button>
+                <button class="download-btn-secondary" onclick="window.location.href='/pricing.html'">See Plans</button>
+            </div>
+            <p class="download-info">Already subscribed? Your downloads will start automatically.</p>
+        </div>
+    </div>
+
+    <!-- License picker -->
+    <div class="download-overlay" id="licensePickerOverlay" onclick="closeLicensePicker()"></div>
+    <div class="download-modal" id="licensePickerModal">
+        <button class="download-close" onclick="closeLicensePicker()">×</button>
+        <div class="download-content">
+            <h2 class="download-title">Choose a License</h2>
+            <p class="download-subtitle" id="licensePickerTrackTitle" style="font-weight:600;color:#fff;margin-bottom:20px;"></p>
+            <div class="license-options" style="display:flex;gap:12px;margin-bottom:24px;">
+                <button class="license-btn license-picker-btn" onclick="confirmBuyLicense('individual')">Individual<span class="license-price">$10</span></button>
+                <button class="license-btn license-picker-btn" onclick="confirmBuyLicense('business')">Business<span class="license-price">$125</span></button>
+            </div>
+            <p class="download-info"><a href="/license.html" target="_blank" style="color:#9c27b0;">View license details →</a></p>
+        </div>
+    </div>
+
+    <!-- Download options (subscribers) -->
+    <div class="download-overlay" id="downloadOptionsOverlay" onclick="closeDownloadOptions()"></div>
+    <div class="download-modal" id="downloadOptionsModal">
+        <button class="download-close" onclick="closeDownloadOptions()">×</button>
+        <div class="download-content">
+            <h2 class="download-title">Download Options</h2>
+            <p class="download-subtitle" id="downloadOptionsTrackTitle"></p>
+            <div class="download-options-list" id="downloadOptionsList"></div>
+        </div>
+    </div>
+
+    <!-- Login prompt -->
+    <div class="login-prompt-overlay" id="loginPromptOverlay" onclick="closeLoginPrompt()"></div>
+    <div class="login-prompt-modal" id="loginPromptModal">
+        <div class="login-prompt-icon">♡</div>
+        <h3 id="loginPromptMessage">Create a free account to like tracks!</h3>
+        <p>Sign up free — no credit card required.</p>
+        <div class="login-prompt-actions">
+            <button class="login-prompt-cancel" onclick="closeLoginPrompt()">Maybe later</button>
+            <a class="login-prompt-signup" href="/signup.html">Create Free Account</a>
+        </div>
+    </div>
+
+    <!-- Create playlist modal -->
+    <div class="create-playlist-overlay" id="createPlaylistOverlay" onclick="closeCreatePlaylistModal()"></div>
+    <div class="create-playlist-modal" id="createPlaylistModal">
+        <h3>New Playlist</h3>
+        <input type="text" id="createPlaylistInput" class="create-playlist-input" placeholder="Playlist name" maxlength="80"
+               onkeydown="if(event.key==='Enter')confirmCreatePlaylist();if(event.key==='Escape')closeCreatePlaylistModal();">
+        <div class="create-playlist-actions">
+            <button class="create-playlist-cancel"  onclick="closeCreatePlaylistModal()">Cancel</button>
+            <button class="create-playlist-confirm" onclick="confirmCreatePlaylist()">Create</button>
+        </div>
+    </div>
+
+    <!-- Scripts (load order matters: shared state before consumers) -->
+    <script src="/browse-tracks.js?v=2"></script>
+    <script src="/browse-cart.js"></script>
+    <script src="/browse-player.js"></script>
+    <script src="/browse-playlists.js"></script>
+    <script src="/browse-downloads.js"></script>
+    <script src="/browse-favorites.js"></script>
+
+    <script>
+    // ── Helpers needed from browse-init.js (not included to avoid auto-loading) ──
+    function togglePanelSection(section) {
+        const submenu = document.getElementById(section + 'Submenu');
+        const btn     = document.getElementById(section + 'Btn');
+        if (submenu) submenu.classList.toggle('open');
+        if (btn)     btn.classList.toggle('open');
+    }
+    function updateMobilePanelAuth(isLoggedIn) {
+        const accountBtn = document.getElementById('accountBtn');
+        const authBtns   = document.getElementById('mobilePanelAuthBtns');
+        if (accountBtn) accountBtn.style.display = isLoggedIn ? 'flex' : 'none';
+        if (authBtns)   authBtns.style.display   = isLoggedIn ? 'none' : 'flex';
+    }
+
+    // ── Escape helpers ──
+    function _esc(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    // ── Render track page ──
+    function renderTrackPage(track, alts, targetAltId) {
+        document.title = `${track.title} — readysounds.`;
+
+        const specs = [
+            track.genre   || '',
+            track.bpm     ? `${track.bpm} BPM` : '',
+            track.duration || ''
+        ].filter(Boolean).join(' · ');
+
+        function metaTags(label, value) {
+            if (!value) return '';
+            const tags = value.split(',').map(t => t.trim()).filter(Boolean);
+            if (!tags.length) return '';
+            return `<div class="meta-row">
+                <span class="meta-label">${label}</span>
+                ${tags.map(t => `<span class="meta-tag">${_esc(t)}</span>`).join('')}
+            </div>`;
+        }
+        function metaVal(label, value) {
+            if (!value) return '';
+            return `<div class="meta-row">
+                <span class="meta-label">${label}</span>
+                <span class="meta-value">${_esc(value)}</span>
+            </div>`;
+        }
+
+        const artworkHtml = track.artwork_url
+            ? `<img src="${track.artwork_url}" alt="${_esc(track.title)}" onerror="this.style.display='none'">`
+            : '';
+
+        document.getElementById('trackHero').innerHTML = `
+            <!-- Hidden track-item for player compatibility -->
+            <div class="track-item main-track"
+                 id="mainTrackItem"
+                 data-track-id="${track.id}"
+                 data-stream-url="${track.stream_url || ''}"
+                 ${track.download_album ? `data-download-album="${track.download_album}"` : ''}
+                 style="display:none;position:absolute;pointer-events:none;">
+                <div class="track-play" id="mainTrackPlayBtn">▶</div>
+                <div class="track-title">${_esc(track.title)}</div>
+                <div class="track-artist">${_esc(track.artist)}</div>
+                <div class="track-artwork">${artworkHtml}</div>
+            </div>
+
+            <div class="track-hero-artwork">${artworkHtml}</div>
+
+            <div class="track-hero-info">
+                <h1 class="track-hero-title">${_esc(track.title)}</h1>
+                <div class="track-hero-artist">${_esc(track.artist)}</div>
+                ${specs ? `<div class="track-hero-specs">${_esc(specs)}</div>` : ''}
+
+                <div class="hero-actions">
+                    <button class="hero-play-btn" id="heroPlayBtn"
+                            onclick="document.getElementById('mainTrackPlayBtn').click()">
+                        ▶ Play
+                    </button>
+                    <button class="hero-action-btn" onclick="downloadTrack(event, ${track.id})">↓ Download</button>
+                    <button class="hero-action-btn" onclick="buyLicense(event, ${track.id})">Buy License</button>
+                    <button class="hero-action-btn" onclick="addToCart(event, ${track.id})">+ Cart</button>
+                    <button class="hero-action-btn hero-like-btn" id="heroLikeBtn"
+                            data-track-id="${track.id}"
+                            onclick="toggleLike(event, ${track.id})">♡</button>
+                </div>
+
+                <div class="meta-grid">
+                    ${metaTags('Moods',          track.moods)}
+                    ${metaTags('Genre',          track.genre)}
+                    ${metaVal ('Energy',         track.energy)}
+                    ${metaTags('Use Cases',      track.use_cases)}
+                    ${metaTags('Best Moments',   track.best_moments)}
+                    ${metaTags('Similar Artists',track.similar_artists)}
+                </div>
+            </div>
+        `;
+
+        // Versions
+        if (alts.length > 0) {
+            const versionsEl = document.getElementById('versionsSection');
+            const listEl     = document.getElementById('versionsList');
+            versionsEl.style.display = 'block';
+
+            listEl.innerHTML = alts.map(alt => {
+                const domId = alt.id + 100;
+                const dlAttr = (alt.download_album || track.download_album)
+                    ? `data-download-album="${alt.download_album || track.download_album}"` : '';
+                return `<div class="track-item alternate alt-row"
+                             data-track-id="${domId}"
+                             data-stream-url="${alt.stream_url || ''}"
+                             ${dlAttr}>
+                    <button class="alt-play track-play" onclick="playTrack(event, ${domId})">▶</button>
+                    <div class="alt-title track-title">${_esc(alt.title)}</div>
+                    <div class="alt-duration">${_esc(alt.duration || '')}</div>
+                    <button class="alt-download" onclick="downloadTrack(event, ${domId})">↓</button>
+                </div>`;
+            }).join('');
+
+            // Auto-play target alternate if specified
+            if (targetAltId) {
+                const domId = targetAltId + 100;
+                const altPlay = document.querySelector(`.track-item[data-track-id="${domId}"] .track-play`);
+                if (altPlay) setTimeout(() => altPlay.click(), 200);
+            }
+        }
+
+        // Show content
+        document.getElementById('trackLoading').style.display = 'none';
+        document.getElementById('trackContent').style.display = 'block';
+
+        // Load favorites
+        if (typeof loadFavorites === 'function') loadFavorites();
+    }
+
+    // ── Auth ──
+    async function checkAuth() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const authButtons      = document.getElementById('authButtons');
+        const profileContainer = document.getElementById('profileContainer');
+        const profileInitial   = document.getElementById('profileInitial');
+
+        if (session && session.user) {
+            if (authButtons)      authButtons.style.display      = 'none';
+            if (profileContainer) profileContainer.style.display = 'flex';
+            if (profileInitial)   profileInitial.textContent     = session.user.email.charAt(0).toUpperCase();
+            updateMobilePanelAuth(true);
+            if (typeof loadUserPlaylists === 'function') await loadUserPlaylists();
+            const hasSub = typeof hasActiveSubscription === 'function' && await hasActiveSubscription();
+            if (hasSub) {
+                document.querySelectorAll('.hero-action-btn[onclick*="addToCart"]').forEach(b => b.style.display = 'none');
+            }
+        } else {
+            if (authButtons)      authButtons.style.display      = 'flex';
+            if (profileContainer) profileContainer.style.display = 'none';
+            updateMobilePanelAuth(false);
+        }
+    }
+
+    // ── Init ──
+    async function initTrackPage() {
+        const params  = new URLSearchParams(window.location.search);
+        const trackId = parseInt(params.get('id'));
+        const altId   = params.get('alt') ? parseInt(params.get('alt')) : null;
+
+        if (!trackId) {
+            document.getElementById('trackLoading').style.display = 'none';
+            document.getElementById('trackNotFound').style.display = 'block';
+            return;
+        }
+
+        supabaseClient = await window.RS.waitForClient();
+
+        checkAuth();
+        supabaseClient.auth.onAuthStateChange((event) => {
+            if (['SIGNED_IN','SIGNED_OUT','INITIAL_SESSION'].includes(event)) checkAuth();
+        });
+
+        const { data: track, error } = await supabaseClient
+            .from('tracks')
+            .select('*, alternates(*)')
+            .eq('id', trackId)
+            .single();
+
+        if (error || !track) {
+            document.getElementById('trackLoading').style.display = 'none';
+            document.getElementById('trackNotFound').style.display = 'block';
+            return;
+        }
+
+        // Populate trackData for the player bar
+        trackData[track.id] = {
+            title: track.title, trackTitle: track.title,
+            artist: track.artist, duration: track.duration,
+            artwork_url: track.artwork_url || '',
+            bpm: track.bpm || '', genre: track.genre || '',
+            moods: track.moods || '', use_cases: track.use_cases || '',
+            similar_artists: track.similar_artists || '',
+            energy: track.energy || '', best_moments: track.best_moments || '',
+        };
+        const alts = (track.alternates || []).slice().sort((a,b) => a.sort_order - b.sort_order);
+        alts.forEach(alt => {
+            const domId = alt.id + 100;
+            trackData[domId] = {
+                title: `${track.title} (${alt.title})`,
+                artist: track.artist,
+                duration: alt.duration,
+                artwork_url: track.artwork_url || '',
+            };
+        });
+
+        renderTrackPage(track, alts, altId);
+
+        // Sync play button state when player starts
+        const observer = new MutationObserver(() => {
+            const btn = document.getElementById('heroPlayBtn');
+            const mainPlayBtn = document.getElementById('mainTrackPlayBtn');
+            if (btn && mainPlayBtn) {
+                const isPlaying = mainPlayBtn.textContent === '⏸';
+                btn.textContent = isPlaying ? '⏸ Pause' : '▶ Play';
+                btn.classList.toggle('playing', isPlaying);
+            }
+        });
+        setTimeout(() => {
+            const mainPlayBtn = document.getElementById('mainTrackPlayBtn');
+            if (mainPlayBtn) observer.observe(mainPlayBtn, { childList: true, subtree: true, characterData: true });
+        }, 300);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTrackPage);
+    } else {
+        initTrackPage();
+    }
+    </script>
+</body>
+</html>

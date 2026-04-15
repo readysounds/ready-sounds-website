@@ -138,18 +138,38 @@ function openMoreMenu(event, trackId) {
     const menu = document.createElement('div');
     menu.className = 'playlist-menu more-menu open';
 
+    // Build shareable URL: track.html?id=<parentId> (or &alt=<altId> for alternates)
+    const trackEl = document.querySelector(`.track-item[data-track-id="${trackId}"]`);
+    const altContainer = trackEl?.closest('.alternates-container');
+    let shareUrl;
+    if (altContainer) {
+        const parentId = altContainer.id.replace('alternates-', '');
+        const altId    = trackId - 100;
+        shareUrl = `${window.location.origin}/track.html?id=${parentId}&alt=${altId}`;
+    } else {
+        shareUrl = `${window.location.origin}/track.html?id=${trackId}`;
+    }
+
     const shareItem = document.createElement('div');
     shareItem.className = 'playlist-menu-item';
     shareItem.innerHTML = '&#11014;&nbsp; Share';
     shareItem.onclick = (e) => {
         e.stopPropagation();
-        const url = `${window.location.origin}${window.location.pathname}#track-${trackId}`;
-        navigator.clipboard.writeText(url).then(() => {
+        navigator.clipboard.writeText(shareUrl).then(() => {
             menu.remove();
             if (typeof showToast === 'function') showToast('Link copied');
         });
     };
     menu.appendChild(shareItem);
+
+    const openItem = document.createElement('div');
+    openItem.className = 'playlist-menu-item';
+    openItem.innerHTML = '&#8599;&nbsp; Open track page';
+    openItem.onclick = (e) => {
+        e.stopPropagation();
+        window.location.href = shareUrl;
+    };
+    menu.appendChild(openItem);
 
     actionsContainer.appendChild(menu);
 }
