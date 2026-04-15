@@ -15,284 +15,390 @@
     <style>
         * { box-sizing: border-box; }
         body { background: #0a0a0a; color: white; font-family: 'Inter', sans-serif; margin: 0; }
-        .main { margin-top: 72px; padding: 40px 0 140px; min-height: 80vh; }
-        .container { max-width: 960px; margin: 0 auto; padding: 0 32px; }
-
-        /* ── Back link ── */
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: rgba(255,255,255,0.5);
-            text-decoration: none;
-            font-size: 14px;
-            margin-bottom: 32px;
-            transition: color 0.2s;
-        }
-        .back-link:hover { color: white; }
-
-        /* ── States ── */
-        .track-loading, .track-not-found {
-            text-align: center;
-            padding: 80px 20px;
-            color: rgba(255,255,255,0.4);
-            font-size: 15px;
-        }
-        .track-not-found a { color: #9c27b0; text-decoration: none; }
 
         /* ── Hero ── */
-        .track-hero {
-            display: grid;
-            grid-template-columns: 220px 1fr;
-            gap: 40px;
-            align-items: start;
-            margin-bottom: 48px;
-        }
-        .track-hero-artwork {
-            width: 220px;
-            height: 220px;
-            border-radius: 12px;
+        .tp-hero {
+            position: relative;
+            padding-top: 64px; /* header height */
             overflow: hidden;
-            background: linear-gradient(135deg, #9c27b0, #4a148c);
-            flex-shrink: 0;
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
         }
-        .track-hero-artwork img {
+        .tp-hero-bg {
+            position: absolute;
+            inset: -40px;
+            background-size: cover;
+            background-position: center;
+            filter: blur(40px);
+            opacity: 0.35;
+            transform: scale(1.05);
+            pointer-events: none;
+        }
+        .tp-hero-gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.85) 100%);
+            pointer-events: none;
+        }
+        .tp-hero-content {
+            position: relative;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 40px 40px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 32px;
+            align-items: end;
+            width: 100%;
+        }
+        /* Back link floats top-left over hero */
+        .tp-back {
+            position: absolute;
+            top: 80px;
+            left: 40px;
+            color: rgba(255,255,255,0.55);
+            text-decoration: none;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.2s;
+            z-index: 2;
+        }
+        .tp-back:hover { color: white; }
+
+        /* Artwork with play overlay */
+        .tp-artwork-wrap {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            background: linear-gradient(135deg,#9c27b0,#4a148c);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            cursor: pointer;
+        }
+        .tp-artwork-wrap img {
             width: 100%; height: 100%; object-fit: cover; display: block;
         }
-        .track-hero-info { padding-top: 4px; }
-        .track-hero-title {
-            font-size: 36px;
-            font-weight: 700;
-            color: white;
-            letter-spacing: -0.5px;
-            margin: 0 0 6px;
-            line-height: 1.1;
+        .tp-artwork-play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.4);
+            opacity: 0;
+            transition: opacity 0.2s;
         }
-        .track-hero-artist {
-            font-size: 16px;
-            color: rgba(255,255,255,0.5);
+        .tp-artwork-wrap:hover .tp-artwork-play-overlay { opacity: 1; }
+        .tp-artwork-play-icon {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.95);
+            display: flex; align-items: center; justify-content: center;
+            color: #0a0a0a;
+            font-size: 20px;
+            padding-left: 3px;
+        }
+
+        /* Title block */
+        .tp-hero-info { min-width: 0; }
+        .tp-versions-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.45);
             margin-bottom: 10px;
         }
-        .track-hero-specs {
+        .tp-title {
+            font-size: 52px;
+            font-weight: 700;
+            letter-spacing: -1.5px;
+            line-height: 1.05;
+            color: white;
+            margin: 0 0 10px;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+        }
+        .tp-artist {
+            font-size: 18px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 10px;
+        }
+        .tp-specs {
             font-size: 13px;
             color: rgba(255,255,255,0.35);
-            margin-bottom: 28px;
             letter-spacing: 0.3px;
         }
 
-        /* ── Hero actions ── */
-        .hero-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 32px;
-        }
-        .hero-play-btn {
-            background: #9c27b0;
-            border: none;
-            color: white;
-            padding: 12px 28px;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-        }
-        .hero-play-btn:hover { background: #7b1fa2; transform: translateY(-1px); }
-        .hero-play-btn.playing { background: rgba(156,39,176,0.6); }
-        .hero-action-btn {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
+        /* Share button */
+        .tp-share-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             color: rgba(255,255,255,0.8);
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 14px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
-        }
-        .hero-action-btn:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.2);
-            color: white;
-        }
-        .hero-like-btn.liked { color: #9c27b0; border-color: #9c27b0; }
-
-        /* ── Metadata ── */
-        .meta-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .meta-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
-        .meta-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.3);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            min-width: 80px;
-        }
-        .meta-tag {
-            background: rgba(156,39,176,0.12);
-            border: 1px solid rgba(156,39,176,0.25);
-            color: rgba(255,255,255,0.7);
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-        }
-        .meta-value {
-            font-size: 13px;
-            color: rgba(255,255,255,0.6);
-        }
-
-        /* ── Versions ── */
-        .versions-section { margin-top: 40px; }
-        .versions-label {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: rgba(255,255,255,0.3);
-            margin-bottom: 12px;
-        }
-        .alt-row {
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            gap: 6px;
+            white-space: nowrap;
+            align-self: flex-start;
+            margin-top: 8px;
         }
-        .alt-row:last-child { border-bottom: none; }
-        .alt-play {
+        .tp-share-btn:hover { background: rgba(255,255,255,0.18); color: white; }
+
+        /* ── Track rows ── */
+        .tp-tracks-section {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 40px 48px;
+        }
+        .tp-row {
+            display: grid;
+            grid-template-columns: 44px 52px 1fr 180px 52px 130px 130px;
+            gap: 14px;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 10px;
+            transition: background 0.15s;
+            cursor: default;
+            position: relative;
+        }
+        .tp-row:hover { background: rgba(255,255,255,0.04); }
+        .tp-row + .tp-row { border-top: 1px solid rgba(255,255,255,0.05); }
+        .tp-row.is-main { background: rgba(156,39,176,0.06); }
+        .tp-row.is-main:hover { background: rgba(156,39,176,0.1); }
+
+        /* Play button */
+        .tp-row-play {
             width: 36px; height: 36px;
             border-radius: 50%;
             background: rgba(156,39,176,0.2);
-            border: 1px solid rgba(156,39,176,0.4);
+            border: 1px solid rgba(156,39,176,0.5);
             color: white;
             font-size: 12px;
             cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
             transition: all 0.2s;
+            padding-left: 2px;
         }
-        .alt-play:hover { background: #9c27b0; border-color: #9c27b0; }
-        .alt-title {
-            flex: 1;
-            font-size: 14px;
-            color: rgba(255,255,255,0.8);
-            font-weight: 500;
-        }
-        .alt-duration {
-            font-size: 12px;
-            color: rgba(255,255,255,0.35);
-            min-width: 36px;
-            text-align: right;
-        }
-        .alt-download {
-            background: none;
-            border: 1px solid rgba(255,255,255,0.12);
-            color: rgba(255,255,255,0.5);
-            padding: 6px 12px;
+        .tp-row-play:hover { background: #9c27b0; border-color: #9c27b0; transform: scale(1.05); }
+
+        /* Thumbnail */
+        .tp-row-thumb {
+            width: 44px; height: 44px;
             border-radius: 6px;
+            overflow: hidden;
+            background: linear-gradient(135deg,#9c27b0,#4a148c);
+            flex-shrink: 0;
+        }
+        .tp-row-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        /* Title */
+        .tp-row-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+        .tp-row-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #9c27b0;
+            border: 1px solid rgba(156,39,176,0.4);
+            border-radius: 4px;
+            padding: 1px 6px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        /* Waveform */
+        .tp-row-waveform {
+            height: 36px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .tp-row-waveform .waveform-progress {
+            position: absolute; top: 0; left: 0; height: 100%;
+            background: rgba(156,39,176,0.2);
+            pointer-events: none;
+            transition: width 0.1s linear;
+        }
+        .tp-row-waveform .waveform {
+            height: 100%;
+            display: flex; align-items: center; justify-content: space-around;
+            padding: 4px; gap: 1px;
+        }
+        .tp-row-waveform .waveform-bar {
+            flex: 1; background: rgba(156,39,176,0.45); border-radius: 2px; min-width: 2px;
+            transition: background 0.1s;
+        }
+        .tp-row-waveform:hover .waveform-bar { background: rgba(156,39,176,0.7); }
+
+        /* Duration */
+        .tp-row-duration {
             font-size: 13px;
+            color: rgba(255,255,255,0.4);
+            text-align: center;
+        }
+
+        /* Row action buttons */
+        .tp-row-download, .tp-row-license {
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
+            text-align: center;
+            white-space: nowrap;
         }
-        .alt-download:hover { border-color: rgba(255,255,255,0.3); color: white; }
+        .tp-row-download {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.75);
+        }
+        .tp-row-download:hover { background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.25); }
+        .tp-row-license {
+            background: #9c27b0;
+            border: 1px solid #9c27b0;
+            color: white;
+        }
+        .tp-row-license:hover { background: #7b1fa2; }
 
-        /* ── Player bar (same as browse) ── */
-        .now-playing-bar {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(15,15,15,0.98);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(156,39,176,0.3);
-            padding: 12px 24px;
-            z-index: 999;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
+        /* ── Details section ── */
+        .tp-details {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 40px 80px;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            padding-top: 32px;
         }
-        .now-playing-bar.visible { transform: translateY(0); }
-        .now-playing-content {
-            max-width: 1400px; margin: 0 auto;
-            display: grid;
-            grid-template-columns: minmax(180px,1fr) minmax(280px,2fr) minmax(140px,1fr);
-            gap: 24px; align-items: center;
+        .tp-details-heading {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 20px;
         }
-        .now-playing-center { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-        .now-playing-right { display: flex; justify-content: flex-end; align-items: center; }
-        .now-playing-volume { display: flex; align-items: center; gap: 8px; }
-        .volume-icon { font-size: 15px; cursor: pointer; opacity: 0.6; transition: opacity 0.15s; user-select: none; }
-        .volume-icon:hover { opacity: 1; }
-        .volume-slider {
-            width: 80px; height: 3px; -webkit-appearance: none; appearance: none;
-            background: linear-gradient(to right, #9c27b0 100%, rgba(255,255,255,0.15) 100%);
-            border-radius: 2px; outline: none; cursor: pointer;
+        .tp-details-grid { display: flex; flex-direction: column; gap: 12px; }
+        .tp-details-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
+        .tp-details-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.28);
+            min-width: 100px;
         }
-        .volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 11px; height: 11px; background: white; border-radius: 50%; cursor: pointer; }
-        .volume-slider::-moz-range-thumb { width: 11px; height: 11px; background: white; border-radius: 50%; cursor: pointer; border: none; }
-        .now-playing-track-info { display: flex; gap: 12px; align-items: center; min-width: 0; }
-        .now-playing-artwork { width: 48px; height: 48px; border-radius: 6px; overflow: hidden; flex-shrink: 0; background: linear-gradient(135deg,#9c27b0,#4a148c); }
-        .now-playing-artwork img { width: 100%; height: 100%; object-fit: cover; }
-        .now-playing-details { min-width: 0; }
-        .now-playing-title { font-size: 14px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .now-playing-artist { font-size: 12px; color: rgba(255,255,255,0.5); }
-        .now-playing-controls { display: flex; gap: 8px; justify-content: center; }
-        .now-playing-btn { width: 40px; height: 40px; border-radius: 50%; background: #9c27b0; border: none; color: white; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        #nowPlayingPrevBtn, #nowPlayingNextBtn { width: 36px; height: 36px; font-size: 13px; background: rgba(156,39,176,0.8); }
-        #nowPlayingPrevBtn:hover, #nowPlayingNextBtn:hover { background: #9c27b0; }
-        .now-playing-btn:hover { background: #7b1fa2; transform: scale(1.05); }
-        .now-playing-progress-container { display: flex; align-items: center; gap: 12px; width: 100%; }
-        .now-playing-time { font-size: 12px; color: rgba(255,255,255,0.6); min-width: 40px; text-align: center; }
-        .now-playing-progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; cursor: pointer; position: relative; transition: height 0.15s; }
-        .now-playing-progress-bar:hover { height: 5px; }
-        .now-playing-progress-fill { height: 100%; background: #9c27b0; border-radius: 2px; width: 0%; transition: width 0.1s linear; position: relative; }
+        .tp-details-tag {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.65);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .tp-details-value { font-size: 13px; color: rgba(255,255,255,0.55); }
+
+        /* ── States ── */
+        .tp-loading, .tp-not-found {
+            text-align: center; padding: 120px 20px;
+            color: rgba(255,255,255,0.4); font-size: 15px;
+        }
+        .tp-not-found a { color: #9c27b0; text-decoration: none; }
+
+        /* ── Player bar ── */
+        .now-playing-bar { position:fixed; bottom:0; left:0; right:0; background:rgba(15,15,15,0.98); backdrop-filter:blur(20px); border-top:1px solid rgba(156,39,176,0.3); padding:12px 24px; z-index:999; transform:translateY(100%); transition:transform 0.3s ease; }
+        .now-playing-bar.visible { transform:translateY(0); }
+        .now-playing-content { max-width:1400px; margin:0 auto; display:grid; grid-template-columns:minmax(180px,1fr) minmax(280px,2fr) minmax(140px,1fr); gap:24px; align-items:center; }
+        .now-playing-center { display:flex; flex-direction:column; align-items:center; gap:6px; }
+        .now-playing-right { display:flex; justify-content:flex-end; align-items:center; }
+        .now-playing-volume { display:flex; align-items:center; gap:8px; }
+        .volume-icon { font-size:15px; cursor:pointer; opacity:0.6; transition:opacity 0.15s; user-select:none; }
+        .volume-icon:hover { opacity:1; }
+        .volume-slider { width:80px; height:3px; -webkit-appearance:none; appearance:none; background:linear-gradient(to right,#9c27b0 100%,rgba(255,255,255,0.15) 100%); border-radius:2px; outline:none; cursor:pointer; }
+        .volume-slider::-webkit-slider-thumb { -webkit-appearance:none; width:11px; height:11px; background:white; border-radius:50%; cursor:pointer; }
+        .volume-slider::-moz-range-thumb { width:11px; height:11px; background:white; border-radius:50%; cursor:pointer; border:none; }
+        .now-playing-track-info { display:flex; gap:12px; align-items:center; min-width:0; }
+        .now-playing-artwork { width:48px; height:48px; border-radius:6px; overflow:hidden; flex-shrink:0; background:linear-gradient(135deg,#9c27b0,#4a148c); }
+        .now-playing-artwork img { width:100%; height:100%; object-fit:cover; }
+        .now-playing-details { min-width:0; }
+        .now-playing-title { font-size:14px; font-weight:600; color:white; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .now-playing-artist { font-size:12px; color:rgba(255,255,255,0.5); }
+        .now-playing-controls { display:flex; gap:8px; justify-content:center; }
+        .now-playing-btn { width:40px; height:40px; border-radius:50%; background:#9c27b0; border:none; color:white; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+        #nowPlayingPrevBtn,#nowPlayingNextBtn { width:36px; height:36px; font-size:13px; background:rgba(156,39,176,0.8); }
+        #nowPlayingPrevBtn:hover,#nowPlayingNextBtn:hover { background:#9c27b0; }
+        .now-playing-btn:hover { background:#7b1fa2; transform:scale(1.05); }
+        .now-playing-progress-container { display:flex; align-items:center; gap:12px; width:100%; }
+        .now-playing-time { font-size:12px; color:rgba(255,255,255,0.6); min-width:40px; text-align:center; }
+        .now-playing-progress-bar { flex:1; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; cursor:pointer; position:relative; transition:height 0.15s; }
+        .now-playing-progress-bar:hover { height:5px; }
+        .now-playing-progress-fill { height:100%; background:#9c27b0; border-radius:2px; width:0%; transition:width 0.1s linear; position:relative; }
         .now-playing-progress-bar:hover .now-playing-progress-fill::after { content:''; position:absolute; right:-5px; top:50%; transform:translateY(-50%); width:11px; height:11px; background:white; border-radius:50%; display:block; }
-        /* Mini player */
-        .now-playing-mini { display: none; align-items: center; gap: 12px; }
-        .mini-artwork { width: 52px; height: 52px; border-radius: 6px; overflow: hidden; flex-shrink: 0; background: linear-gradient(135deg,#9c27b0,#4a148c); }
-        .mini-artwork img { width: 100%; height: 100%; object-fit: cover; }
-        .mini-info { flex: 1; min-width: 0; }
-        .mini-title { font-size: 14px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .mini-artist { font-size: 12px; color: rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .mini-expand-btn { background: none; border: none; color: rgba(255,255,255,0.55); font-size: 20px; cursor: pointer; padding: 8px 6px; line-height: 1; flex-shrink: 0; transition: color 0.2s; }
-        .mini-expand-btn:hover { color: white; }
-        .mini-play-btn { width: 42px; height: 42px; border-radius: 50%; background: #9c27b0; border: none; color: white; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s; }
-        .mini-play-btn:hover { background: #7b1fa2; }
-        @media (max-width: 768px) { .now-playing-content { display: none; } .now-playing-mini { display: flex; } .now-playing-bar { padding: 10px 14px; } }
-        /* Full player modal */
-        .player-modal { position: fixed; inset: 0; background: #0d0d0d; z-index: 3500; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; overflow: hidden; }
-        .player-modal.open { transform: translateY(0); }
-        .player-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 4px; flex-shrink: 0; }
-        .player-modal-close { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 28px; cursor: pointer; padding: 4px 6px; line-height: 1; transition: color 0.2s; }
-        .player-modal-close:hover { color: white; }
-        .player-modal-label { font-size: 12px; font-weight: 700; letter-spacing: 2px; color: white; text-transform: uppercase; }
-        .player-modal-more { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 22px; cursor: pointer; padding: 4px 6px; line-height: 1; transition: color 0.2s; letter-spacing: 2px; }
-        .player-modal-more:hover { color: white; }
-        .player-modal-artwork-wrap { width: calc(100% - 48px); max-width: 340px; margin: 20px auto 0; aspect-ratio: 1; border-radius: 14px; overflow: hidden; background: linear-gradient(135deg,#9c27b0,#4a148c); box-shadow: 0 24px 64px rgba(0,0,0,0.7); flex-shrink: 0; }
-        .player-modal-artwork-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .player-modal-info { text-align: center; padding: 22px 24px 0; flex-shrink: 0; }
-        .player-modal-title { font-size: 26px; font-weight: 700; color: white; letter-spacing: -0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .player-modal-artist { font-size: 17px; color: rgba(255,255,255,0.45); margin-top: 4px; }
-        .player-modal-waveform { margin: 22px 24px 0; flex-shrink: 0; cursor: pointer; position: relative; }
-        .player-modal-waveform-bars { display: flex; align-items: flex-end; gap: 2px; height: 48px; width: 100%; }
-        .player-modal-waveform-bar { flex: 1; background: rgba(255,255,255,0.18); border-radius: 1px; min-height: 4px; transition: background 0.05s; }
-        .player-modal-waveform-bar.played { background: rgba(255,255,255,0.88); }
-        .player-modal-times { display: flex; justify-content: space-between; padding: 6px 2px 0; flex-shrink: 0; margin: 0 24px; }
-        .player-modal-time { font-size: 12px; color: rgba(255,255,255,0.38); }
-        .player-modal-controls { display: flex; align-items: center; justify-content: center; gap: 44px; padding: 24px 28px 40px; margin-top: auto; flex-shrink: 0; }
-        .player-ctrl-btn { background: none; border: none; color: rgba(255,255,255,0.75); cursor: pointer; padding: 8px; transition: color 0.2s, transform 0.12s; display: flex; align-items: center; justify-content: center; }
-        .player-ctrl-btn:hover { color: white; }
-        .player-ctrl-btn:active { transform: scale(0.87); }
-        .player-ctrl-play { width: 72px; height: 72px; border-radius: 50%; background: white; border: none; color: #0d0d0d; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.15s, background 0.2s; flex-shrink: 0; }
-        .player-ctrl-play:hover { background: #e8e8e8; }
-        .player-ctrl-play:active { transform: scale(0.93); }
+        .now-playing-mini { display:none; align-items:center; gap:12px; }
+        .mini-artwork { width:52px; height:52px; border-radius:6px; overflow:hidden; flex-shrink:0; background:linear-gradient(135deg,#9c27b0,#4a148c); }
+        .mini-artwork img { width:100%; height:100%; object-fit:cover; }
+        .mini-info { flex:1; min-width:0; }
+        .mini-title { font-size:14px; font-weight:600; color:white; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .mini-artist { font-size:12px; color:rgba(255,255,255,0.5); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .mini-expand-btn { background:none; border:none; color:rgba(255,255,255,0.55); font-size:20px; cursor:pointer; padding:8px 6px; line-height:1; flex-shrink:0; transition:color 0.2s; }
+        .mini-expand-btn:hover { color:white; }
+        .mini-play-btn { width:42px; height:42px; border-radius:50%; background:#9c27b0; border:none; color:white; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.2s; }
+        .mini-play-btn:hover { background:#7b1fa2; }
+        @media (max-width:768px) { .now-playing-content { display:none; } .now-playing-mini { display:flex; } .now-playing-bar { padding:10px 14px; } }
+        .player-modal { position:fixed; inset:0; background:#0d0d0d; z-index:3500; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.4,0,0.2,1); display:flex; flex-direction:column; overflow:hidden; }
+        .player-modal.open { transform:translateY(0); }
+        .player-modal-header { display:flex; align-items:center; justify-content:space-between; padding:20px 24px 4px; flex-shrink:0; }
+        .player-modal-close { background:none; border:none; color:rgba(255,255,255,0.6); font-size:28px; cursor:pointer; padding:4px 6px; line-height:1; transition:color 0.2s; }
+        .player-modal-close:hover { color:white; }
+        .player-modal-label { font-size:12px; font-weight:700; letter-spacing:2px; color:white; text-transform:uppercase; }
+        .player-modal-more { background:none; border:none; color:rgba(255,255,255,0.6); font-size:22px; cursor:pointer; padding:4px 6px; line-height:1; transition:color 0.2s; letter-spacing:2px; }
+        .player-modal-more:hover { color:white; }
+        .player-modal-artwork-wrap { width:calc(100% - 48px); max-width:340px; margin:20px auto 0; aspect-ratio:1; border-radius:14px; overflow:hidden; background:linear-gradient(135deg,#9c27b0,#4a148c); box-shadow:0 24px 64px rgba(0,0,0,0.7); flex-shrink:0; }
+        .player-modal-artwork-wrap img { width:100%; height:100%; object-fit:cover; }
+        .player-modal-info { text-align:center; padding:22px 24px 0; flex-shrink:0; }
+        .player-modal-title { font-size:26px; font-weight:700; color:white; letter-spacing:-0.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .player-modal-artist { font-size:17px; color:rgba(255,255,255,0.45); margin-top:4px; }
+        .player-modal-waveform { margin:22px 24px 0; flex-shrink:0; cursor:pointer; position:relative; }
+        .player-modal-waveform-bars { display:flex; align-items:flex-end; gap:2px; height:48px; width:100%; }
+        .player-modal-waveform-bar { flex:1; background:rgba(255,255,255,0.18); border-radius:1px; min-height:4px; transition:background 0.05s; }
+        .player-modal-waveform-bar.played { background:rgba(255,255,255,0.88); }
+        .player-modal-times { display:flex; justify-content:space-between; padding:6px 2px 0; flex-shrink:0; margin:0 24px; }
+        .player-modal-time { font-size:12px; color:rgba(255,255,255,0.38); }
+        .player-modal-controls { display:flex; align-items:center; justify-content:center; gap:44px; padding:24px 28px 40px; margin-top:auto; flex-shrink:0; }
+        .player-ctrl-btn { background:none; border:none; color:rgba(255,255,255,0.75); cursor:pointer; padding:8px; transition:color 0.2s,transform 0.12s; display:flex; align-items:center; justify-content:center; }
+        .player-ctrl-btn:hover { color:white; }
+        .player-ctrl-btn:active { transform:scale(0.87); }
+        .player-ctrl-play { width:72px; height:72px; border-radius:50%; background:white; border:none; color:#0d0d0d; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform 0.15s,background 0.2s; flex-shrink:0; }
+        .player-ctrl-play:hover { background:#e8e8e8; }
+        .player-ctrl-play:active { transform:scale(0.93); }
 
         /* ── Modals ── */
-        .cart-overlay { position: fixed; top:0; left:0; width:100%; height:100vh; background: rgba(0,0,0,0.7); z-index: 1999; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-        .cart-overlay.open { opacity: 1; pointer-events: all; }
-        .cart-modal { position: fixed; top:0; right:-100%; width:100%; max-width:500px; height:100vh; background:#0a0a0a; border-left:1px solid rgba(255,255,255,0.1); z-index:2000; transition:right 0.3s; display:flex; flex-direction:column; box-shadow:-4px 0 20px rgba(0,0,0,0.5); }
-        .cart-modal.open { right: 0; }
+        .cart-overlay { position:fixed; top:0; left:0; width:100%; height:100vh; background:rgba(0,0,0,0.7); z-index:1999; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+        .cart-overlay.open { opacity:1; pointer-events:all; }
+        .cart-modal { position:fixed; top:0; right:-100%; width:100%; max-width:500px; height:100vh; background:#0a0a0a; border-left:1px solid rgba(255,255,255,0.1); z-index:2000; transition:right 0.3s; display:flex; flex-direction:column; box-shadow:-4px 0 20px rgba(0,0,0,0.5); }
+        .cart-modal.open { right:0; }
         .cart-header { padding:24px; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center; }
         .cart-title { font-size:24px; font-weight:600; margin:0; }
         .cart-close { background:none; border:none; color:rgba(255,255,255,0.7); font-size:28px; cursor:pointer; padding:4px; line-height:1; transition:color 0.2s; }
@@ -355,34 +461,38 @@
         .create-playlist-modal { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#1a1a1a; border:1px solid rgba(156,39,176,0.3); border-radius:16px; padding:32px; max-width:400px; width:90%; z-index:4001; display:none; }
         .create-playlist-modal.active { display:block; }
         .create-playlist-modal h3 { font-size:20px; font-weight:700; margin:0 0 20px; }
-        .create-playlist-input { width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:8px; color:white; padding:12px 16px; font-size:15px; font-family:inherit; outline:none; box-sizing:border-box; }
+        .create-playlist-input { width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:8px; color:white; padding:12px 16px; font-size:15px; font-family:inherit; outline:none; }
         .create-playlist-input:focus { border-color:#9c27b0; }
         .create-playlist-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:16px; }
         .create-playlist-cancel { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.7); padding:10px 18px; border-radius:8px; font-size:14px; cursor:pointer; }
         .create-playlist-confirm { background:#9c27b0; border:none; color:white; padding:10px 18px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; }
         .create-playlist-confirm:hover { background:#7b1fa2; }
-        /* Toast */
         .toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); background:rgba(30,30,30,0.95); border:1px solid rgba(255,255,255,0.12); color:white; padding:10px 20px; border-radius:8px; font-size:14px; z-index:5000; opacity:0; transition:all 0.25s; pointer-events:none; white-space:nowrap; }
         .toast.visible { opacity:1; transform:translateX(-50%) translateY(0); }
-        /* Playlist menu */
         .playlist-menu { position:absolute; bottom:50px; right:0; background:#1a1a1a; border:1px solid rgba(156,39,176,0.3); border-radius:8px; padding:8px 0; min-width:200px; max-height:300px; overflow-y:auto; z-index:1000; display:none; box-shadow:0 4px 20px rgba(0,0,0,0.5); }
         .playlist-menu.open { display:block; }
         .playlist-menu-item { padding:10px 16px; color:rgba(255,255,255,0.8); cursor:pointer; transition:all 0.2s; font-size:14px; display:flex; align-items:center; gap:8px; }
         .playlist-menu-item:hover { background:rgba(156,39,176,0.1); color:white; }
         .playlist-menu-item.create-new { color:#9c27b0; font-weight:600; border-bottom:1px solid rgba(255,255,255,0.08); }
-        .more-menu { min-width: 160px; }
-        /* License picker */
         .license-picker-btn { flex:1; padding:10px 16px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:rgba(255,255,255,0.7); font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; text-align:center; }
         .license-picker-btn:hover { background:rgba(156,39,176,0.2); border-color:#9c27b0; color:#9c27b0; }
 
         /* ── Responsive ── */
-        @media (max-width: 600px) {
-            .container { padding: 0 16px; }
-            .track-hero { grid-template-columns: 1fr; gap: 24px; }
-            .track-hero-artwork { width: 100%; height: auto; aspect-ratio: 1; }
-            .track-hero-title { font-size: 26px; }
-            .main { padding: 24px 0 120px; }
-            .back-link { margin-bottom: 20px; }
+        @media (max-width: 768px) {
+            .tp-back { top: 76px; left: 20px; }
+            .tp-hero-content { grid-template-columns: 1fr; gap: 20px; padding: 20px 20px 28px; }
+            .tp-artwork-wrap { width: 140px; height: 140px; }
+            .tp-title { font-size: 32px; }
+            .tp-share-btn { align-self: auto; }
+            .tp-tracks-section { padding: 0 20px 40px; }
+            .tp-row { grid-template-columns: 36px 1fr 44px 100px 100px; gap: 10px; padding: 12px 8px; }
+            .tp-row-thumb { display: none; }
+            .tp-row-waveform { display: none; }
+            .tp-details { padding: 0 20px 60px; }
+        }
+        @media (max-width: 480px) {
+            .tp-row { grid-template-columns: 36px 1fr 40px 88px 88px; gap: 8px; }
+            .tp-row-download, .tp-row-license { padding: 8px 10px; font-size: 12px; }
         }
     </style>
 </head>
@@ -435,10 +545,10 @@
             <button class="mobile-panel-close" onclick="closeMobilePanel()">✕</button>
         </div>
         <nav class="mobile-panel-nav">
-            <a href="browse.html"        class="mobile-panel-link">Browse</a>
-            <a href="playlists.html"     class="mobile-panel-link">Playlists</a>
-            <a href="compilations.html"  class="mobile-panel-link">Compilations</a>
-            <a href="pricing.html"       class="mobile-panel-link">Pricing</a>
+            <a href="browse.html"       class="mobile-panel-link">Browse</a>
+            <a href="playlists.html"    class="mobile-panel-link">Playlists</a>
+            <a href="compilations.html" class="mobile-panel-link">Compilations</a>
+            <a href="pricing.html"      class="mobile-panel-link">Pricing</a>
         </nav>
         <div class="mobile-panel-divider"></div>
         <button class="mobile-panel-expandable" id="myMediaBtn" onclick="togglePanelSection('myMedia')">
@@ -453,7 +563,7 @@
             <span>Account</span><span class="mobile-panel-chevron">▾</span>
         </button>
         <div class="mobile-panel-submenu" id="accountSubmenu">
-            <a href="settings.html"  class="mobile-panel-sublink">Settings</a>
+            <a href="settings.html" class="mobile-panel-sublink">Settings</a>
             <a href="#" class="mobile-panel-sublink" onclick="handleLogout(); closeMobilePanel(); return false;">Sign Out</a>
         </div>
         <a href="pricing.html" class="mobile-panel-subscribe">Subscribe</a>
@@ -466,27 +576,44 @@
         </div>
     </div>
 
-    <!-- Main content -->
-    <main class="main">
-        <div class="container">
-            <a href="browse.html" class="back-link">← Browse all tracks</a>
+    <!-- Page states -->
+    <div id="tpLoading" class="tp-loading" style="margin-top:120px;">Loading…</div>
+    <div id="tpNotFound" class="tp-not-found" style="display:none;margin-top:120px;">
+        Track not found. <a href="browse.html">Browse all tracks →</a>
+    </div>
 
-            <div id="trackLoading" class="track-loading">Loading…</div>
-            <div id="trackNotFound" class="track-not-found" style="display:none">
-                Track not found. <a href="browse.html">Browse all tracks →</a>
-            </div>
-            <div id="trackContent" style="display:none">
-                <!-- Hero -->
-                <div class="track-hero" id="trackHero"></div>
+    <!-- Content (filled by JS) -->
+    <div id="tpContent" style="display:none;">
 
-                <!-- Versions -->
-                <div class="versions-section" id="versionsSection" style="display:none">
-                    <div class="versions-label">Versions</div>
-                    <div id="versionsList"></div>
+        <!-- Hero -->
+        <div class="tp-hero" id="tpHero">
+            <div class="tp-hero-bg" id="tpHeroBg"></div>
+            <div class="tp-hero-gradient"></div>
+            <a href="browse.html" class="tp-back">← Browse</a>
+            <div class="tp-hero-content">
+                <div class="tp-artwork-wrap" id="tpArtworkWrap" onclick="document.getElementById('tpMainPlayBtn').click()">
+                    <img id="tpArtworkImg" src="" alt="">
+                    <div class="tp-artwork-play-overlay">
+                        <div class="tp-artwork-play-icon" id="tpArtworkPlayIcon">▶</div>
+                    </div>
                 </div>
+                <div class="tp-hero-info">
+                    <div class="tp-versions-label" id="tpVersionsLabel"></div>
+                    <h1 class="tp-title" id="tpTitle"></h1>
+                    <div class="tp-artist" id="tpArtist"></div>
+                    <div class="tp-specs"  id="tpSpecs"></div>
+                </div>
+                <button class="tp-share-btn" onclick="copyTrackPageLink()">&#11014; Share</button>
             </div>
         </div>
-    </main>
+
+        <!-- Track rows -->
+        <div class="tp-tracks-section" id="tpTracksSection"></div>
+
+        <!-- Details -->
+        <div class="tp-details" id="tpDetails"></div>
+
+    </div>
 
     <!-- Now Playing Bar -->
     <div class="now-playing-bar" id="nowPlayingBar">
@@ -500,9 +627,9 @@
             </div>
             <div class="now-playing-center">
                 <div class="now-playing-controls">
-                    <button class="now-playing-btn" id="nowPlayingPrevBtn" onclick="playPreviousTrack()" title="Previous">⏮</button>
+                    <button class="now-playing-btn" id="nowPlayingPrevBtn" onclick="playPreviousTrack()">⏮</button>
                     <button class="now-playing-btn" id="nowPlayingPlayBtn" onclick="togglePlayPause()">▶</button>
-                    <button class="now-playing-btn" id="nowPlayingNextBtn" onclick="playNextTrackManual()" title="Next">⏭</button>
+                    <button class="now-playing-btn" id="nowPlayingNextBtn" onclick="playNextTrackManual()">⏭</button>
                 </div>
                 <div class="now-playing-progress-container">
                     <div class="now-playing-time" id="nowPlayingCurrentTime">0:00</div>
@@ -525,8 +652,8 @@
                 <div class="mini-title"  id="miniTitle">Select a track</div>
                 <div class="mini-artist" id="miniArtist"></div>
             </div>
-            <button class="mini-expand-btn" onclick="openPlayerModal()" title="Expand">⌃</button>
-            <button class="mini-play-btn" id="miniPlayBtn" onclick="togglePlayPause()">▶</button>
+            <button class="mini-expand-btn" onclick="openPlayerModal()">⌃</button>
+            <button class="mini-play-btn"   id="miniPlayBtn" onclick="togglePlayPause()">▶</button>
         </div>
     </div>
 
@@ -537,9 +664,7 @@
             <span class="player-modal-label">Now Playing</span>
             <button class="player-modal-more">•••</button>
         </div>
-        <div class="player-modal-artwork-wrap">
-            <img id="playerModalArtwork" src="" alt="">
-        </div>
+        <div class="player-modal-artwork-wrap"><img id="playerModalArtwork" src="" alt=""></div>
         <div class="player-modal-info">
             <div class="player-modal-title"  id="playerModalTitle">Select a track</div>
             <div class="player-modal-artist" id="playerModalArtist"></div>
@@ -613,7 +738,7 @@
         </div>
     </div>
 
-    <!-- Download options (subscribers) -->
+    <!-- Download options -->
     <div class="download-overlay" id="downloadOptionsOverlay" onclick="closeDownloadOptions()"></div>
     <div class="download-modal" id="downloadOptionsModal">
         <button class="download-close" onclick="closeDownloadOptions()">×</button>
@@ -636,7 +761,7 @@
         </div>
     </div>
 
-    <!-- Create playlist modal -->
+    <!-- Create playlist -->
     <div class="create-playlist-overlay" id="createPlaylistOverlay" onclick="closeCreatePlaylistModal()"></div>
     <div class="create-playlist-modal" id="createPlaylistModal">
         <h3>New Playlist</h3>
@@ -648,7 +773,6 @@
         </div>
     </div>
 
-    <!-- Scripts (load order matters: shared state before consumers) -->
     <script src="/browse-tracks.js?v=2"></script>
     <script src="/browse-cart.js"></script>
     <script src="/browse-player.js"></script>
@@ -657,192 +781,191 @@
     <script src="/browse-favorites.js"></script>
 
     <script>
-    // ── Helpers needed from browse-init.js (not included to avoid auto-loading) ──
     function togglePanelSection(section) {
-        const submenu = document.getElementById(section + 'Submenu');
-        const btn     = document.getElementById(section + 'Btn');
-        if (submenu) submenu.classList.toggle('open');
-        if (btn)     btn.classList.toggle('open');
+        const sub = document.getElementById(section + 'Submenu');
+        const btn = document.getElementById(section + 'Btn');
+        if (sub) sub.classList.toggle('open');
+        if (btn) btn.classList.toggle('open');
     }
     function updateMobilePanelAuth(isLoggedIn) {
-        const accountBtn = document.getElementById('accountBtn');
-        const authBtns   = document.getElementById('mobilePanelAuthBtns');
-        if (accountBtn) accountBtn.style.display = isLoggedIn ? 'flex' : 'none';
-        if (authBtns)   authBtns.style.display   = isLoggedIn ? 'none' : 'flex';
+        const a = document.getElementById('accountBtn');
+        const b = document.getElementById('mobilePanelAuthBtns');
+        if (a) a.style.display = isLoggedIn ? 'flex' : 'none';
+        if (b) b.style.display = isLoggedIn ? 'none' : 'flex';
+    }
+    function _esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function copyTrackPageLink() {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            if (typeof showToast === 'function') showToast('Link copied');
+        });
     }
 
-    // ── Escape helpers ──
-    function _esc(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-    // ── Render track page ──
     function renderTrackPage(track, alts, targetAltId) {
         document.title = `${track.title} — readysounds.`;
 
-        const specs = [
-            track.genre   || '',
-            track.bpm     ? `${track.bpm} BPM` : '',
-            track.duration || ''
-        ].filter(Boolean).join(' · ');
+        const totalVersions = 1 + alts.length;
+        const specs = [track.genre, track.bpm ? `${track.bpm} BPM` : '', track.duration]
+            .filter(Boolean).join(' · ');
+        const artUrl = track.artwork_url || '';
 
-        function metaTags(label, value) {
-            if (!value) return '';
-            const tags = value.split(',').map(t => t.trim()).filter(Boolean);
-            if (!tags.length) return '';
-            return `<div class="meta-row">
-                <span class="meta-label">${label}</span>
-                ${tags.map(t => `<span class="meta-tag">${_esc(t)}</span>`).join('')}
+        // Hero
+        if (artUrl) {
+            document.getElementById('tpHeroBg').style.backgroundImage = `url(${artUrl})`;
+            document.getElementById('tpArtworkImg').src = artUrl;
+        }
+        document.getElementById('tpVersionsLabel').textContent =
+            totalVersions > 1 ? `${totalVersions} Versions` : '';
+        document.getElementById('tpTitle').textContent  = track.title;
+        document.getElementById('tpArtist').textContent = track.artist;
+        document.getElementById('tpSpecs').textContent  = specs;
+
+        // Track rows
+        const waveformBars = generateWaveformBars();
+        function makeRow(id, streamUrl, dlAlbum, title, duration, isMain) {
+            const thumb = artUrl ? `<img src="${artUrl}" alt="">` : '';
+            const badge = isMain && alts.length > 0 ? `<span class="tp-row-badge">Full</span>` : '';
+            const dlAttr = dlAlbum ? `data-download-album="${dlAlbum}"` : '';
+            return `<div class="track-item ${isMain ? 'main-track tp-row is-main' : 'alternate tp-row'}"
+                         data-track-id="${id}"
+                         data-stream-url="${streamUrl || ''}"
+                         ${dlAttr}>
+                <!-- Hidden play btn (id for artwork click) -->
+                <button class="tp-row-play track-play${isMain ? '" id="tpMainPlayBtn' : ''}"
+                        onclick="playTrack(event, ${id})">▶</button>
+                <div class="tp-row-thumb track-artwork">${thumb}</div>
+                <div class="tp-row-title track-title">
+                    <span>${_esc(title)}</span>${badge}
+                </div>
+                <div class="tp-row-waveform waveform-container" onclick="seekAudio(event, ${id})" data-track-id="${id}">
+                    <div class="waveform-progress" id="progress-${id}"></div>
+                    <div class="waveform">${waveformBars}</div>
+                </div>
+                <div class="tp-row-duration">${_esc(duration || '')}</div>
+                <button class="tp-row-download" onclick="downloadTrack(event, ${id}); event.stopPropagation()">↓ Download</button>
+                <button class="tp-row-license"  onclick="buyLicense(event, ${id}); event.stopPropagation()">Buy License</button>
             </div>`;
         }
-        function metaVal(label, value) {
+
+        let rowsHtml = makeRow(track.id, track.stream_url, track.download_album,
+                               track.title, track.duration, true);
+        alts.forEach(alt => {
+            const domId = alt.id + 100;
+            rowsHtml += makeRow(domId, alt.stream_url,
+                                alt.download_album || track.download_album,
+                                alt.title, alt.duration, false);
+        });
+        document.getElementById('tpTracksSection').innerHTML = rowsHtml;
+
+        // Details
+        function tags(label, value) {
             if (!value) return '';
-            return `<div class="meta-row">
-                <span class="meta-label">${label}</span>
-                <span class="meta-value">${_esc(value)}</span>
+            const items = value.split(',').map(t => t.trim()).filter(Boolean);
+            if (!items.length) return '';
+            return `<div class="tp-details-row">
+                <span class="tp-details-label">${label}</span>
+                ${items.map(t => `<span class="tp-details-tag">${_esc(t)}</span>`).join('')}
             </div>`;
         }
+        function val(label, value) {
+            if (!value) return '';
+            return `<div class="tp-details-row">
+                <span class="tp-details-label">${label}</span>
+                <span class="tp-details-value">${_esc(value)}</span>
+            </div>`;
+        }
+        const detailsHtml = [
+            tags('Moods',          track.moods),
+            tags('Genre',          track.genre),
+            val ('Energy',         track.energy),
+            tags('Use Cases',      track.use_cases),
+            tags('Best Moments',   track.best_moments),
+            tags('Similar Artists',track.similar_artists),
+        ].filter(Boolean).join('');
 
-        const artworkHtml = track.artwork_url
-            ? `<img src="${track.artwork_url}" alt="${_esc(track.title)}" onerror="this.style.display='none'">`
-            : '';
-
-        document.getElementById('trackHero').innerHTML = `
-            <!-- Hidden track-item for player compatibility -->
-            <div class="track-item main-track"
-                 id="mainTrackItem"
-                 data-track-id="${track.id}"
-                 data-stream-url="${track.stream_url || ''}"
-                 ${track.download_album ? `data-download-album="${track.download_album}"` : ''}
-                 style="display:none;position:absolute;pointer-events:none;">
-                <div class="track-play" id="mainTrackPlayBtn">▶</div>
-                <div class="track-title">${_esc(track.title)}</div>
-                <div class="track-artist">${_esc(track.artist)}</div>
-                <div class="track-artwork">${artworkHtml}</div>
-            </div>
-
-            <div class="track-hero-artwork">${artworkHtml}</div>
-
-            <div class="track-hero-info">
-                <h1 class="track-hero-title">${_esc(track.title)}</h1>
-                <div class="track-hero-artist">${_esc(track.artist)}</div>
-                ${specs ? `<div class="track-hero-specs">${_esc(specs)}</div>` : ''}
-
-                <div class="hero-actions">
-                    <button class="hero-play-btn" id="heroPlayBtn"
-                            onclick="document.getElementById('mainTrackPlayBtn').click()">
-                        ▶ Play
-                    </button>
-                    <button class="hero-action-btn" onclick="downloadTrack(event, ${track.id})">↓ Download</button>
-                    <button class="hero-action-btn" onclick="buyLicense(event, ${track.id})">Buy License</button>
-                    <button class="hero-action-btn" onclick="addToCart(event, ${track.id})">+ Cart</button>
-                    <button class="hero-action-btn hero-like-btn" id="heroLikeBtn"
-                            data-track-id="${track.id}"
-                            onclick="toggleLike(event, ${track.id})">♡</button>
-                </div>
-
-                <div class="meta-grid">
-                    ${metaTags('Moods',          track.moods)}
-                    ${metaTags('Genre',          track.genre)}
-                    ${metaVal ('Energy',         track.energy)}
-                    ${metaTags('Use Cases',      track.use_cases)}
-                    ${metaTags('Best Moments',   track.best_moments)}
-                    ${metaTags('Similar Artists',track.similar_artists)}
-                </div>
-            </div>
-        `;
-
-        // Versions
-        if (alts.length > 0) {
-            const versionsEl = document.getElementById('versionsSection');
-            const listEl     = document.getElementById('versionsList');
-            versionsEl.style.display = 'block';
-
-            listEl.innerHTML = alts.map(alt => {
-                const domId = alt.id + 100;
-                const dlAttr = (alt.download_album || track.download_album)
-                    ? `data-download-album="${alt.download_album || track.download_album}"` : '';
-                return `<div class="track-item alternate alt-row"
-                             data-track-id="${domId}"
-                             data-stream-url="${alt.stream_url || ''}"
-                             ${dlAttr}>
-                    <button class="alt-play track-play" onclick="playTrack(event, ${domId})">▶</button>
-                    <div class="alt-title track-title">${_esc(alt.title)}</div>
-                    <div class="alt-duration">${_esc(alt.duration || '')}</div>
-                    <button class="alt-download" onclick="downloadTrack(event, ${domId})">↓</button>
-                </div>`;
-            }).join('');
-
-            // Auto-play target alternate if specified
-            if (targetAltId) {
-                const domId = targetAltId + 100;
-                const altPlay = document.querySelector(`.track-item[data-track-id="${domId}"] .track-play`);
-                if (altPlay) setTimeout(() => altPlay.click(), 200);
-            }
+        if (detailsHtml) {
+            document.getElementById('tpDetails').innerHTML =
+                `<div class="tp-details-heading">Details</div>
+                 <div class="tp-details-grid">${detailsHtml}</div>`;
         }
 
         // Show content
-        document.getElementById('trackLoading').style.display = 'none';
-        document.getElementById('trackContent').style.display = 'block';
+        document.getElementById('tpLoading').style.display  = 'none';
+        document.getElementById('tpContent').style.display  = 'block';
 
-        // Load favorites
+        // Sync artwork play icon with player state
+        const observer = new MutationObserver(() => {
+            const pb = document.getElementById('tpMainPlayBtn');
+            if (pb) {
+                document.getElementById('tpArtworkPlayIcon').textContent =
+                    pb.textContent.trim() === '⏸' ? '⏸' : '▶';
+            }
+        });
+        setTimeout(() => {
+            const pb = document.getElementById('tpMainPlayBtn');
+            if (pb) observer.observe(pb, { childList: true, characterData: true, subtree: true });
+        }, 300);
+
+        // Auto-play target alternate
+        if (targetAltId) {
+            const domId = targetAltId + 100;
+            setTimeout(() => {
+                const btn = document.querySelector(`.track-item[data-track-id="${domId}"] .track-play`);
+                if (btn) btn.click();
+            }, 200);
+        }
+
         if (typeof loadFavorites === 'function') loadFavorites();
     }
 
-    // ── Auth ──
     async function checkAuth() {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        const authButtons      = document.getElementById('authButtons');
-        const profileContainer = document.getElementById('profileContainer');
-        const profileInitial   = document.getElementById('profileInitial');
-
+        const authEl    = document.getElementById('authButtons');
+        const profEl    = document.getElementById('profileContainer');
+        const initEl    = document.getElementById('profileInitial');
         if (session && session.user) {
-            if (authButtons)      authButtons.style.display      = 'none';
-            if (profileContainer) profileContainer.style.display = 'flex';
-            if (profileInitial)   profileInitial.textContent     = session.user.email.charAt(0).toUpperCase();
+            if (authEl)  authEl.style.display  = 'none';
+            if (profEl)  profEl.style.display  = 'flex';
+            if (initEl)  initEl.textContent    = session.user.email.charAt(0).toUpperCase();
             updateMobilePanelAuth(true);
             if (typeof loadUserPlaylists === 'function') await loadUserPlaylists();
-            const hasSub = typeof hasActiveSubscription === 'function' && await hasActiveSubscription();
-            if (hasSub) {
-                document.querySelectorAll('.hero-action-btn[onclick*="addToCart"]').forEach(b => b.style.display = 'none');
-            }
         } else {
-            if (authButtons)      authButtons.style.display      = 'flex';
-            if (profileContainer) profileContainer.style.display = 'none';
+            if (authEl)  authEl.style.display  = 'flex';
+            if (profEl)  profEl.style.display  = 'none';
             updateMobilePanelAuth(false);
         }
     }
 
-    // ── Init ──
     async function initTrackPage() {
         const params  = new URLSearchParams(window.location.search);
         const trackId = parseInt(params.get('id'));
         const altId   = params.get('alt') ? parseInt(params.get('alt')) : null;
 
         if (!trackId) {
-            document.getElementById('trackLoading').style.display = 'none';
-            document.getElementById('trackNotFound').style.display = 'block';
+            document.getElementById('tpLoading').style.display  = 'none';
+            document.getElementById('tpNotFound').style.display = 'block';
             return;
         }
 
         supabaseClient = await window.RS.waitForClient();
-
         checkAuth();
         supabaseClient.auth.onAuthStateChange((event) => {
             if (['SIGNED_IN','SIGNED_OUT','INITIAL_SESSION'].includes(event)) checkAuth();
         });
 
         const { data: track, error } = await supabaseClient
-            .from('tracks')
-            .select('*, alternates(*)')
-            .eq('id', trackId)
-            .single();
+            .from('tracks').select('*, alternates(*)')
+            .eq('id', trackId).single();
 
         if (error || !track) {
-            document.getElementById('trackLoading').style.display = 'none';
-            document.getElementById('trackNotFound').style.display = 'block';
+            document.getElementById('tpLoading').style.display  = 'none';
+            document.getElementById('tpNotFound').style.display = 'block';
             return;
         }
 
-        // Populate trackData for the player bar
+        const alts = (track.alternates || []).slice().sort((a,b) => a.sort_order - b.sort_order);
+
+        // Populate trackData for player bar
         trackData[track.id] = {
             title: track.title, trackTitle: track.title,
             artist: track.artist, duration: track.duration,
@@ -852,33 +975,16 @@
             similar_artists: track.similar_artists || '',
             energy: track.energy || '', best_moments: track.best_moments || '',
         };
-        const alts = (track.alternates || []).slice().sort((a,b) => a.sort_order - b.sort_order);
         alts.forEach(alt => {
             const domId = alt.id + 100;
             trackData[domId] = {
                 title: `${track.title} (${alt.title})`,
-                artist: track.artist,
-                duration: alt.duration,
+                artist: track.artist, duration: alt.duration,
                 artwork_url: track.artwork_url || '',
             };
         });
 
         renderTrackPage(track, alts, altId);
-
-        // Sync play button state when player starts
-        const observer = new MutationObserver(() => {
-            const btn = document.getElementById('heroPlayBtn');
-            const mainPlayBtn = document.getElementById('mainTrackPlayBtn');
-            if (btn && mainPlayBtn) {
-                const isPlaying = mainPlayBtn.textContent === '⏸';
-                btn.textContent = isPlaying ? '⏸ Pause' : '▶ Play';
-                btn.classList.toggle('playing', isPlaying);
-            }
-        });
-        setTimeout(() => {
-            const mainPlayBtn = document.getElementById('mainTrackPlayBtn');
-            if (mainPlayBtn) observer.observe(mainPlayBtn, { childList: true, subtree: true, characterData: true });
-        }, 300);
     }
 
     if (document.readyState === 'loading') {
