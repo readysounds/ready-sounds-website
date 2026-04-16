@@ -1403,6 +1403,10 @@
             display: flex;
             justify-content: center;
         }
+
+        .search-results-label {
+            display: none !important;
+        }
         
         .search-box {
             max-width: 600px;
@@ -3240,6 +3244,21 @@
 
             .search-section {
                 margin-bottom: 12px;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .search-results-label.has-query {
+                display: block !important;
+                margin-top: 8px;
+                font-size: 13px;
+                color: rgba(255, 255, 255, 0.5);
+                text-align: center;
+            }
+
+            .search-results-label.has-query span {
+                color: rgba(255, 255, 255, 0.85);
+                font-weight: 500;
             }
 
             /* Hide desktop track table header */
@@ -4087,6 +4106,7 @@
                         <span class="search-icon">🔍</span>
                         <input type="text" id="searchInput" class="search-input" placeholder="search by mood, genre, instrument..." oninput="searchTracks()">
                     </div>
+                    <div id="searchResultsLabel" class="search-results-label"></div>
                 </div>
 
                 <!-- Active Filter Chips -->

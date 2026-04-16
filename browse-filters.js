@@ -200,5 +200,18 @@ function applyFilters() {
         group.style.display = (searchMatch && filterMatch) ? '' : 'none';
     });
 
+    // Update mobile search results label
+    const query = (document.getElementById('searchInput')?.value || '').trim();
+    const label = document.getElementById('searchResultsLabel');
+    if (label) {
+        if (query) {
+            const visibleCount = [...trackGroups].filter(g => g.style.display !== 'none').length;
+            label.innerHTML = `Results for: <span>"${query}"</span> &middot; ${visibleCount} track${visibleCount !== 1 ? 's' : ''}`;
+            label.classList.add('has-query');
+        } else {
+            label.classList.remove('has-query');
+        }
+    }
+
     renderFilterChips();
 }
