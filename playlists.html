@@ -1226,9 +1226,10 @@
 
         async function loadData() {
             try {
-                const [tracksRes, playlistsRes] = await Promise.all([
+                const [tracksRes, playlistsRes, altsRes] = await Promise.all([
                     supabaseClient.from('tracks').select('id, title, artist, genre, bpm, duration, moods, stream_url, artwork_url').eq('is_active', true),
-                    supabaseClient.from('curated_playlists').select('*').eq('is_active', true).order('sort_order')
+                    supabaseClient.from('curated_playlists').select('*').eq('is_active', true).order('sort_order'),
+                    supabaseClient.from('alternates').select('id, title, stream_url, duration, track_id, tracks(title, artist, artwork_url)')
                 ]);
                 if (tracksRes.data) {
                     tracksRes.data.forEach(t => {
@@ -1244,6 +1245,21 @@
                             meta: metaParts.join(' \u00b7 '),
                             artwork: t.artwork_url || '',
                             url: t.stream_url || ''
+                        };
+                    });
+                }
+                if (altsRes.data) {
+                    altsRes.data.forEach(alt => {
+                        const parent = alt.tracks || {};
+                        trackDatabase[alt.id + 100] = {
+                            title: (parent.artist || '') + ' \u2014 \u201c' + (parent.title || '') + '\u201d (' + alt.title + ')',
+                            artist: parent.artist || '',
+                            trackTitle: (parent.title || '') + ' \u2014 ' + alt.title,
+                            duration: alt.duration || '',
+                            moods: '',
+                            meta: alt.duration || '',
+                            artwork: parent.artwork_url || '',
+                            url: alt.stream_url || ''
                         };
                     });
                 }
