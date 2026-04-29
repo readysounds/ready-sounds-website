@@ -1282,7 +1282,7 @@
                 grid.innerHTML = '<p style="color:rgba(255,255,255,0.4);padding:40px 0">No curated playlists available.</p>';
                 return;
             }
-            grid.innerHTML = curatedPlaylists.map(p => {
+            grid.innerHTML = curatedPlaylists.filter(p => !childPlaylistSlugs.has(p.slug)).map(p => {
                 const count = (p.track_ids || []).length;
                 const emojiOrDefault = p.emoji || '\uD83C\uDFB5';
                 const coverHtml = p.cover_url
@@ -1351,6 +1351,11 @@
         // Track database (populated from Supabase on load)
         const trackDatabase = {};
         let curatedPlaylists = [];
+
+        const subPlaylistMap = {
+            'best-for-paid-social': ['paid-social-15s', 'paid-social-30s']
+        };
+        const childPlaylistSlugs = new Set(Object.values(subPlaylistMap).flat());
 
         function showUserPlaylist(playlistId, playlistName, trackIds) {
             document.getElementById('playlistGrid').style.display = 'none';
@@ -1426,6 +1431,41 @@
             if (!playlist) return;
             document.getElementById('playlistGrid').style.display = 'none';
             document.getElementById('myPlaylistsSection').style.display = 'none';
+
+            const childSlugs = subPlaylistMap[slug];
+            if (childSlugs) {
+                const children = childSlugs.map(s => curatedPlaylists.find(p => p.slug === s)).filter(Boolean);
+                const subCardsHtml = children.map(child => {
+                    const count = (child.track_ids || []).length;
+                    const coverHtml = child.cover_url
+                        ? `<img src="${escapeHtml(child.cover_url)}" alt="${escapeHtml(child.name)}" class="playlist-image" onerror="this.style.display='none'">`
+                        : `<div style="width:100%;height:100%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:3em">${child.emoji || '🎵'}</div>`;
+                    return `<div class="playlist-card" onclick="showPlaylist('${child.slug}')">${coverHtml}<div class="play-overlay">▶</div><div class="playlist-overlay"><h3 class="playlist-title">${escapeHtml(child.name)}</h3><p class="playlist-count">${count} track${count !== 1 ? 's' : ''}</p></div></div>`;
+                }).join('');
+                const coverHtml = playlist.cover_url
+                    ? `<img src="${escapeHtml(playlist.cover_url)}" alt="${escapeHtml(playlist.name)}">`
+                    : (playlist.emoji || '🎵');
+                document.getElementById('playlistDetails').innerHTML = `
+                    <div class="playlist-detail active">
+                        <div class="playlist-header">
+                            <div class="playlist-header-left">
+                                <div class="playlist-cover">${coverHtml.startsWith('<img') ? coverHtml : `<span>${coverHtml}</span>`}</div>
+                                <div class="playlist-info">
+                                    <h2>${escapeHtml(playlist.name)}</h2>
+                                    <p class="playlist-description">${escapeHtml(playlist.description || '')}</p>
+                                </div>
+                            </div>
+                            <div class="playlist-header-actions">
+                                <button class="play-playlist-btn" onclick="playCuratedPlaylist('${slug}')">▶ Play All</button>
+                                <button class="close-playlist" onclick="closePlaylist()">← Back to Playlists</button>
+                            </div>
+                        </div>
+                        <div id="playlistGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px;margin-top:32px">${subCardsHtml}</div>
+                    </div>`;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+
             const trackIds = playlist.track_ids || [];
             const tracksHTML = trackIds.map((trackId) => {
                 const track = trackDatabase[trackId];
@@ -1649,6 +1689,18 @@
         });
 
         function playCuratedPlaylist(slug) {
+            const childSlugs = subPlaylistMap[slug];
+            if (childSlugs) {
+                const allIds = childSlugs.flatMap(s => {
+                    const child = curatedPlaylists.find(p => p.slug === s);
+                    return child ? (child.track_ids || []) : [];
+                });
+                if (!allIds.length) return;
+                currentPlaylist = allIds;
+                currentTrackIndex = 0;
+                playTrack(allIds[0]);
+                return;
+            }
             const playlist = curatedPlaylists.find(p => p.slug === slug);
             if (!playlist || !playlist.track_ids || !playlist.track_ids.length) return;
             currentPlaylist = playlist.track_ids;
