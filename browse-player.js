@@ -401,8 +401,10 @@ function playTrack(event, trackId) {
         });
         button.textContent = '⏸';
 
-        // Record in recently played
-        if (typeof addToRecentlyPlayed === 'function') addToRecentlyPlayed(trackId);
+        // Record in recently played (skip alternate versions)
+        if (typeof addToRecentlyPlayed === 'function' && !item.classList.contains('alternate')) {
+            addToRecentlyPlayed(trackId);
+        }
 
         // Update player bar
         updateNowPlayingBar(trackId);
