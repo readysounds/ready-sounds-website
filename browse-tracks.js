@@ -217,7 +217,8 @@ async function loadTracksFromSupabase() {
             trackData[domId] = {
                 title: `${track.title} (${alt.title})`,
                 artist: track.artist,
-                duration: alt.duration
+                duration: alt.duration,
+                isAlternate: true
             };
         });
     });

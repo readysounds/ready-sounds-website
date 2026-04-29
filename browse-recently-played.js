@@ -28,7 +28,7 @@ function renderRecentlyPlayed() {
     const section = document.getElementById('recentlyPlayedSection');
     if (!section) return;
 
-    const ids = getRecentlyPlayedIds().filter(id => trackData && trackData[id]);
+    const ids = getRecentlyPlayedIds().filter(id => trackData && trackData[id] && !trackData[id].isAlternate);
 
     if (ids.length === 0) {
         section.style.display = 'none';
