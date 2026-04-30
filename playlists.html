@@ -1278,8 +1278,9 @@
                 renderPlaylistGrid();
                 loadUserPlaylists();
                 loadFavorites();
-                const hash = window.location.hash.slice(1);
-                if (hash) showPlaylist(hash);
+                const params = new URLSearchParams(window.location.search);
+                const slug = params.get('playlist');
+                if (slug) showPlaylist(slug);
             } catch (err) {
                 console.error('Error loading data:', err);
             }
@@ -1436,6 +1437,7 @@
         }
 
         function showPlaylist(slug) {
+            history.pushState({playlist: slug}, '', '?playlist=' + encodeURIComponent(slug));
             const playlist = curatedPlaylists.find(p => p.slug === slug);
             if (!playlist) return;
             document.getElementById('playlistGrid').style.display = 'none';
@@ -1539,6 +1541,7 @@
         }
 
         function closePlaylist() {
+            history.pushState({}, '', 'playlists.html');
             document.getElementById('playlistDetails').innerHTML = '';
             document.getElementById('playlistGrid').style.display = 'grid';
             loadUserPlaylists();
