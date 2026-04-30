@@ -302,7 +302,7 @@ async function loadFeaturedPlaylists() {
         const img = p.cover_url
             ? `<img src="${p.cover_url}" alt="${p.name.replace(/"/g, '&quot;')}">`
             : `<div class="fp-placeholder">🎵</div>`;
-        return `<a href="playlists.html#${p.slug}" class="featured-playlist-card">${img}<div class="fp-name">${p.name}</div></a>`;
+        return `<a href="playlists.html?playlist=${encodeURIComponent(p.slug)}" class="featured-playlist-card">${img}<div class="fp-name">${p.name}</div></a>`;
     }).join('');
 
     section.style.display = 'block';
