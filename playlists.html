@@ -1293,7 +1293,13 @@
                 return;
             }
             grid.innerHTML = curatedPlaylists.filter(p => !childPlaylistSlugs.has(p.slug)).map(p => {
-                const count = (p.track_ids || []).length;
+                const childSlugs = subPlaylistMap[p.slug];
+                const count = childSlugs
+                    ? childSlugs.reduce((sum, s) => {
+                        const child = curatedPlaylists.find(c => c.slug === s);
+                        return sum + (child ? (child.track_ids || []).length : 0);
+                    }, 0)
+                    : (p.track_ids || []).length;
                 const emojiOrDefault = p.emoji || '\uD83C\uDFB5';
                 const coverHtml = p.cover_url
                     ? '<img src="' + p.cover_url + '" alt="' + p.name.replace(/"/g, '&quot;') + '" class="playlist-image" onerror="this.style.display=\'none\'">'
