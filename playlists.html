@@ -16,6 +16,7 @@
     <meta name="twitter:description" content="Browse curated playlists on readysounds. Human-made music for content creators.">
     <meta name="twitter:image" content="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/readysounds-text.png">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://js.stripe.com/v3/"></script>
     <script src="/supabase.js"></script>
     <script src="/nav.js"></script>
     <script src="/auth.js"></script>
@@ -706,6 +707,100 @@
             background: rgba(156, 39, 176, 0.15);
         }
 
+        /* ── Cart nav button ── */
+        .cart-nav-btn {
+            background: rgba(156,39,176,0.15);
+            border: 1px solid rgba(156,39,176,0.5);
+            color: rgba(255,255,255,0.85);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .cart-nav-btn:hover { background: rgba(156,39,176,0.25); border-color: #9c27b0; color: white; }
+        .cart-nav-btn.has-items { background: rgba(156,39,176,0.25); border-color: #9c27b0; color: white; }
+
+        /* ── Cart overlay & modal ── */
+        .cart-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6); z-index: 2000;
+        }
+        .cart-overlay.visible { display: block; }
+        .cart-modal {
+            position: fixed; top: 0; right: -420px; width: 420px; max-width: 100%;
+            height: 100%; background: #1a1a1a;
+            border-left: 1px solid rgba(156,39,176,0.3);
+            z-index: 2001; display: flex; flex-direction: column;
+            transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        .cart-modal.open { right: 0; }
+        .cart-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
+        }
+        .cart-title { font-size: 18px; font-weight: 600; color: white; margin: 0; }
+        .cart-close {
+            background: none; border: none; color: rgba(255,255,255,0.5);
+            font-size: 24px; cursor: pointer; line-height: 1; padding: 4px;
+            transition: color 0.2s;
+        }
+        .cart-close:hover { color: white; }
+        .cart-body { flex: 1; overflow-y: auto; padding: 16px 24px; }
+        .cart-empty { text-align: center; padding: 48px 0; color: rgba(255,255,255,0.4); }
+        .cart-empty-icon { font-size: 40px; margin-bottom: 12px; }
+        .cart-item {
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .cart-item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .cart-item-title { font-size: 14px; font-weight: 600; color: white; }
+        .cart-item-artist { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+        .cart-item-remove {
+            background: none; border: none; color: rgba(255,255,255,0.35);
+            font-size: 20px; cursor: pointer; line-height: 1; padding: 0 4px;
+            transition: color 0.2s; flex-shrink: 0;
+        }
+        .cart-item-remove:hover { color: white; }
+        .license-label { font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+        .license-options { display: flex; gap: 8px; }
+        .license-btn {
+            flex: 1; padding: 8px 12px; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: transparent; color: rgba(255,255,255,0.6);
+            font-size: 12px; cursor: pointer; transition: all 0.2s;
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+        }
+        .license-btn:hover { border-color: rgba(156,39,176,0.5); color: white; }
+        .license-btn.active { border-color: #9c27b0; background: rgba(156,39,176,0.2); color: white; }
+        .license-price { font-weight: 700; font-size: 13px; }
+        .cart-footer {
+            padding: 16px 24px 24px; border-top: 1px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
+        }
+        .cart-total-row {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 16px; font-weight: 600; color: white; margin-bottom: 16px;
+        }
+        .cart-checkout-btn {
+            width: 100%; padding: 14px; background: #9c27b0;
+            border: none; border-radius: 10px; color: white;
+            font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .cart-checkout-btn:hover { background: #7b1fa2; }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(12px);
+            background: #222; color: white; padding: 10px 20px; border-radius: 8px;
+            font-size: 13px; font-weight: 500; opacity: 0; pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s; z-index: 3000;
+        }
+        .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
         .playlist-pricing-nudge {
             margin-top: 28px;
             padding: 20px 24px;
@@ -927,6 +1022,7 @@
                 </div>
                 <a href="pricing.html" class="nav-item">Pricing</a>
                 <a href="terms.html" class="nav-item">Terms &amp; Conditions</a>
+                <button class="cart-nav-btn" id="cartBtn" onclick="openCart()">Cart (0)</button>
                 <div class="auth-buttons" id="authButtons">
                     <a href="signup.html" class="auth-btn auth-btn-login" id="loginBtn">Log In</a>
                     <a href="signup.html" class="auth-btn auth-btn-signup" id="signupBtn">Create Free Account</a>
@@ -1397,7 +1493,7 @@
                             <div class="track-mood-col">${moodTags}</div>
                             <div class="track-actions">
                                 <button class="action-btn-fav" data-track-id="${trackId}" onclick="toggleFavorite(${trackId}); event.stopPropagation();">♡</button>
-                                <a href="pricing.html" class="track-btn-license" onclick="event.stopPropagation()">License</a>
+                                <button class="track-btn-license" onclick="addToCart(event, ${trackId})">Add to Cart</button>
                             </div>
                         </div>
                     `;
@@ -1503,7 +1599,7 @@
                         <div class="track-mood-col">${moodTags}</div>
                         <div class="track-actions">
                             <button class="action-btn-fav" data-track-id="${trackId}" onclick="toggleFavorite(${trackId}); event.stopPropagation();">♡</button>
-                            <a href="pricing.html" class="track-btn-license" onclick="event.stopPropagation()">License</a>
+                            <button class="track-btn-license" onclick="addToCart(event, ${trackId})">Add to Cart</button>
                         </div>
                     </div>
                 `;
@@ -1730,6 +1826,146 @@
             initSupabase();
         });
 
+        // ── Cart ──────────────────────────────────────────────────────────────
+        let cart = [];
+
+        function escHtml(str) {
+            return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function openCart() {
+            document.getElementById('cartModal').classList.add('open');
+            document.getElementById('cartOverlay').classList.add('visible');
+            renderCart();
+        }
+
+        function closeCart() {
+            document.getElementById('cartModal').classList.remove('open');
+            document.getElementById('cartOverlay').classList.remove('visible');
+        }
+
+        function updateCartCount() {
+            const btn = document.getElementById('cartBtn');
+            btn.textContent = cart.length > 0 ? `Cart (${cart.length})` : 'Cart (0)';
+            if (cart.length > 0) btn.classList.add('has-items');
+            else btn.classList.remove('has-items');
+        }
+
+        function addToCart(event, trackId) {
+            event.stopPropagation();
+            const track = trackDatabase[trackId];
+            if (!track) return;
+            if (cart.find(i => i.id === trackId)) {
+                showCartToast('Already in cart');
+                return;
+            }
+            cart.push({ id: trackId, title: track.trackTitle || track.title || 'Track', artist: track.artist || '', license: 'individual', price: 10 });
+            updateCartCount();
+            const btn = event.currentTarget;
+            const orig = btn.textContent;
+            btn.textContent = '✓ Added';
+            btn.style.background = 'rgba(76,175,80,0.2)';
+            btn.style.borderColor = '#4caf50';
+            btn.style.color = '#4caf50';
+            setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.style.borderColor = ''; btn.style.color = ''; }, 1500);
+        }
+
+        function removeFromCart(trackId) {
+            cart = cart.filter(i => i.id !== trackId);
+            updateCartCount();
+            renderCart();
+        }
+
+        function changeLicense(trackId, licenseType) {
+            const item = cart.find(i => i.id === trackId);
+            if (item) { item.license = licenseType; item.price = licenseType === 'individual' ? 10 : 125; renderCart(); }
+        }
+
+        function renderCart() {
+            const body = document.getElementById('cartBody');
+            const footer = document.getElementById('cartFooter');
+            if (cart.length === 0) {
+                body.innerHTML = `<div class="cart-empty"><div class="cart-empty-icon">🛒</div><p>Your cart is empty</p></div>`;
+                footer.style.display = 'none';
+                return;
+            }
+            let html = '', total = 0;
+            cart.forEach(item => {
+                total += item.price;
+                html += `
+                    <div class="cart-item">
+                        <div class="cart-item-header">
+                            <div class="cart-item-info">
+                                <div class="cart-item-title">${escHtml(item.title)}</div>
+                                <div class="cart-item-artist">${escHtml(item.artist || 'Buck Moon')}</div>
+                            </div>
+                            <button class="cart-item-remove" onclick="removeFromCart(${item.id})" title="Remove">×</button>
+                        </div>
+                        <div class="cart-item-license">
+                            <div class="license-label">License Type</div>
+                            <div class="license-options">
+                                <button class="license-btn ${item.license === 'individual' ? 'active' : ''}" onclick="changeLicense(${item.id}, 'individual')">Individual <span class="license-price">$10</span></button>
+                                <button class="license-btn ${item.license === 'business' ? 'active' : ''}" onclick="changeLicense(${item.id}, 'business')">Business <span class="license-price">$125</span></button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            body.innerHTML = html;
+            document.getElementById('cartTotal').textContent = `$${total}`;
+            footer.style.display = 'block';
+        }
+
+        async function proceedToCheckout() {
+            if (cart.length === 0) return;
+            const lineItems = cart.map(item => ({
+                trackId: item.id,
+                trackTitle: (trackDatabase[item.id] ? (trackDatabase[item.id].trackTitle || trackDatabase[item.id].title) : item.title),
+                license: item.license,
+                price: item.price
+            }));
+            try {
+                const response = await fetch('/api/create-checkout-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items: lineItems, mode: 'payment' })
+                });
+                const session = await response.json();
+                if (session.error) { alert('Checkout error: ' + session.error); return; }
+                const stripe = Stripe('pk_live_51Ss8KQRzfMLCjnGKS8LlJqJNO3mlbehpSo19N1E6c8WhBqKCP5KvdbC8APag5Fp8jQ0pW6Bk9oSWaoXFdodwgS5X00HmOqYDwn');
+                const result = await stripe.redirectToCheckout({ sessionId: session.id });
+                if (result.error) alert('Payment error: ' + result.error.message);
+            } catch (err) { console.error('Checkout error:', err); alert('Unable to process checkout. Please try again.'); }
+        }
+
+        let _cartToastTimer = null;
+        function showCartToast(msg) {
+            let el = document.getElementById('cartToast');
+            if (!el) { el = document.createElement('div'); el.id = 'cartToast'; el.className = 'toast'; document.body.appendChild(el); }
+            el.textContent = msg; el.classList.add('visible');
+            clearTimeout(_cartToastTimer);
+            _cartToastTimer = setTimeout(() => el.classList.remove('visible'), 2000);
+        }
+
     </script>
+
+    <!-- Cart Modal -->
+    <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-header">
+            <h3 class="cart-title">Your Cart</h3>
+            <button class="cart-close" onclick="closeCart()">×</button>
+        </div>
+        <div class="cart-body" id="cartBody">
+            <div class="cart-empty"><div class="cart-empty-icon">🛒</div><p>Your cart is empty</p></div>
+        </div>
+        <div class="cart-footer" id="cartFooter" style="display:none">
+            <div class="cart-total-row">
+                <span>Total</span>
+                <span id="cartTotal">$0</span>
+            </div>
+            <button class="cart-checkout-btn" onclick="proceedToCheckout()">Checkout →</button>
+        </div>
+    </div>
+
 </body>
 </html>
