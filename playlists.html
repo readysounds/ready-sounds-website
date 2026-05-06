@@ -711,17 +711,29 @@
             background: #9c27b0;
             border: 1px solid #9c27b0;
             color: white;
-            padding: 8px 14px;
+            width: 32px;
+            height: 32px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 0.85em;
-            font-weight: 500;
             transition: all 0.2s;
-            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            padding: 0;
         }
         .track-btn-cart:hover {
             background: #7b1fa2;
             border-color: #7b1fa2;
+        }
+        .track-btn-cart svg {
+            width: 15px;
+            height: 15px;
+            fill: none;
+            stroke: white;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         /* ── Cart nav button ── */
@@ -1563,7 +1575,7 @@
                             <div class="track-mood-col">${moodTags}</div>
                             <div class="track-actions">
                                 <button class="action-btn-fav" data-track-id="${trackId}" onclick="toggleFavorite(${trackId}); event.stopPropagation();">♡</button>
-                                <button class="track-btn-cart" onclick="openLicensePicker(event, ${trackId})">Add to Cart</button>
+                                <button class="track-btn-cart" onclick="openLicensePicker(event, ${trackId})" title="Add to Cart"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></button>
                             <a href="pricing.html" class="track-btn-license" onclick="event.stopPropagation()">Subscribe</a>
                             </div>
                         </div>
@@ -1670,7 +1682,7 @@
                         <div class="track-mood-col">${moodTags}</div>
                         <div class="track-actions">
                             <button class="action-btn-fav" data-track-id="${trackId}" onclick="toggleFavorite(${trackId}); event.stopPropagation();">♡</button>
-                            <button class="track-btn-cart" onclick="openLicensePicker(event, ${trackId})">Add to Cart</button>
+                            <button class="track-btn-cart" onclick="openLicensePicker(event, ${trackId})" title="Add to Cart"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></button>
                             <a href="pricing.html" class="track-btn-license" onclick="event.stopPropagation()">Subscribe</a>
                         </div>
                     </div>
