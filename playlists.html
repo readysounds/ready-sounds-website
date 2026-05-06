@@ -707,6 +707,23 @@
             background: rgba(156, 39, 176, 0.15);
         }
 
+        .track-btn-cart {
+            background: #9c27b0;
+            border: 1px solid #9c27b0;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .track-btn-cart:hover {
+            background: #7b1fa2;
+            border-color: #7b1fa2;
+        }
+
         /* ── Cart nav button ── */
         .cart-nav-btn {
             background: rgba(156,39,176,0.15);
@@ -1546,7 +1563,8 @@
                             <div class="track-mood-col">${moodTags}</div>
                             <div class="track-actions">
                                 <button class="action-btn-fav" data-track-id="${trackId}" onclick="toggleFavorite(${trackId}); event.stopPropagation();">♡</button>
-                                <button class="track-btn-license" onclick="openLicensePicker(event, ${trackId})">License</button>
+                                <button class="track-btn-cart" onclick="openLicensePicker(event, ${trackId})">Add to Cart</button>
+                            <a href="pricing.html" class="track-btn-license" onclick="event.stopPropagation()">Subscribe</a>
                             </div>
                         </div>
                     `;
@@ -1652,7 +1670,8 @@
                         <div class="track-mood-col">${moodTags}</div>
                         <div class="track-actions">
                             <button class="action-btn-fav" data-track-id="${trackId}" onclick="toggleFavorite(${trackId}); event.stopPropagation();">♡</button>
-                            <button class="track-btn-license" onclick="openLicensePicker(event, ${trackId})">License</button>
+                            <button class="track-btn-cart" onclick="openLicensePicker(event, ${trackId})">Add to Cart</button>
+                            <a href="pricing.html" class="track-btn-license" onclick="event.stopPropagation()">Subscribe</a>
                         </div>
                     </div>
                 `;
