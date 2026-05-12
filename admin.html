@@ -580,6 +580,12 @@
         <input type="password" id="serviceKeyInput" placeholder="your ADMIN_KEY from Netlify env vars" autocomplete="off">
         <button class="btn" onclick="saveKey()">Save</button>
     </div>
+    <div class="key-label" style="margin-top:16px">Claude API Key <span style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:400;text-transform:none;letter-spacing:0">(for metadata generation)</span></div>
+    <div class="key-row">
+        <input type="password" id="claudeKeyInput" placeholder="sk-ant-…" autocomplete="off">
+        <button class="btn" onclick="saveClaudeKey()">Save</button>
+    </div>
+    <div id="claudeKeyStatus" style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:8px"></div>
 </div>
 
 <!-- Tab bar -->
@@ -671,6 +677,14 @@
                 <option value="high">High</option>
                 <option value="very high">Very High</option>
             </select>
+        </div>
+
+        <!-- Generate Metadata button -->
+        <div class="form-field full">
+            <button class="btn btn-ghost" id="generateBtn" onclick="generateMetadata()" style="width:100%;padding:10px;font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px">
+                <span id="generateBtnIcon">✨</span> Generate Metadata from AI
+            </button>
+            <div id="generateStatus" style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:6px;text-align:center;min-height:16px"></div>
         </div>
 
         <!-- Best Moments -->
@@ -1580,6 +1594,109 @@
         return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
+    // ── Claude API key ──────────────────────────────────────────────
+    const CLAUDE_KEY_SESSION = 'rs_claude_key';
+
+    function saveClaudeKey() {
+        const val = document.getElementById('claudeKeyInput').value.trim();
+        if (!val) return;
+        sessionStorage.setItem(CLAUDE_KEY_SESSION, val);
+        document.getElementById('claudeKeyInput').value = '';
+        document.getElementById('claudeKeyStatus').textContent = '✓ Claude API key saved for this session';
+    }
+
+    function getClaudeKey() {
+        return sessionStorage.getItem(CLAUDE_KEY_SESSION) || '';
+    }
+
+    // ── Generate metadata ───────────────────────────────────────────
+    async function generateMetadata() {
+        const claudeKey = getClaudeKey();
+        if (!claudeKey) {
+            document.getElementById('generateStatus').textContent = 'Enter your Claude API key above first.';
+            document.getElementById('generateStatus').style.color = '#ef9a9a';
+            return;
+        }
+
+        const title   = document.getElementById('f_title').value.trim();
+        const artist  = document.getElementById('f_artist').value.trim();
+        const genre   = document.getElementById('f_genre').value.trim();
+        const bpm     = document.getElementById('f_bpm').value.trim();
+        const similar = document.getElementById('f_similar_artists').value.trim();
+
+        if (!title) {
+            document.getElementById('generateStatus').textContent = 'Fill in at least the title first.';
+            document.getElementById('generateStatus').style.color = '#ef9a9a';
+            return;
+        }
+
+        const btn = document.getElementById('generateBtn');
+        const status = document.getElementById('generateStatus');
+        btn.disabled = true;
+        document.getElementById('generateBtnIcon').textContent = '⏳';
+        status.style.color = 'rgba(255,255,255,0.4)';
+        status.textContent = 'Generating…';
+
+        const prompt = `You are a sync licensing metadata specialist. Generate searchable metadata for a music track that video editors and content creators would actually use when searching.
+
+Track info:
+- Title: ${title}
+- Artist: ${artist || 'unknown'}
+- Genre: ${genre || 'unknown'}
+- BPM: ${bpm || 'unknown'}
+- Similar Artists: ${similar || 'unknown'}
+
+Return ONLY a valid JSON object with these exact fields (no markdown, no explanation, no code fences):
+{
+  "moods": "8-12 comma-separated mood words (e.g. upbeat, energetic, confident, tense)",
+  "use_cases": "8-12 comma-separated specific video placements that real editors search for (e.g. gym montage, product launch ad, travel vlog, brand commercial, sports highlight)",
+  "energy": "exactly one of: low, medium, high, very high",
+  "best_moments": "8-12 comma-separated concrete scenes or moments a video editor pictures (e.g. race start, winning celebration, night drive, deadline crunch, product reveal)"
+}
+
+Use language video editors and content creators actually search for — concrete scenes and moments, not music critic vocabulary.`;
+
+        try {
+            const res = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': claudeKey,
+                    'anthropic-version': '2023-06-01',
+                    'anthropic-dangerous-direct-browser-access': 'true',
+                },
+                body: JSON.stringify({
+                    model: 'claude-haiku-4-5',
+                    max_tokens: 512,
+                    messages: [{ role: 'user', content: prompt }]
+                })
+            });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error?.message || `API error ${res.status}`);
+            }
+
+            const data = await res.json();
+            const text = data.content?.[0]?.text || '';
+            const parsed = JSON.parse(text);
+
+            if (parsed.moods)       document.getElementById('f_moods').value       = parsed.moods;
+            if (parsed.use_cases)   document.getElementById('f_use_cases').value   = parsed.use_cases;
+            if (parsed.energy)      document.getElementById('f_energy').value       = parsed.energy;
+            if (parsed.best_moments) document.getElementById('f_best_moments').value = parsed.best_moments;
+
+            status.style.color = '#4caf50';
+            status.textContent = '✓ Metadata generated — review and tweak before saving';
+        } catch(e) {
+            status.style.color = '#ef9a9a';
+            status.textContent = `Error: ${e.message}`;
+        } finally {
+            btn.disabled = false;
+            document.getElementById('generateBtnIcon').textContent = '✨';
+        }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
         if (sessionStorage.getItem(AUTH_SESSION_KEY) === '1') {
             showAdmin();
@@ -1593,6 +1710,9 @@
             loadPlaylistList();
             loadDownloads();
             fetchNextSortOrder();
+        }
+        if (getClaudeKey()) {
+            document.getElementById('claudeKeyStatus').textContent = '✓ Claude API key saved for this session';
         }
     });
 </script>
