@@ -1739,6 +1739,18 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        window.addEventListener('popstate', (e) => {
+            const slug = e.state?.playlist;
+            if (slug) {
+                showPlaylist(slug);
+            } else {
+                document.getElementById('playlistDetails').innerHTML = '';
+                document.getElementById('playlistGrid').style.display = 'grid';
+                loadUserPlaylists();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+
         // Audio Player Functionality
         const audioElement = document.getElementById('audioElement');
         const SVG_PLAY  = '<path d="M8 5.5v13l11-6.5z"/>';

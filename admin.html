@@ -1666,7 +1666,7 @@ Use language video editors and content creators actually search for — concrete
                     'anthropic-dangerous-direct-browser-access': 'true',
                 },
                 body: JSON.stringify({
-                    model: 'claude-haiku-4-5',
+                    model: 'claude-haiku-4-5-20251001',
                     max_tokens: 512,
                     messages: [{ role: 'user', content: prompt }]
                 })
@@ -1678,7 +1678,8 @@ Use language video editors and content creators actually search for — concrete
             }
 
             const data = await res.json();
-            const text = data.content?.[0]?.text || '';
+            const raw = data.content?.[0]?.text || '';
+            const text = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
             const parsed = JSON.parse(text);
 
             if (parsed.moods)       document.getElementById('f_moods').value       = parsed.moods;
