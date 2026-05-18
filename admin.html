@@ -876,12 +876,19 @@
     function lockKeySection() {
         const sec = document.getElementById('keySection');
         sec.classList.add('locked');
+        const claudeKey = getClaudeKey();
         sec.innerHTML = `
             <div class="key-status">
                 <div class="key-dot"></div>
                 Admin key saved for this session
             </div>
             <button class="btn btn-ghost" onclick="clearKey()">Change</button>
+            <div class="key-label" style="margin-top:16px">Claude API Key <span style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:400;text-transform:none;letter-spacing:0">(for metadata generation)</span></div>
+            <div class="key-row">
+                <input type="password" id="claudeKeyInput" placeholder="sk-ant-…" autocomplete="off">
+                <button class="btn" onclick="saveClaudeKey()">Save</button>
+            </div>
+            <div id="claudeKeyStatus" style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:8px">${claudeKey ? '✓ Claude API key saved for this session' : ''}</div>
         `;
     }
 
