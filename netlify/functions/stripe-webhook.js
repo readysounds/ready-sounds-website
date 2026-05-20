@@ -106,12 +106,17 @@ async function handleCheckoutSessionCompleted(session) {
 
   if (subscriptionId) {
     // Subscription checkout — update profile
+    const planType = session.metadata?.planType || 'individual';
+    const billingPeriod = session.metadata?.billingPeriod || 'annual';
+    const subscriptionPlan = `${planType}_${billingPeriod}`;
+
     const { error } = await supabase
       .from('profiles')
       .update({
         stripe_customer_id: customerId,
         stripe_subscription_id: subscriptionId,
         subscription_status: 'active',
+        subscription_plan: subscriptionPlan,
         updated_at: new Date().toISOString()
       })
       .eq('email', customerEmail);
@@ -223,8 +228,10 @@ async function handleSubscriptionCreated(subscription) {
   const priceId = subscription.items.data[0]?.price.id;
   let planType = 'individual_monthly'; // default
 
-  if (priceId === process.env.STRIPE_PRICE_BUSINESS_YEARLY) {
-    planType = 'business_yearly';
+  if (priceId === process.env.STRIPE_BUSINESS_PRICE_ID) {
+    planType = 'business_annual';
+  } else if (priceId === process.env.STRIPE_INDIVIDUAL_ANNUAL_PRICE_ID) {
+    planType = 'individual_annual';
   }
 
   // Update user profile
@@ -235,7 +242,7 @@ async function handleSubscriptionCreated(subscription) {
       stripe_subscription_id: subscriptionId,
       subscription_status: status,
       subscription_plan: planType,
-      subscription_current_period_end: currentPeriodEnd,
+      subscription_end_date: currentPeriodEnd,
       updated_at: new Date().toISOString()
     })
     .eq('email', customerEmail);
@@ -265,7 +272,7 @@ async function handleSubscriptionUpdated(subscription) {
     .from('profiles')
     .update({
       subscription_status: subscriptionStatus,
-      subscription_current_period_end: currentPeriodEnd,
+      subscription_end_date: currentPeriodEnd,
       updated_at: new Date().toISOString()
     })
     .eq('stripe_subscription_id', subscriptionId);
