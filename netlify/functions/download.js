@@ -72,12 +72,12 @@ exports.handler = async (event, context) => {
     const body = JSON.parse(event.body);
     const { filePath, trackId, trackTitle, trackArtist, versionTitle, fileFormat } = body;
 
-    // Check access: active subscription OR prior per-track purchase of this track
+    // Check access: active/cancelling subscription OR prior per-track purchase of this track
     const { data: profile } = await supabase
       .from('profiles')
       .select('subscription_plan')
       .eq('email', user.email)
-      .eq('subscription_status', 'active')
+      .in('subscription_status', ['active', 'cancelling'])
       .single();
 
     let subscriptionPlan = profile?.subscription_plan || null;

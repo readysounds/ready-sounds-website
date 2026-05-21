@@ -174,7 +174,7 @@ async function handlePerTrackPurchase(session, customerEmail, customerId) {
   const downloadRecords = trackIdInts.map((trackId, i) => {
     const track = tracksById[trackId] || {};
     const license = licenses[i] || 'individual';
-    const planKey = license === 'business' ? 'business_yearly' : 'individual_monthly';
+    const planKey = license === 'business' ? 'business_annual' : 'individual_annual';
     return {
       user_id: userId,
       track_id: trackId,
@@ -264,8 +264,8 @@ async function handleSubscriptionUpdated(subscription) {
   const currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
   const cancelAtPeriodEnd = subscription.cancel_at_period_end;
 
-  // If subscription is set to cancel at period end, update status
-  const subscriptionStatus = cancelAtPeriodEnd ? 'cancelled' : status;
+  // cancelled = won't renew but still active until period end; expired = fully ended
+  const subscriptionStatus = cancelAtPeriodEnd ? 'cancelling' : status;
 
   // Update profile by subscription ID
   const { error } = await supabase
