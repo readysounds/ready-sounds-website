@@ -60,9 +60,24 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
             margin: 0 auto 32px;
             animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .checkmark svg {
+            width: 36px;
+            height: 36px;
+            stroke: #9c27b0;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            animation: draw 0.4s ease 0.3s both;
+        }
+
+        @keyframes draw {
+            0%   { stroke-dashoffset: 50; opacity: 0; }
+            100% { stroke-dashoffset: 0;  opacity: 1; }
         }
 
         @keyframes pop {
@@ -209,16 +224,20 @@
     <a href="index.html" class="logo">readysounds.</a>
 
     <div class="card">
-        <div class="checkmark">🎵</div>
+        <div class="checkmark">
+            <svg viewBox="0 0 24 24" style="stroke-dasharray: 50;">
+                <polyline points="4 13 9 18 20 7"/>
+            </svg>
+        </div>
 
-        <h1>you're in.</h1>
+        <h1>You're in.</h1>
         <p class="subtitle">
             Your subscription is active. Start browsing and downloading<br>
             tracks for your next project.
         </p>
 
         <p id="subscription-status">
-            <span class="status-loading"></span>activating your account...
+            <span class="status-loading"></span>Activating your account...
         </p>
 
         <div class="info-box" id="infoBox">
@@ -246,8 +265,8 @@
         </div>
 
         <div class="actions" id="actions">
-            <a href="browse.html" class="btn-primary">browse the catalog →</a>
-            <a href="account.html" class="btn-secondary">view your account</a>
+            <a href="browse.html" class="btn-primary">Browse the Catalog →</a>
+            <a href="account.html" class="btn-secondary">View Your Account</a>
         </div>
     </div>
 
