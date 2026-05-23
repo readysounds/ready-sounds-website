@@ -81,6 +81,13 @@ exports.handler = async (event) => {
   }
 };
 
+// current_period_end moved to items in newer Stripe API versions
+function getPeriodEnd(subscription) {
+  const ts = subscription.current_period_end
+    || subscription.items?.data?.[0]?.current_period_end;
+  return ts ? new Date(ts * 1000).toISOString() : null;
+}
+
 function generateLicenseId() {
   const year = new Date().getFullYear();
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -213,7 +220,7 @@ async function handleSubscriptionCreated(subscription) {
   const customerId = subscription.customer;
   const subscriptionId = subscription.id;
   const status = subscription.status;
-  const currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
+  const currentPeriodEnd = getPeriodEnd(subscription);
 
   // Get customer email from Stripe
   const customer = await stripe.customers.retrieve(customerId);
@@ -261,7 +268,7 @@ async function handleSubscriptionUpdated(subscription) {
 
   const subscriptionId = subscription.id;
   const status = subscription.status;
-  const currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
+  const currentPeriodEnd = getPeriodEnd(subscription);
   const cancelAtPeriodEnd = subscription.cancel_at_period_end;
 
   // cancelled = won't renew but still active until period end; expired = fully ended
