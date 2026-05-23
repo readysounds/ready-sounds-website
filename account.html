@@ -369,10 +369,11 @@
             document.getElementById('memberSince').textContent = memberSince;
 
             // Get profile with subscription info
+            // Note: profiles.id is an integer PK, not the auth UUID — match by email
             const { data: profile, error } = await supabaseClient
                 .from('profiles')
                 .select('*')
-                .eq('id', user.id)
+                .eq('email', user.email)
                 .single();
 
             const status = profile?.subscription_status;
