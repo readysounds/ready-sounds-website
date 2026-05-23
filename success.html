@@ -266,7 +266,7 @@
 
         <div class="actions" id="actions">
             <a href="browse.html" class="btn-primary">Browse the Catalog →</a>
-            <a href="account.html" class="btn-secondary">View Your Account</a>
+            <a href="account.html" class="btn-secondary" id="accountLink">View Your Account</a>
         </div>
     </div>
 
@@ -290,8 +290,8 @@
             `;
             // Update primary CTA
             document.getElementById('actions').innerHTML = `
-                <a href="downloads.html" class="btn-primary">view my downloads →</a>
-                <a href="browse.html" class="btn-secondary">continue browsing</a>
+                <a href="downloads.html" class="btn-primary">View My Downloads →</a>
+                <a href="browse.html" class="btn-secondary">Continue Browsing</a>
             `;
         }
 
@@ -303,6 +303,12 @@
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) {
                     statusEl.innerHTML = '';
+                    // No session — update account link so it doesn't dead-end
+                    const accountLink = document.getElementById('accountLink');
+                    if (accountLink) {
+                        accountLink.href = 'signup.html';
+                        accountLink.textContent = 'Sign In to View Account';
+                    }
                     return;
                 }
 
