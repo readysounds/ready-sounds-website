@@ -45,11 +45,7 @@ function renderAlternate(alt, track) {
         <div class="track-moods"></div>
         <div class="track-bpm">${track.bpm || ''}</div>
         <div class="track-duration">${escHtml(alt.duration || '')}</div>
-        <div class="track-actions">
-            <button class="action-btn action-btn-playlist" onclick="openPlaylistMenu(event, ${domId})">+</button>
-            <button class="action-btn action-btn-more" onclick="openMoreMenu(event, ${domId})" title="More">•••</button>
-            <button class="action-btn action-btn-download" onclick="downloadTrack(event, ${domId})">&#11015;</button>
-        </div>
+        <div class="track-actions"></div>
     </div>`;
 }
 
