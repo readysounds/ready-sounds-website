@@ -76,10 +76,17 @@ exports.handler = async (event) => {
     console.error('Error processing webhook:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' })
+      body: JSON.stringify({ error: 'Internal server error', detail: error.message, stack: error.stack })
     };
   }
 };
+
+// current_period_end moved to items in newer Stripe API versions
+function getPeriodEnd(subscription) {
+  const ts = subscription.current_period_end
+    || subscription.items?.data?.[0]?.current_period_end;
+  return ts ? new Date(ts * 1000).toISOString() : null;
+}
 
 function generateLicenseId() {
   const year = new Date().getFullYear();
@@ -106,12 +113,17 @@ async function handleCheckoutSessionCompleted(session) {
 
   if (subscriptionId) {
     // Subscription checkout — update profile
+    const planType = session.metadata?.planType || 'individual';
+    const billingPeriod = session.metadata?.billingPeriod || 'annual';
+    const subscriptionPlan = `${planType}_${billingPeriod}`;
+
     const { error } = await supabase
       .from('profiles')
       .update({
         stripe_customer_id: customerId,
         stripe_subscription_id: subscriptionId,
         subscription_status: 'active',
+        subscription_plan: subscriptionPlan,
         updated_at: new Date().toISOString()
       })
       .eq('email', customerEmail);
@@ -169,7 +181,7 @@ async function handlePerTrackPurchase(session, customerEmail, customerId) {
   const downloadRecords = trackIdInts.map((trackId, i) => {
     const track = tracksById[trackId] || {};
     const license = licenses[i] || 'individual';
-    const planKey = license === 'business' ? 'business_yearly' : 'individual_monthly';
+    const planKey = license === 'business' ? 'business_annual' : 'individual_annual';
     return {
       user_id: userId,
       track_id: trackId,
@@ -208,7 +220,7 @@ async function handleSubscriptionCreated(subscription) {
   const customerId = subscription.customer;
   const subscriptionId = subscription.id;
   const status = subscription.status;
-  const currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
+  const currentPeriodEnd = getPeriodEnd(subscription);
 
   // Get customer email from Stripe
   const customer = await stripe.customers.retrieve(customerId);
@@ -223,8 +235,10 @@ async function handleSubscriptionCreated(subscription) {
   const priceId = subscription.items.data[0]?.price.id;
   let planType = 'individual_monthly'; // default
 
-  if (priceId === process.env.STRIPE_PRICE_BUSINESS_YEARLY) {
-    planType = 'business_yearly';
+  if (priceId === process.env.STRIPE_BUSINESS_PRICE_ID) {
+    planType = 'business_annual';
+  } else if (priceId === process.env.STRIPE_INDIVIDUAL_ANNUAL_PRICE_ID) {
+    planType = 'individual_annual';
   }
 
   // Update user profile
@@ -235,7 +249,7 @@ async function handleSubscriptionCreated(subscription) {
       stripe_subscription_id: subscriptionId,
       subscription_status: status,
       subscription_plan: planType,
-      subscription_current_period_end: currentPeriodEnd,
+      subscription_end_date: currentPeriodEnd,
       updated_at: new Date().toISOString()
     })
     .eq('email', customerEmail);
@@ -254,18 +268,18 @@ async function handleSubscriptionUpdated(subscription) {
 
   const subscriptionId = subscription.id;
   const status = subscription.status;
-  const currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
+  const currentPeriodEnd = getPeriodEnd(subscription);
   const cancelAtPeriodEnd = subscription.cancel_at_period_end;
 
-  // If subscription is set to cancel at period end, update status
-  const subscriptionStatus = cancelAtPeriodEnd ? 'cancelled' : status;
+  // cancelled = won't renew but still active until period end; expired = fully ended
+  const subscriptionStatus = cancelAtPeriodEnd ? 'cancelling' : status;
 
   // Update profile by subscription ID
   const { error } = await supabase
     .from('profiles')
     .update({
       subscription_status: subscriptionStatus,
-      subscription_current_period_end: currentPeriodEnd,
+      subscription_end_date: currentPeriodEnd,
       updated_at: new Date().toISOString()
     })
     .eq('stripe_subscription_id', subscriptionId);
