@@ -393,27 +393,23 @@
         /* Mobile Filter Button & Modal */
         .mobile-filter-btn {
             display: none;
-            position: fixed;
-            bottom: 72px;
-            left: 50%;
-            transform: translateX(-50%);
             background: #1e1e1e;
             color: rgba(255,255,255,0.85);
             border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 24px;
+            border-radius: 8px;
             padding: 12px 28px;
             font-size: 15px;
             font-weight: 600;
             letter-spacing: 0.02em;
             cursor: pointer;
-            z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
             transition: all 0.2s;
             white-space: nowrap;
+            width: 100%;
+            justify-content: center;
+            margin-bottom: 16px;
         }
 
         .mobile-filter-btn:active {
-            transform: translateX(-50%) scale(0.97);
             background: #2a2a2a;
         }
         
@@ -3843,11 +3839,6 @@
         </div>
     </div>
 
-    <!-- Mobile Filter Button -->
-    <button class="mobile-filter-btn" id="mobileFilterBtn" onclick="openFilterModal()">
-        ⚙ Filters
-    </button>
-
     <!-- Filter Modal Overlay -->
     <div class="filter-modal-overlay" id="filterModalOverlay" onclick="closeFilterModal()"></div>
 
@@ -4118,6 +4109,11 @@
                     </div>
                     <div id="searchResultsLabel" class="search-results-label"></div>
                 </div>
+
+                <!-- Mobile Filter Button -->
+                <button class="mobile-filter-btn" id="mobileFilterBtn" onclick="openFilterModal()">
+                    ⚙ Filters
+                </button>
 
                 <!-- Active Filter Chips -->
                 <div id="activeFiltersBar" style="display:none; flex-wrap:wrap; gap:8px; margin-bottom:16px; align-items:center;"></div>
