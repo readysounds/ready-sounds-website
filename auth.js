@@ -54,7 +54,7 @@
             if (mobilePanelAuth)  mobilePanelAuth.style.display = 'none';
             injectMobileUserSection(session.user);
         } else {
-            if (authButtons)      authButtons.style.display = 'flex';
+            if (authButtons)      authButtons.style.display = '';
             if (profileContainer) profileContainer.style.display = 'none';
             if (mobilePanelAuth)  mobilePanelAuth.style.display = '';
             removeMobileUserSection();
