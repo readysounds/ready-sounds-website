@@ -566,8 +566,20 @@ function showLoginPrompt(action) {
     const modal = document.getElementById('loginPromptModal');
     const overlay = document.getElementById('loginPromptOverlay');
     const msg = document.getElementById('loginPromptMessage');
+    const sub = document.getElementById('loginPromptSubMessage');
+    const cta = document.getElementById('loginPromptCTA');
     if (!modal) return;
-    msg.textContent = `Create a free account to ${action}!`;
+
+    if (action === 'download tracks') {
+        msg.textContent = 'A license is required to download.';
+        if (sub) sub.textContent = 'Subscribe for unlimited downloads, or buy an individual license.';
+        if (cta) { cta.textContent = 'View Pricing'; cta.href = '/pricing.html'; }
+    } else {
+        msg.textContent = `Create a free account to ${action}!`;
+        if (sub) sub.textContent = 'Sign up free — no credit card required.';
+        if (cta) { cta.textContent = 'Create Free Account'; cta.href = '/signup.html'; }
+    }
+
     overlay.classList.add('active');
     modal.classList.add('active');
 }
