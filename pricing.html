@@ -265,6 +265,94 @@
         @media (max-width: 900px) {
             .header-nav { display: none; }
         }
+
+        .card-use-note {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        .comparison-section {
+            max-width: 1500px;
+            margin: 56px auto 0;
+        }
+
+        .comparison-title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .comparison-table thead th {
+            padding: 16px 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 15px;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-table thead th:first-child {
+            text-align: left;
+        }
+
+        .comparison-table thead .th-sub {
+            display: block;
+            font-size: 12px;
+            font-weight: 400;
+            color: #9c27b0;
+            margin-top: 2px;
+        }
+
+        .comparison-table tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.15s;
+        }
+
+        .comparison-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .comparison-table tbody td {
+            padding: 14px 20px;
+            color: rgba(255, 255, 255, 0.65);
+            text-align: center;
+        }
+
+        .comparison-table tbody td:first-child {
+            text-align: left;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .comparison-table .check {
+            color: #9c27b0;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .comparison-table .dash {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-section {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .comparison-table {
+                min-width: 540px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -356,11 +444,12 @@
             </div>
 
             <div class="pricing-grid">
-                <!-- Individual Subscription - Yearly -->
+                <!-- Hobbyist Subscription - Yearly -->
                 <div class="pricing-card featured">
                     <div class="card-header">
-                        <h2 class="card-title">Individual</h2>
+                        <h2 class="card-title">Hobbyist</h2>
                         <p class="card-subtitle">Annual Plan</p>
+                        <p class="card-use-note">For personal, non-commercial use only</p>
                     </div>
                     <div class="card-price">
                         <div class="price-amount">$79</div>
@@ -439,6 +528,65 @@
                     </ul>
                     <a href="contact.html" class="cta-button secondary" style="display:block; text-align:center; text-decoration:none;">Get in Touch</a>
                 </div>
+            </div>
+
+            <!-- Feature Comparison Table -->
+            <div class="comparison-section">
+                <h2 class="comparison-title">Plan Comparison</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Hobbyist<span class="th-sub">$79 / yr</span></th>
+                            <th>Business<span class="th-sub">$1,299 / yr</span></th>
+                            <th>Agency<span class="th-sub">Custom</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Unlimited downloads</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>All tracks + alternates + stems</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>New tracks added monthly</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Personal use</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Brand / commercial use</td>
+                            <td><span class="dash">—</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Broadcast / TV sync</td>
+                            <td><span class="dash">—</span></td>
+                            <td><span class="dash">—</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Custom license available</td>
+                            <td><span class="dash">—</span></td>
+                            <td><span class="dash">—</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
