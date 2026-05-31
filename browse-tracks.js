@@ -91,8 +91,7 @@ function renderTrackGroup(track) {
             <div class="track-actions">
                 <button class="action-btn action-btn-like" data-track-id="${track.id}" onclick="toggleLike(event, ${track.id})">&#129293;</button>
                 <button class="action-btn action-btn-primary" onclick="addToCart(event, ${track.id})">cart</button>
-                <button class="action-btn action-btn-playlist" onclick="openPlaylistMenu(event, ${track.id})">+</button>
-                <button class="action-btn action-btn-project" onclick="openProjectMenu(event, ${track.id})" title="Add to Project">📂</button>
+                <button class="action-btn action-btn-playlist" onclick="openPlaylistMenu(event, ${track.id})" title="Add to Playlist or Project">+</button>
                 <button class="action-btn action-btn-more" onclick="openMoreMenu(event, ${track.id})" title="More">•••</button>
                 <button class="action-btn action-btn-download" onclick="downloadTrack(event, ${track.id})">&#11015;</button>
             </div>

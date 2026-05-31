@@ -59,70 +59,81 @@ let currentPlaylistTrackId = null;
 async function openPlaylistMenu(event, trackId) {
     event.stopPropagation();
 
-    // Check if user is logged in
     const loggedIn = await isUserLoggedIn();
     if (!loggedIn) {
         showLoginPrompt('create playlists');
         return;
     }
 
-    // Close any open menu
-    if (currentPlaylistMenu) {
-        currentPlaylistMenu.remove();
-    }
+    if (currentPlaylistMenu) { currentPlaylistMenu.remove(); }
+    document.querySelectorAll('.more-menu').forEach(m => m.remove());
 
-    // Load playlists if not loaded
-    if (userPlaylists.length === 0) {
-        await loadUserPlaylists();
-    }
+    // Load playlists + projects in parallel
+    await Promise.all([loadUserPlaylists(), loadUserProjects()]);
 
     currentPlaylistTrackId = trackId;
-    const button = event.target;
-    const actionsContainer = button.closest('.track-actions');
+    const actionsContainer = event.target.closest('.track-actions');
 
-    // Create menu
     const menu = document.createElement('div');
     menu.className = 'playlist-menu open';
 
-    // Create New Playlist option
-    const createNew = document.createElement('div');
-    createNew.className = 'playlist-menu-item create-new';
-    createNew.textContent = '+ Create New Playlist';
-    createNew.onclick = (e) => {
-        e.stopPropagation();
-        createNewPlaylist(trackId);
-    };
-    menu.appendChild(createNew);
+    // ── Playlists section ──────────────────────────────────────────────────────
+    const plHeader = document.createElement('div');
+    plHeader.className = 'playlist-menu-section-header';
+    plHeader.textContent = 'Playlists';
+    menu.appendChild(plHeader);
 
-    // List existing user playlists
+    const createNewPl = document.createElement('div');
+    createNewPl.className = 'playlist-menu-item create-new';
+    createNewPl.textContent = '+ New Playlist';
+    createNewPl.onclick = (e) => { e.stopPropagation(); createNewPlaylist(trackId); };
+    menu.appendChild(createNewPl);
+
     userPlaylists.forEach(playlist => {
         const item = document.createElement('div');
         item.className = 'playlist-menu-item';
-
-        const trackIds = playlist.track_ids || [];
-        const isInPlaylist = trackIds.includes(trackId);
-        if (isInPlaylist) {
-            item.classList.add('in-playlist');
-            item.textContent = `✓ ${playlist.name}`;
-        } else {
-            item.textContent = playlist.name;
-        }
-
-        item.onclick = (e) => {
-            e.stopPropagation();
-            toggleTrackInPlaylist(trackId, playlist.id);
-        };
+        const isIn = (playlist.track_ids || []).includes(trackId);
+        item.textContent = isIn ? `✓ ${playlist.name}` : playlist.name;
+        if (isIn) item.classList.add('in-playlist');
+        item.onclick = (e) => { e.stopPropagation(); toggleTrackInPlaylist(trackId, playlist.id); };
         menu.appendChild(item);
     });
 
-    // Show message if no playlists
-    if (userPlaylists.length === 0) {
-        const emptyMsg = document.createElement('div');
-        emptyMsg.className = 'playlist-menu-item';
-        emptyMsg.style.color = '#888';
-        emptyMsg.style.fontStyle = 'italic';
-        emptyMsg.textContent = 'No playlists yet';
-        menu.appendChild(emptyMsg);
+    // ── Divider ────────────────────────────────────────────────────────────────
+    const divider = document.createElement('div');
+    divider.className = 'playlist-menu-divider';
+    menu.appendChild(divider);
+
+    // ── Projects section ───────────────────────────────────────────────────────
+    const prHeader = document.createElement('div');
+    prHeader.className = 'playlist-menu-section-header';
+    prHeader.textContent = 'Projects';
+    menu.appendChild(prHeader);
+
+    const createNewPr = document.createElement('div');
+    createNewPr.className = 'playlist-menu-item create-new';
+    createNewPr.textContent = '+ New Project';
+    createNewPr.onclick = (e) => { e.stopPropagation(); openCreateProjectModal(trackId); };
+    menu.appendChild(createNewPr);
+
+    if (userProjects.length > 0) {
+        // Check which projects already contain this track
+        const { data: existingRows } = await supabaseClient
+            .from('project_tracks')
+            .select('project_id')
+            .eq('track_id', trackId)
+            .in('project_id', userProjects.map(p => p.id));
+        const inProjectIds = new Set((existingRows || []).map(r => r.project_id));
+
+        userProjects.forEach(project => {
+            const item = document.createElement('div');
+            item.className = 'playlist-menu-item';
+            const isIn = inProjectIds.has(project.id);
+            item.textContent = isIn ? `✓ ${project.name}` : project.name;
+            if (isIn) item.classList.add('in-playlist');
+            item.onclick = (e) => { e.stopPropagation(); toggleTrackInProject(trackId, project.id, isIn); };
+            menu.appendChild(item);
+        });
     }
 
     actionsContainer.style.position = 'relative';
