@@ -25,6 +25,7 @@
     <meta name="twitter:image" content="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/readysounds-text.png">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='100' cy='100' r='95' fill='%231a1a1a' stroke='%239c27b0' stroke-width='4'/%3E%3Cpath d='M 40 100 Q 70 60 100 60 Q 130 60 160 100 Q 130 140 100 140 Q 70 140 40 100 Z' fill='%234a148c' stroke='%239c27b0' stroke-width='3'/%3E%3Ccircle cx='100' cy='100' r='25' fill='%239c27b0'/%3E%3Ccircle cx='100' cy='100' r='12' fill='%23ffffff'/%3E%3Ccircle cx='105' cy='95' r='4' fill='%23e0e0e0'/%3E%3Ccircle cx='100' cy='100' r='70' fill='none' stroke='%239c27b0' stroke-width='2' stroke-dasharray='8,8' opacity='0.4'/%3E%3Ccircle cx='100' cy='100' r='55' fill='none' stroke='%237b1fa2' stroke-width='1.5' stroke-dasharray='6,6' opacity='0.3'/%3E%3Cline x1='100' y1='20' x2='100' y2='50' stroke='%239c27b0' stroke-width='2' opacity='0.5'/%3E%3Cline x1='35' y1='65' x2='55' y2='75' stroke='%239c27b0' stroke-width='2' opacity='0.5'/%3E%3Cline x1='165' y1='65' x2='145' y2='75' stroke='%239c27b0' stroke-width='2' opacity='0.5'/%3E%3C/svg%3E">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/supabase.js"></script>
     <script src="/nav.js"></script>
@@ -481,6 +482,16 @@
                 <div class="contact-info">
 
                     <div class="contact-block">
+                        <span class="contact-block-label">Call or Text Us</span>
+                        <span class="contact-block-title">
+                            <a href="tel:18563266362" style="color: #9c27b0; text-decoration: none; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; transition: color 0.2s;" onmouseover="this.style.color='#ce93d8'" onmouseout="this.style.color='#9c27b0'">1-856-326-6362</a>
+                        </span>
+                        <p class="contact-block-value">We'll get back to you within 24 hours.</p>
+                    </div>
+
+                    <div class="contact-divider"></div>
+
+                    <div class="contact-block">
                         <span class="contact-block-label">General Inquiries</span>
                         <span class="contact-block-title">Say Hello</span>
                         <p class="contact-block-value">
@@ -581,6 +592,9 @@
     </footer>
 
     <script>
+        // ── EmailJS ──
+        emailjs.init('Yw9epGF9LqO9j86XV');
+
         // ── Form submission ──
         async function handleSubmit(event) {
             event.preventDefault();
@@ -601,6 +615,14 @@
                 });
 
                 if (response.ok) {
+                    const firstName = document.getElementById('firstName').value.trim();
+                    const email = document.getElementById('email').value.trim();
+
+                    await emailjs.send('service_og2wjlu', 'template_s9c36gh', {
+                        to_name: firstName,
+                        email: email
+                    });
+
                     msg.className = 'form-message success';
                     msg.textContent = "Message sent! We'll get back to you within 24 hours.";
                     msg.style.display = 'block';
