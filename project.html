@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZJS68FCQ0Q"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-ZJS68FCQ0Q');
+    </script>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/favicon.svg?v=2">
+    <link rel="icon" type="image/png" href="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/favicon.png?v=2">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>readysounds. — Project</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/supabase.js"></script>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+
+        .page-nav {
+            background: rgba(10,10,10,0.98);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 18px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .page-logo {
+            font-size: 22px;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            text-transform: lowercase;
+        }
+
+        .page-nav-browse {
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .page-nav-browse:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        .main-content {
+            flex: 1;
+            max-width: 860px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 48px 24px 80px;
+        }
+
+        .project-hero {
+            margin-bottom: 40px;
+        }
+
+        .project-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #9c27b0;
+            margin-bottom: 10px;
+        }
+
+        .project-title {
+            font-size: 2.2em;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.15;
+            margin-bottom: 8px;
+        }
+
+        .project-description {
+            color: #888;
+            font-size: 1em;
+            line-height: 1.5;
+        }
+
+        .track-count-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .track-list { margin-top: 8px; }
+
+        .track-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.15s;
+        }
+        .track-row:last-child { border-bottom: none; }
+
+        .track-num {
+            width: 28px;
+            text-align: center;
+            color: #555;
+            font-size: 0.85em;
+            flex-shrink: 0;
+        }
+
+        .play-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(156,39,176,0.2);
+            border: 1px solid rgba(156,39,176,0.4);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .play-btn:hover { background: rgba(156,39,176,0.5); }
+        .play-btn.playing { background: rgba(156,39,176,0.5); }
+
+        .track-artwork {
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: #2a2a2a;
+            flex-shrink: 0;
+        }
+
+        .track-info { flex: 1; min-width: 0; }
+        .track-title {
+            font-weight: 600;
+            font-size: 0.95em;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .track-artist {
+            color: #888;
+            font-size: 0.85em;
+            margin-top: 3px;
+        }
+
+        .track-meta {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .track-duration { color: #666; font-size: 0.85em; }
+        .track-genre { color: #555; font-size: 0.8em; margin-top: 2px; }
+
+        /* Progress bar under each track when playing */
+        .track-progress-wrap {
+            display: none;
+            width: 100%;
+            padding: 0 0 4px 82px;
+        }
+        .track-progress-wrap.visible { display: block; }
+        .track-progress {
+            width: 100%;
+            accent-color: #9c27b0;
+            height: 3px;
+            cursor: pointer;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666;
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        .error-state h2 { color: #fff; margin-bottom: 12px; font-size: 1.6em; font-weight: 700; }
+        .error-state p { color: #888; font-size: 1em; }
+
+        .cta-section {
+            margin-top: 64px;
+            padding: 40px;
+            background: rgba(156,39,176,0.08);
+            border: 1px solid rgba(156,39,176,0.2);
+            border-radius: 16px;
+            text-align: center;
+        }
+        .cta-section h3 {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .cta-section p {
+            color: #888;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .cta-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1em;
+            transition: all 0.2s;
+        }
+        .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(156,39,176,0.4); }
+
+        @media (max-width: 600px) {
+            .project-title { font-size: 1.6em; }
+            .main-content { padding: 32px 16px 60px; }
+            .cta-section { padding: 28px 20px; }
+            .track-row { gap: 10px; }
+            .track-artwork { width: 40px; height: 40px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="page-nav">
+        <a href="index.html" class="page-logo">readysounds.</a>
+        <a href="browse.html" class="page-nav-browse">Browse All Music</a>
+    </nav>
+
+    <div class="main-content">
+        <div id="pageContent">
+            <div class="loading-state">Loading project...</div>
+        </div>
+    </div>
+
+    <script>
+        let activeAudio = null;
+        let activePlayBtn = null;
+        let activeProgressWrap = null;
+
+        window.RS.waitForClient().then(client => {
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get('token');
+            if (!token) {
+                showError('No project token found.', 'Check that you have the full share link.');
+                return;
+            }
+            loadProject(client, token);
+        });
+
+        async function loadProject(client, token) {
+            const { data: project, error } = await client
+                .from('projects')
+                .select('id, name, description, created_at')
+                .eq('share_token', token)
+                .single();
+
+            if (error || !project) {
+                showError('Project not found', 'This link may have expired or been removed.');
+                return;
+            }
+
+            document.title = `readysounds. — ${project.name}`;
+
+            const { data: ptRows } = await client
+                .from('project_tracks')
+                .select('track_id, added_at')
+                .eq('project_id', project.id)
+                .order('added_at', { ascending: true });
+
+            const trackIds = (ptRows || []).map(r => r.track_id);
+            let tracks = [];
+
+            if (trackIds.length > 0) {
+                const { data: trackData } = await client
+                    .from('tracks')
+                    .select('id, title, artist, duration, artwork_url, stream_url, genre, bpm')
+                    .in('id', trackIds);
+                tracks = trackData || [];
+            }
+
+            const trackMap = {};
+            tracks.forEach(t => { trackMap[t.id] = t; });
+            const orderedTracks = (ptRows || []).map(r => trackMap[r.track_id]).filter(Boolean);
+
+            renderProject(project, orderedTracks);
+        }
+
+        function renderProject(project, tracks) {
+            const count = tracks.length;
+            const descHtml = project.description
+                ? `<div class="project-description">${escHtml(project.description)}</div>`
+                : '';
+
+            let tracksHtml = '';
+            if (count === 0) {
+                tracksHtml = `<div class="loading-state" style="padding:40px 0">No tracks in this project yet.</div>`;
+            } else {
+                tracksHtml = `<div class="track-list" id="trackList">`;
+                tracks.forEach((t, i) => {
+                    tracksHtml += `
+                        <div class="track-row" id="row-${t.id}">
+                            <div class="track-num">${i + 1}</div>
+                            <button class="play-btn" id="play-${t.id}" onclick="togglePlay(${t.id}, '${escAttr(t.stream_url)}', this)">▶</button>
+                            <img class="track-artwork" src="${escAttr(t.artwork_url || '')}" alt="" onerror="this.style.display='none'">
+                            <div class="track-info">
+                                <div class="track-title">${escHtml(t.title)}</div>
+                                <div class="track-artist">${escHtml(t.artist)}</div>
+                            </div>
+                            <div class="track-meta">
+                                <div class="track-duration">${escHtml(t.duration || '')}</div>
+                                ${t.genre ? `<div class="track-genre">${escHtml(t.genre)}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="track-progress-wrap" id="prog-${t.id}">
+                            <input type="range" class="track-progress" id="range-${t.id}" min="0" max="100" value="0" step="0.1"
+                                oninput="seekTo(${t.id}, this.value)">
+                        </div>`;
+                });
+                tracksHtml += `</div>`;
+            }
+
+            document.getElementById('pageContent').innerHTML = `
+                <div class="project-hero">
+                    <div class="project-label">Shared Project</div>
+                    <div class="project-title">${escHtml(project.name)}</div>
+                    ${descHtml}
+                    <div class="track-count-bar">
+                        <span>🎵</span>
+                        <span>${count} track${count !== 1 ? 's' : ''}</span>
+                    </div>
+                </div>
+                ${tracksHtml}
+                <div class="cta-section">
+                    <h3>Need more music like this?</h3>
+                    <p>Browse thousands of tracks cleared for film, TV, advertising, and digital content at readysounds.</p>
+                    <a href="browse.html" class="cta-btn">Browse All Music at readysounds.com →</a>
+                </div>
+            `;
+        }
+
+        function togglePlay(trackId, streamUrl, btn) {
+            const isSameTrack = activeAudio && activePlayBtn === btn;
+
+            if (isSameTrack && !activeAudio.paused) {
+                activeAudio.pause();
+                btn.textContent = '▶';
+                btn.classList.remove('playing');
+                return;
+            }
+
+            if (isSameTrack && activeAudio.paused) {
+                activeAudio.play();
+                btn.textContent = '⏸';
+                btn.classList.add('playing');
+                return;
+            }
+
+            // Different track — stop current
+            if (activeAudio) {
+                activeAudio.pause();
+                if (activePlayBtn) { activePlayBtn.textContent = '▶'; activePlayBtn.classList.remove('playing'); }
+                if (activeProgressWrap) activeProgressWrap.classList.remove('visible');
+            }
+
+            activeAudio = new Audio(streamUrl);
+            activePlayBtn = btn;
+            activeProgressWrap = document.getElementById(`prog-${trackId}`);
+
+            btn.textContent = '⏸';
+            btn.classList.add('playing');
+            if (activeProgressWrap) activeProgressWrap.classList.add('visible');
+
+            activeAudio.play();
+
+            const rangeEl = document.getElementById(`range-${trackId}`);
+            activeAudio.ontimeupdate = () => {
+                if (rangeEl && activeAudio.duration) {
+                    rangeEl.value = (activeAudio.currentTime / activeAudio.duration) * 100;
+                }
+            };
+
+            activeAudio.onended = () => {
+                btn.textContent = '▶';
+                btn.classList.remove('playing');
+                if (activeProgressWrap) activeProgressWrap.classList.remove('visible');
+                activeAudio = null; activePlayBtn = null; activeProgressWrap = null;
+            };
+        }
+
+        function seekTo(trackId, pct) {
+            if (activeAudio && document.getElementById(`play-${trackId}`) === activePlayBtn) {
+                activeAudio.currentTime = (pct / 100) * activeAudio.duration;
+            }
+        }
+
+        function showError(title, body) {
+            document.getElementById('pageContent').innerHTML = `
+                <div class="error-state">
+                    <h2>${escHtml(title)}</h2>
+                    <p>${escHtml(body)}</p>
+                    <a href="browse.html" style="display:inline-block;margin-top:24px;color:#9c27b0;text-decoration:none;font-weight:600;">Browse music at readysounds.com →</a>
+                </div>`;
+        }
+
+        function escHtml(s) {
+            const d = document.createElement('div');
+            d.textContent = String(s);
+            return d.innerHTML;
+        }
+        function escAttr(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+        }
+    </script>
+</body>
+</html>

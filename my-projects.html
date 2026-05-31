@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZJS68FCQ0Q"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-ZJS68FCQ0Q');
+    </script>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/favicon.svg?v=2">
+    <link rel="icon" type="image/png" href="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/favicon.png?v=2">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>readysounds. — My Projects</title>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://readysounds.com/my-projects.html">
+    <meta property="og:title" content="My Projects — readysounds.">
+    <meta property="og:description" content="Your client projects on readysounds.">
+    <meta property="og:image" content="https://pub-fd4a6646ef594336bc5ad646a65a2625.r2.dev/images/readysounds-text.png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/supabase.js"></script>
+    <script src="/nav.js"></script>
+    <script src="/auth.js"></script>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body { padding: 20px; }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 80px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 30px;
+            color: #9c27b0;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: color 0.3s;
+        }
+        .back-link:hover { color: #ba68c8; }
+
+        header { margin-bottom: 40px; }
+
+        h1 {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #ffffff;
+        }
+
+        .subtitle { font-size: 1em; color: #666; }
+
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+        }
+        .empty-state-icon { font-size: 80px; margin-bottom: 20px; opacity: 0.3; }
+        .empty-state-text { font-size: 1.5em; color: #666; margin-bottom: 30px; }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .project-card {
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+
+        .project-card-clickable {
+            cursor: pointer;
+        }
+        .project-card-clickable:hover {
+            background: rgba(156, 39, 176, 0.1);
+            border-color: rgba(156, 39, 176, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .project-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+
+        .project-meta { color: #888; font-size: 0.85em; }
+
+        .project-actions { display: flex; gap: 8px; flex-shrink: 0; margin-left: 12px; }
+
+        .icon-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn:hover { background: rgba(156,39,176,0.3); border-color: rgba(156,39,176,0.5); }
+        .icon-btn.delete-btn:hover { background: rgba(244,67,54,0.3); border-color: rgba(244,67,54,0.5); }
+
+        .share-btn-full {
+            width: 100%;
+            margin-top: 14px;
+            background: rgba(156,39,176,0.15);
+            border: 1px solid rgba(156,39,176,0.3);
+            color: rgba(255,255,255,0.8);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        .share-btn-full:hover { background: rgba(156,39,176,0.3); border-color: rgba(156,39,176,0.5); color: #fff; }
+
+        .loading { text-align: center; padding: 60px 20px; color: #888; font-size: 1.2em; }
+
+        .create-btn {
+            background: linear-gradient(135deg, #9c27b0, #4a148c);
+            border: none;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-bottom: 8px;
+            font-family: inherit;
+        }
+        .create-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(156,39,176,0.4); }
+
+        /* ── Project detail view ── */
+        .project-detail { display: none; }
+        .project-detail.active { display: block; }
+        .projects-list { display: block; }
+        .projects-list.hidden { display: none; }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .detail-back {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .detail-back:hover { background: rgba(255,255,255,0.1); }
+
+        .detail-title { font-size: 1.8em; font-weight: 700; color: #fff; }
+        .detail-share-btn {
+            margin-left: auto;
+            background: rgba(156,39,176,0.2);
+            border: 1px solid rgba(156,39,176,0.4);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .detail-share-btn:hover { background: rgba(156,39,176,0.35); }
+
+        .project-track-list { margin-top: 8px; }
+
+        .project-track-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .project-track-row:last-child { border-bottom: none; }
+
+        .pt-artwork {
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: #333;
+            flex-shrink: 0;
+        }
+        .pt-play-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(156,39,176,0.2);
+            border: 1px solid rgba(156,39,176,0.4);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .pt-play-btn:hover { background: rgba(156,39,176,0.5); }
+        .pt-info { flex: 1; min-width: 0; }
+        .pt-title { font-weight: 600; font-size: 0.95em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pt-artist { color: #888; font-size: 0.85em; margin-top: 2px; }
+        .pt-duration { color: #888; font-size: 0.85em; flex-shrink: 0; }
+        .pt-remove-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .pt-remove-btn:hover { color: #e57373; background: rgba(244,67,54,0.1); }
+
+        /* ── Nav ── */
+        .rs-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: rgba(10,10,10,0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            z-index: 1000;
+            padding: 16px 0;
+        }
+
+        /* ── Modals ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: #1c1c1c;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 32px;
+            width: 100%;
+            max-width: 420px;
+            margin: 20px;
+        }
+        .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: white; }
+        .modal-subtitle { font-size: 13px; color: #888; margin-bottom: 16px; }
+        .modal-input {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: white;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            margin-bottom: 8px;
+            box-sizing: border-box;
+        }
+        .modal-input:focus { border-color: rgba(156,39,176,0.6); }
+        .modal-input::placeholder { color: rgba(255,255,255,0.3); }
+        .modal-body { color: rgba(255,255,255,0.7); margin-bottom: 24px; line-height: 1.5; }
+        .modal-error { color: #e57373; font-size: 13px; margin-bottom: 16px; display: none; }
+        .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+        .modal-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .modal-btn-cancel { background: rgba(255,255,255,0.08); color: white; }
+        .modal-btn-cancel:hover { background: rgba(255,255,255,0.13); }
+        .modal-btn-confirm { background: #9c27b0; color: white; }
+        .modal-btn-confirm:hover { background: #7b1fa2; }
+        .modal-btn-danger { background: #c62828; color: white; }
+        .modal-btn-danger:hover { background: #b71c1c; }
+
+        @keyframes toastIn {
+            from { opacity:0; transform:translateX(-50%) translateY(8px); }
+            to   { opacity:1; transform:translateX(-50%) translateY(0); }
+        }
+
+        /* Simple inline audio player */
+        .pt-audio-bar {
+            width: 100%;
+            accent-color: #9c27b0;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">readysounds.</a>
+            <nav class="header-nav" id="headerNav">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()">☰</button>
+                <a href="browse.html" class="nav-item">Browse</a>
+                <div class="nav-music-dropdown">
+                    <span class="nav-item nav-music-trigger">Music</span>
+                    <div class="nav-music-menu">
+                        <a href="playlists.html">Playlists</a>
+                        <a href="compilations.html">Compilations</a>
+                    </div>
+                </div>
+                <a href="pricing.html" class="nav-item">Pricing</a>
+                <a href="contact.html" class="nav-item">Contact</a>
+                <div class="auth-buttons" id="authButtons">
+                    <a href="signup.html" class="auth-btn auth-btn-login" id="loginBtn">Log In</a>
+                    <a href="signup.html" class="auth-btn auth-btn-signup" id="signupBtn">Create Free Account</a>
+                </div>
+                <div class="profile-container" id="profileContainer">
+                    <div class="profile-icon" id="profileIcon" onclick="toggleProfileDropdown()">
+                        <span id="profileInitial">U</span>
+                    </div>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="profile-dropdown-header">My Media</div>
+                        <a href="favorites.html" class="profile-dropdown-item"><span>Favorites</span></a>
+                        <a href="my-playlists.html" class="profile-dropdown-item"><span>My Playlists</span></a>
+                        <a href="my-projects.html" class="profile-dropdown-item"><span>My Projects</span></a>
+                        <a href="downloads.html" class="profile-dropdown-item"><span>My Downloads</span></a>
+                        <div class="profile-dropdown-divider"></div>
+                        <a href="account.html" class="profile-dropdown-item"><span>Account</span></a>
+                        <div class="profile-dropdown-divider"></div>
+                        <a href="#" class="profile-dropdown-item" id="logoutBtn" onclick="handleLogout(); return false;"><span>Sign Out</span></a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-panel-overlay" id="mobilePanelOverlay" onclick="closeMobilePanel()"></div>
+    <!-- Mobile Menu Panel -->
+    <div class="mobile-panel" id="mobilePanel">
+        <div class="mobile-panel-header">
+            <button class="mobile-panel-close" onclick="closeMobilePanel()">✕</button>
+        </div>
+        <nav class="mobile-panel-nav">
+            <a href="browse.html" class="mobile-panel-link">Browse</a>
+            <a href="playlists.html" class="mobile-panel-link">Playlists</a>
+            <a href="compilations.html" class="mobile-panel-link">Compilations</a>
+            <a href="pricing.html" class="mobile-panel-link">Pricing</a>
+            <a href="contact.html" class="mobile-panel-link">Contact</a>
+        </nav>
+        <div class="mobile-panel-divider"></div>
+        <button class="mobile-panel-expandable" id="myMediaBtn" onclick="togglePanelSection('myMedia')">
+            <span>My Media</span>
+            <span class="mobile-panel-chevron">▾</span>
+        </button>
+        <div class="mobile-panel-submenu" id="myMediaSubmenu">
+            <a href="favorites.html" class="mobile-panel-sublink">Favorites</a>
+            <a href="my-playlists.html" class="mobile-panel-sublink">My Playlists</a>
+            <a href="my-projects.html" class="mobile-panel-sublink">My Projects</a>
+            <a href="downloads.html" class="mobile-panel-sublink">My Downloads</a>
+        </div>
+        <button class="mobile-panel-expandable" id="accountBtn" onclick="togglePanelSection('account')" style="display:none;">
+            <span>Account</span>
+            <span class="mobile-panel-chevron">▾</span>
+        </button>
+        <div class="mobile-panel-submenu" id="accountSubmenu">
+            <a href="settings.html" class="mobile-panel-sublink">Settings</a>
+            <a href="#" class="mobile-panel-sublink" onclick="handleLogout(); closeMobilePanel(); return false;">Sign Out</a>
+        </div>
+        <a href="pricing.html" class="mobile-panel-subscribe">Subscribe</a>
+        <div class="mobile-panel-auth-btns" id="mobilePanelAuthBtns">
+            <a href="signup.html" class="mobile-panel-auth-btn login">Log In</a>
+            <a href="signup.html" class="mobile-panel-auth-btn signup">Create Free Account</a>
+        </div>
+        <div class="mobile-panel-footer">
+            <a href="terms.html" class="mobile-panel-footer-link">Terms &amp; Conditions</a>
+        </div>
+    </div>
+
+    <!-- Create Project Modal -->
+    <div class="modal-overlay" id="createModal" onclick="if(event.target===this)closeCreateModal()">
+        <div class="modal-box">
+            <div class="modal-title">New Project</div>
+            <div class="modal-subtitle">Name it after the campaign or show (e.g. "HIV Commercial Q3")</div>
+            <input class="modal-input" type="text" id="createModalInput" placeholder="Project name" maxlength="80">
+            <div class="modal-error" id="createModalError">Please enter a name.</div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeCreateModal()">Cancel</button>
+                <button class="modal-btn modal-btn-confirm" onclick="submitCreateProject()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div class="modal-overlay" id="deleteModal" onclick="if(event.target===this)closeDeleteModal()">
+        <div class="modal-box">
+            <div class="modal-title">Delete Project</div>
+            <div class="modal-body" id="deleteModalBody">Are you sure you want to delete this project?</div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="modal-btn modal-btn-danger" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="browse.html" class="back-link">← Back to Music Library</a>
+
+        <!-- Projects list view -->
+        <div class="projects-list" id="projectsListView">
+            <header>
+                <h1>My Projects</h1>
+                <p class="subtitle">Share curated track selections with clients</p>
+            </header>
+
+            <button class="create-btn" onclick="createProject()">+ New Project</button>
+
+            <div id="projectsContainer">
+                <div class="loading">Loading your projects...</div>
+            </div>
+        </div>
+
+        <!-- Project detail view -->
+        <div class="project-detail" id="projectDetailView">
+            <div class="detail-header">
+                <button class="detail-back" onclick="backToProjects()">← All Projects</button>
+                <div class="detail-title" id="detailTitle"></div>
+                <button class="detail-share-btn" onclick="copyShareLink()">🔗 Copy Share Link</button>
+            </div>
+            <div id="projectTrackList" class="project-track-list"></div>
+        </div>
+    </div>
+
+    <script>
+        let supabaseClient = null;
+        let allProjects = [];
+        let currentProjectId = null;
+        let currentShareToken = null;
+        let activeAudio = null;
+        let activePlayBtn = null;
+
+        window.RS.waitForClient().then(client => {
+            supabaseClient = client;
+            window.RS.requireAuth().then(session => {
+                if (session) loadProjects();
+            });
+            window.RS.initNavAuth();
+        });
+
+        async function loadProjects() {
+            const container = document.getElementById('projectsContainer');
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🔒</div>
+                            <div class="empty-state-text">Please log in to view your projects</div>
+                            <a href="signup.html" style="background:linear-gradient(135deg,#9c27b0,#4a148c);color:white;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;font-weight:600;">Log In</a>
+                        </div>`;
+                    return;
+                }
+
+                const { data, error } = await supabaseClient
+                    .from('projects')
+                    .select('*, project_tracks(count)')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) { container.innerHTML = '<div class="empty-state-text">Error loading projects</div>'; return; }
+
+                allProjects = data || [];
+
+                if (allProjects.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📂</div>
+                            <div class="empty-state-text">No projects yet</div>
+                            <button onclick="createProject()" style="background:linear-gradient(135deg,#9c27b0,#4a148c);color:white;padding:14px 28px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-family:inherit;">Create Your First Project</button>
+                        </div>`;
+                    return;
+                }
+
+                let html = '<div class="project-grid">';
+                allProjects.forEach(proj => {
+                    const count = proj.project_tracks?.[0]?.count ?? 0;
+                    const date = new Date(proj.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    html += `
+                        <div class="project-card">
+                            <div class="project-header project-card-clickable" onclick="viewProject('${proj.id}', '${escapeHtml(proj.name)}', '${proj.share_token}')">
+                                <div>
+                                    <div class="project-name">${escapeHtml(proj.name)}</div>
+                                    <div class="project-meta">${count} track${count !== 1 ? 's' : ''} · ${date}</div>
+                                </div>
+                                <div class="project-actions" onclick="event.stopPropagation()">
+                                    <button class="icon-btn delete-btn" title="Delete" onclick="deleteProject('${proj.id}', '${escapeHtml(proj.name)}')">🗑️</button>
+                                </div>
+                            </div>
+                            <button class="share-btn-full" onclick="copyShareLinkFor('${proj.share_token}')">🔗 Copy share link</button>
+                        </div>`;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<div class="empty-state-text">Error loading projects</div>';
+            }
+        }
+
+        // ── Create modal ──────────────────────────────────────────────────────
+
+        function createProject() {
+            const input = document.getElementById('createModalInput');
+            const err = document.getElementById('createModalError');
+            input.value = '';
+            err.style.display = 'none';
+            document.getElementById('createModal').classList.add('active');
+            setTimeout(() => input.focus(), 80);
+        }
+
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.remove('active');
+        }
+
+        async function submitCreateProject() {
+            const input = document.getElementById('createModalInput');
+            const err = document.getElementById('createModalError');
+            const name = input.value.trim();
+            if (!name) { err.style.display = 'block'; return; }
+            err.style.display = 'none';
+            closeCreateModal();
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) return;
+
+                const { error } = await supabaseClient
+                    .from('projects')
+                    .insert([{ user_id: user.id, name }]);
+
+                if (error) { showToast('Failed to create project', 'error'); return; }
+                showToast(`Created "${name}"!`);
+                loadProjects();
+            } catch (e) {
+                showToast('Failed to create project', 'error');
+            }
+        }
+
+        // ── Delete modal ──────────────────────────────────────────────────────
+
+        let _deleteId = null;
+
+        function deleteProject(projectId, projectName) {
+            _deleteId = projectId;
+            document.getElementById('deleteModalBody').textContent = `Delete "${projectName}"? This can't be undone.`;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            _deleteId = null;
+        }
+
+        async function confirmDelete() {
+            if (!_deleteId) return;
+            const id = _deleteId;
+            closeDeleteModal();
+            try {
+                const { error } = await supabaseClient.from('projects').delete().eq('id', id);
+                if (error) { showToast('Failed to delete project', 'error'); return; }
+                showToast('Project deleted');
+                if (currentProjectId === id) backToProjects();
+                else loadProjects();
+            } catch (e) {
+                showToast('Failed to delete project', 'error');
+            }
+        }
+
+        // ── Project detail view ───────────────────────────────────────────────
+
+        async function viewProject(projectId, projectName, shareToken) {
+            currentProjectId = projectId;
+            currentShareToken = shareToken;
+            document.getElementById('detailTitle').textContent = projectName;
+            document.getElementById('projectsListView').classList.add('hidden');
+            document.getElementById('projectDetailView').classList.add('active');
+
+            await loadProjectTracks(projectId);
+        }
+
+        function backToProjects() {
+            stopActiveAudio();
+            currentProjectId = null;
+            currentShareToken = null;
+            document.getElementById('projectDetailView').classList.remove('active');
+            document.getElementById('projectsListView').classList.remove('hidden');
+            loadProjects();
+        }
+
+        async function loadProjectTracks(projectId) {
+            const list = document.getElementById('projectTrackList');
+            list.innerHTML = '<div class="loading">Loading tracks...</div>';
+
+            const { data: ptRows, error } = await supabaseClient
+                .from('project_tracks')
+                .select('track_id, added_at')
+                .eq('project_id', projectId)
+                .order('added_at', { ascending: true });
+
+            if (error || !ptRows || ptRows.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon" style="font-size:48px">🎵</div>
+                        <div class="empty-state-text" style="font-size:1.1em">No tracks yet</div>
+                        <a href="browse.html" style="color:#9c27b0;text-decoration:none;font-weight:600;">Browse music to add tracks →</a>
+                    </div>`;
+                return;
+            }
+
+            const trackIds = ptRows.map(r => r.track_id);
+
+            const { data: tracks, error: tErr } = await supabaseClient
+                .from('tracks')
+                .select('id, title, artist, duration, artwork_url, stream_url')
+                .in('id', trackIds);
+
+            if (tErr || !tracks) { list.innerHTML = '<div class="empty-state-text">Error loading tracks</div>'; return; }
+
+            const trackMap = {};
+            tracks.forEach(t => { trackMap[t.id] = t; });
+
+            list.innerHTML = '';
+            ptRows.forEach(row => {
+                const t = trackMap[row.track_id];
+                if (!t) return;
+                const row_el = document.createElement('div');
+                row_el.className = 'project-track-row';
+                row_el.dataset.trackId = t.id;
+                row_el.innerHTML = `
+                    <button class="pt-play-btn" onclick="playProjectTrack(this, '${escapeAttr(t.stream_url)}', ${t.id})">▶</button>
+                    <img class="pt-artwork" src="${escapeAttr(t.artwork_url || '')}" alt="" onerror="this.style.display='none'">
+                    <div class="pt-info">
+                        <div class="pt-title">${escapeHtml(t.title)}</div>
+                        <div class="pt-artist">${escapeHtml(t.artist)}</div>
+                    </div>
+                    <div class="pt-duration">${escapeHtml(t.duration || '')}</div>
+                    <button class="pt-remove-btn" title="Remove from project" onclick="removeTrackFromProject(${t.id})">×</button>
+                `;
+                list.appendChild(row_el);
+            });
+        }
+
+        function playProjectTrack(btn, streamUrl, trackId) {
+            if (activeAudio && !activeAudio.paused && activePlayBtn === btn) {
+                activeAudio.pause();
+                btn.textContent = '▶';
+                return;
+            }
+            stopActiveAudio();
+            activeAudio = new Audio(streamUrl);
+            activePlayBtn = btn;
+            btn.textContent = '⏸';
+            activeAudio.play();
+            activeAudio.onended = () => { btn.textContent = '▶'; activeAudio = null; activePlayBtn = null; };
+        }
+
+        function stopActiveAudio() {
+            if (activeAudio) { activeAudio.pause(); activeAudio = null; }
+            if (activePlayBtn) { activePlayBtn.textContent = '▶'; activePlayBtn = null; }
+        }
+
+        async function removeTrackFromProject(trackId) {
+            const { error } = await supabaseClient
+                .from('project_tracks')
+                .delete()
+                .eq('project_id', currentProjectId)
+                .eq('track_id', trackId);
+
+            if (error) { showToast('Failed to remove track', 'error'); return; }
+            showToast('Track removed');
+            loadProjectTracks(currentProjectId);
+        }
+
+        // ── Share link ────────────────────────────────────────────────────────
+
+        function copyShareLink() {
+            if (currentShareToken) copyShareLinkFor(currentShareToken);
+        }
+
+        function copyShareLinkFor(token) {
+            const url = `${window.location.origin}/project.html?token=${token}`;
+            navigator.clipboard.writeText(url).then(() => showToast('Share link copied!'));
+        }
+
+        // ── Toast ─────────────────────────────────────────────────────────────
+
+        function showToast(msg, type = 'success') {
+            const t = document.createElement('div');
+            t.style.cssText = `position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:${type==='error'?'#c62828':'#2e7d32'};color:white;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:500;z-index:3000;animation:toastIn .2s;pointer-events:none;white-space:nowrap;`;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function escapeHtml(text) {
+            const d = document.createElement('div');
+            d.textContent = String(text);
+            return d.innerHTML;
+        }
+
+        function escapeAttr(text) {
+            return String(text).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                closeCreateModal();
+                closeDeleteModal();
+                closeMobilePanel();
+            }
+            if (e.key === 'Enter' && document.getElementById('createModal').classList.contains('active')) {
+                submitCreateProject();
+            }
+        });
+    </script>
+</body>
+</html>

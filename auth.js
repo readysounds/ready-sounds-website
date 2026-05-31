@@ -72,6 +72,7 @@
             '<div class="mobile-panel-user-header">My Account</div>' +
             '<a href="/favorites.html" class="mobile-panel-user-link">Favorites</a>' +
             '<a href="/my-playlists.html" class="mobile-panel-user-link">My Playlists</a>' +
+            '<a href="/my-projects.html" class="mobile-panel-user-link">My Projects</a>' +
             '<a href="/account.html" class="mobile-panel-user-link">Account</a>' +
             '<a href="#" class="mobile-panel-user-link signout" onclick="handleLogout(); return false;">Sign Out</a>';
         var footer = panel.querySelector('.mobile-panel-footer');

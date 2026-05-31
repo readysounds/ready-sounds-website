@@ -1921,7 +1921,23 @@
             border-color: #9c27b0;
             background: rgba(156, 39, 176, 0.25);
         }
-        
+
+        .action-btn-project {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .action-btn-project:hover {
+            background: rgba(156, 39, 176, 0.2);
+            border-color: rgba(156, 39, 176, 0.4);
+        }
+
         .action-btn-download {
             background: rgba(156, 39, 176, 0.15);
             border: 1px solid rgba(156, 39, 176, 0.5);
@@ -3768,6 +3784,9 @@
                         <a href="my-playlists.html" class="profile-dropdown-item">
                             <span>My Playlists</span>
                         </a>
+                        <a href="my-projects.html" class="profile-dropdown-item">
+                            <span>My Projects</span>
+                        </a>
                         <a href="downloads.html" class="profile-dropdown-item">
                             <span>My Downloads</span>
                         </a>
@@ -4284,6 +4303,7 @@
     <script src="/browse-cart.js"></script>
     <script src="/browse-player.js"></script>
     <script src="/browse-playlists.js"></script>
+    <script src="/browse-projects.js"></script>
     <script src="/browse-downloads.js"></script>
     <script src="/browse-favorites.js"></script>
     <script src="/browse-recently-played.js"></script>
@@ -4302,6 +4322,17 @@
             <a class="login-prompt-signup" href="/signup.html">Create Free Account</a>
         </div>
     </div>
+    <!-- Create Project Modal -->
+    <div class="create-playlist-overlay" id="createProjectOverlay" onclick="closeCreateProjectModal()"></div>
+    <div class="create-playlist-modal" id="createProjectModal">
+        <h3>New Project</h3>
+        <input type="text" id="createProjectInput" class="create-playlist-input" placeholder="e.g. HIV Commercial Q3" maxlength="80" onkeydown="if(event.key==='Enter')confirmCreateProject();if(event.key==='Escape')closeCreateProjectModal();">
+        <div class="create-playlist-actions">
+            <button class="create-playlist-cancel" onclick="closeCreateProjectModal()">Cancel</button>
+            <button class="create-playlist-confirm" onclick="confirmCreateProject()">Create</button>
+        </div>
+    </div>
+
     <!-- Create Playlist Modal -->
     <div class="create-playlist-overlay" id="createPlaylistOverlay" onclick="closeCreatePlaylistModal()"></div>
     <div class="create-playlist-modal" id="createPlaylistModal">
