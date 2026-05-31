@@ -618,10 +618,14 @@
                     const firstName = document.getElementById('firstName').value.trim();
                     const email = document.getElementById('email').value.trim();
 
-                    await emailjs.send('service_og2wjlu', 'template_s9c36gh', {
-                        to_name: firstName,
-                        email: email
-                    });
+                    try {
+                        await emailjs.send('service_og2wjlu', 'template_s9c36gh', {
+                            to_name: firstName,
+                            email: email
+                        });
+                    } catch (emailErr) {
+                        console.warn('EmailJS auto-reply failed:', emailErr);
+                    }
 
                     msg.className = 'form-message success';
                     msg.textContent = "Message sent! We'll get back to you within 24 hours.";
