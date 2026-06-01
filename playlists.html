@@ -559,17 +559,16 @@
             }
         }
 
-        .track-item.playing .track-artwork::after {
-            content: '♪';
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0,0,0,0.55);
-            color: #9c27b0;
-            font-size: 1.3rem;
-            border-radius: 6px;
+        .track-item.playing .track-play-overlay {
+            opacity: 1;
+            background: rgba(156, 39, 176, 0.65);
+            font-size: 20px;
+        }
+        .track-item.playing .track-play-overlay::after {
+            content: '⏸';
+        }
+        .track-item.playing .track-play-overlay-icon {
+            display: none;
         }
 
         .track-info {
@@ -1564,10 +1563,10 @@
                     const moodTags = (track.moods || '').split(',').slice(0, 2).map(m => m.trim()).filter(Boolean)
                         .map(m => `<span class="track-mood-tag">${escapeHtml(m)}</span>`).join('');
                     tracksHTML += `
-                        <div class="track-item" data-track-id="${trackId}" onclick="playTrack(${trackId})">
+                        <div class="track-item" data-track-id="${trackId}" onclick="handleTrackClick(${trackId})">
                             <div class="track-artwork">
                                 <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.trackTitle)}">
-                                <div class="track-play-overlay">▶</div>
+                                <div class="track-play-overlay"><span class="track-play-overlay-icon">▶</span></div>
                             </div>
                             <div class="track-info">
                                 <div class="track-title">${escapeHtml(track.trackTitle)}</div>
@@ -1674,10 +1673,10 @@
                 const moodTags = (track.moods || '').split(',').slice(0, 2).map(m => m.trim()).filter(Boolean)
                     .map(m => `<span class="track-mood-tag">${escapeHtml(m)}</span>`).join('');
                 return `
-                    <div class="track-item" data-track-id="${trackId}" onclick="playTrack(${trackId})">
+                    <div class="track-item" data-track-id="${trackId}" onclick="handleTrackClick(${trackId})">
                         <div class="track-artwork">
                             <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.trackTitle)}">
-                            <div class="track-play-overlay">▶</div>
+                            <div class="track-play-overlay"><span class="track-play-overlay-icon">▶</span></div>
                         </div>
                         <div class="track-info">
                             <div class="track-title">${escapeHtml(track.trackTitle)}</div>
@@ -1854,6 +1853,15 @@
             const activeItem = document.querySelector(`.track-item[data-track-id="${trackId}"]`);
             if (activeItem) activeItem.classList.add('playing');
             updateFavoriteIcons();
+        }
+
+        function handleTrackClick(trackId) {
+            if (trackId === currentPlayingTrackId && !audioElement.paused) {
+                audioElement.pause();
+                syncPlayButtons(false);
+            } else {
+                playTrack(trackId);
+            }
         }
 
         function togglePlayPause() {
