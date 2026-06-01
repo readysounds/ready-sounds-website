@@ -562,12 +562,14 @@
         .track-item.playing .track-play-overlay {
             opacity: 1;
             background: rgba(156, 39, 176, 0.65);
-            font-size: 20px;
         }
-        .track-item.playing .track-play-overlay::after {
-            content: '⏸';
+        .track-item.playing .track-play-overlay .track-play-overlay-icon {
+            display: none;
         }
-        .track-item.playing .track-play-overlay-icon {
+        .track-item.playing .track-play-overlay .track-pause-icon {
+            display: block;
+        }
+        .track-play-overlay .track-pause-icon {
             display: none;
         }
 
@@ -1566,7 +1568,7 @@
                         <div class="track-item" data-track-id="${trackId}" onclick="handleTrackClick(${trackId})">
                             <div class="track-artwork">
                                 <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.trackTitle)}">
-                                <div class="track-play-overlay"><span class="track-play-overlay-icon">▶</span></div>
+                                <div class="track-play-overlay"><span class="track-play-overlay-icon">▶</span><svg class="track-pause-icon" width="18" height="18" viewBox="0 0 24 24" fill="white"><rect x="5" y="4" width="4" height="16" rx="1.5"/><rect x="15" y="4" width="4" height="16" rx="1.5"/></svg></div>
                             </div>
                             <div class="track-info">
                                 <div class="track-title">${escapeHtml(track.trackTitle)}</div>
@@ -1676,7 +1678,7 @@
                     <div class="track-item" data-track-id="${trackId}" onclick="handleTrackClick(${trackId})">
                         <div class="track-artwork">
                             <img src="${escapeHtml(track.artwork)}" alt="${escapeHtml(track.trackTitle)}">
-                            <div class="track-play-overlay"><span class="track-play-overlay-icon">▶</span></div>
+                            <div class="track-play-overlay"><span class="track-play-overlay-icon">▶</span><svg class="track-pause-icon" width="18" height="18" viewBox="0 0 24 24" fill="white"><rect x="5" y="4" width="4" height="16" rx="1.5"/><rect x="15" y="4" width="4" height="16" rx="1.5"/></svg></div>
                         </div>
                         <div class="track-info">
                             <div class="track-title">${escapeHtml(track.trackTitle)}</div>
