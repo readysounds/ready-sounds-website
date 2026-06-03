@@ -580,6 +580,11 @@ function showLoginPrompt(action) {
         if (cta) { cta.textContent = 'Create Free Account'; cta.href = '/signup.html'; }
     }
 
+    // Preserve the currently selected track so it can be restored after login/signup
+    if (typeof currentTrackId !== 'undefined' && currentTrackId) {
+        sessionStorage.setItem('rs_restore_track', currentTrackId);
+    }
+
     overlay.classList.add('active');
     modal.classList.add('active');
 }

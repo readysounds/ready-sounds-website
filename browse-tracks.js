@@ -267,4 +267,22 @@ async function loadTracksFromSupabase() {
 
     // Handle deep-link to a specific track now that DOM is ready
     if (typeof handleTrackAutoPlay === 'function') handleTrackAutoPlay();
+
+    // Restore track that was selected before a login/signup redirect
+    const restoreId = sessionStorage.getItem('rs_restore_track');
+    if (restoreId) {
+        sessionStorage.removeItem('rs_restore_track');
+        const trackEl = document.querySelector(`.track-item[data-track-id="${restoreId}"]`);
+        if (trackEl) {
+            const altContainer = trackEl.closest('.alternates-container');
+            if (altContainer) {
+                altContainer.classList.add('expanded');
+                const mainTrack = altContainer.previousElementSibling;
+                if (mainTrack) mainTrack.classList.add('expanded');
+            }
+            trackEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            trackEl.classList.add('highlighted');
+            setTimeout(() => trackEl.classList.remove('highlighted'), 2500);
+        }
+    }
 }

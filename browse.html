@@ -1553,6 +1553,14 @@
         .track-item:hover {
             background: rgba(255, 255, 255, 0.02);
         }
+
+        @keyframes track-restore-flash {
+            0%   { background: rgba(255, 255, 255, 0.10); }
+            100% { background: transparent; }
+        }
+        .track-item.highlighted {
+            animation: track-restore-flash 2.5s ease-out forwards;
+        }
         
         .track-item.main-track {
             position: relative;
