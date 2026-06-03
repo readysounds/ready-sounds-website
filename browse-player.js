@@ -202,11 +202,11 @@ function toggleFavoriteFromModal() {
     if (isFav) {
         btn.classList.remove('active');
         btn.textContent = '♡';
-        removeFromFavorites && removeFromFavorites(currentTrackId);
+        toggleFavorite && toggleFavorite(currentTrackId);
     } else {
         btn.classList.add('active');
         btn.textContent = '♥';
-        addToFavorites && addToFavorites(currentTrackId);
+        toggleFavorite && toggleFavorite(currentTrackId);
     }
 }
 

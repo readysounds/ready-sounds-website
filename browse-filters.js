@@ -160,7 +160,7 @@ function applyFilters() {
 
         // --- Filter matching ---
         let filterMatch = true;
-        const trackGenres = mainTrack.querySelector('.track-genre')?.textContent.toLowerCase().split(',').map(g => g.trim()) || [];
+        const trackGenres = mainTrack.querySelector('.track-genre')?.textContent?.toLowerCase().split(',').map(g => g.trim()) || [];
         const trackBPM = parseInt(mainTrack.querySelector('.track-bpm')?.textContent) || 0;
         const trackDuration = mainTrack.querySelector('.track-duration')?.textContent || '';
 
