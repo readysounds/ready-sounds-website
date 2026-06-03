@@ -122,17 +122,18 @@ function openMoreMenu(event, trackId) {
         currentPlaylistMenu = null;
     }
 
-    // Toggle: close if this menu is already open
-    const existing = actionsContainer.querySelector('.more-menu');
+    // Toggle: close if this menu is already open (now appended to body, keyed by trackId)
+    const existing = document.querySelector(`.more-menu[data-track-id="${trackId}"]`);
     if (existing) { existing.remove(); return; }
 
     // Close any other open more menus
     document.querySelectorAll('.more-menu').forEach(m => m.remove());
 
-    actionsContainer.style.position = 'relative';
-
     const menu = document.createElement('div');
     menu.className = 'playlist-menu more-menu open';
+    menu.dataset.trackId = trackId;
+    menu.style.position = 'fixed';
+    menu.style.zIndex = '9999';
 
     // Build shareable URL: track.html?id=<parentId> (or &alt=<altId> for alternates)
     const trackEl = document.querySelector(`.track-item[data-track-id="${trackId}"]`);
@@ -167,7 +168,31 @@ function openMoreMenu(event, trackId) {
     };
     menu.appendChild(openItem);
 
-    actionsContainer.appendChild(menu);
+    menu.style.visibility = 'hidden';
+    document.body.appendChild(menu);
+
+    // Position relative to the button after layout
+    requestAnimationFrame(() => {
+        const btnRect = btn.getBoundingClientRect();
+        const menuWidth = menu.offsetWidth || 200;
+        const menuHeight = menu.offsetHeight;
+        let left = btnRect.right - menuWidth;
+        if (left < 8) left = 8;
+        let top = btnRect.top - menuHeight - 8;
+        if (top < 8) top = btnRect.bottom + 8;
+        menu.style.left = left + 'px';
+        menu.style.top = top + 'px';
+        menu.style.visibility = '';
+    });
+
+    // Close when clicking outside
+    const closeMenu = (e) => {
+        if (!menu.contains(e.target) && e.target !== btn) {
+            menu.remove();
+            document.removeEventListener('click', closeMenu, true);
+        }
+    };
+    document.addEventListener('click', closeMenu, true);
 }
 
 // ── Supabase track loader ────────────────────────────────────────────────────

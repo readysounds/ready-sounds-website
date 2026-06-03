@@ -551,7 +551,8 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     z-index: -1;
 }
-.nav-music-dropdown:hover .nav-music-menu { display: flex; }
+.nav-music-dropdown:hover .nav-music-menu,
+.nav-music-dropdown.open .nav-music-menu { display: flex; }
 
 .nav-music-menu a {
     display: block;

@@ -72,7 +72,7 @@ async function openPlaylistMenu(event, trackId) {
     await Promise.all([loadUserPlaylists(), loadUserProjects()]);
 
     currentPlaylistTrackId = trackId;
-    const actionsContainer = event.target.closest('.track-actions');
+    const btn = event.target.closest('.action-btn-playlist') || event.target;
 
     const menu = document.createElement('div');
     menu.className = 'playlist-menu open';
@@ -136,9 +136,33 @@ async function openPlaylistMenu(event, trackId) {
         });
     }
 
-    actionsContainer.style.position = 'relative';
-    actionsContainer.appendChild(menu);
+    menu.style.position = 'fixed';
+    menu.style.zIndex = '9999';
+    menu.style.visibility = 'hidden';
+    document.body.appendChild(menu);
     currentPlaylistMenu = menu;
+
+    requestAnimationFrame(() => {
+        const btnRect = btn.getBoundingClientRect();
+        const menuWidth = menu.offsetWidth || 200;
+        const menuHeight = menu.offsetHeight;
+        let left = btnRect.right - menuWidth;
+        if (left < 8) left = 8;
+        let top = btnRect.top - menuHeight - 8;
+        if (top < 8) top = btnRect.bottom + 8;
+        menu.style.left = left + 'px';
+        menu.style.top = top + 'px';
+        menu.style.visibility = '';
+    });
+
+    const closeMenu = (e) => {
+        if (!menu.contains(e.target) && e.target !== btn) {
+            menu.remove();
+            currentPlaylistMenu = null;
+            document.removeEventListener('click', closeMenu, true);
+        }
+    };
+    document.addEventListener('click', closeMenu, true);
 }
 
 let _createPlaylistTrackId = null;

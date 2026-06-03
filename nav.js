@@ -35,6 +35,26 @@
         if (btn) btn.classList.toggle('open');
     }
 
+    // Touch-friendly Music dropdown toggle (works alongside hover on desktop)
+    document.addEventListener('DOMContentLoaded', function () {
+        const trigger = document.querySelector('.nav-music-trigger');
+        const dropdown = document.querySelector('.nav-music-dropdown');
+        if (trigger && dropdown) {
+            trigger.addEventListener('click', function (e) {
+                const isOpen = dropdown.classList.toggle('open');
+                if (isOpen) {
+                    const close = function (ev) {
+                        if (!dropdown.contains(ev.target)) {
+                            dropdown.classList.remove('open');
+                            document.removeEventListener('click', close, true);
+                        }
+                    };
+                    document.addEventListener('click', close, true);
+                }
+            });
+        }
+    });
+
     // Expose to global scope for inline onclick handlers
     window.toggleMobileMenu = toggleMobileMenu;
     window.closeMobilePanel = closeMobilePanel;
