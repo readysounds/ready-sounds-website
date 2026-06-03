@@ -82,7 +82,9 @@ async function downloadTrack(event, trackId) {
         return;
     }
 
-    // No access - show the purchase modal
+    // No access - show the upgrade prompt (user is logged in but has no subscription/purchase)
+    showDownloadPrompt(true);
+
     // Store the track ID and info for the cart button in the modal
     currentDownloadTrackId = trackId;
 
@@ -108,14 +110,30 @@ async function downloadTrack(event, trackId) {
         }
     }
 
-    // Show the download prompt modal
-    showDownloadPrompt();
+    // unreachable — handled above
 }
 
 // Show download prompt modal
-function showDownloadPrompt() {
+// loggedIn=true  → user has an account but no subscription; hide "Sign Up" and go straight to pricing
+// loggedIn=false → user is not logged in; show "Sign Up Free" CTA
+function showDownloadPrompt(loggedIn) {
     const overlay = document.getElementById('downloadOverlay');
     const modal = document.getElementById('downloadModal');
+
+    const subtitle = modal.querySelector('.download-subtitle');
+    const primaryBtn = modal.querySelector('.download-btn-primary');
+    const infoText = modal.querySelector('.download-info');
+
+    if (loggedIn) {
+        if (subtitle) subtitle.textContent = 'A subscription is required to download tracks.';
+        if (primaryBtn) { primaryBtn.textContent = 'View Plans'; primaryBtn.onclick = () => window.location.href = '/pricing.html'; }
+        if (infoText) infoText.style.display = 'none';
+    } else {
+        if (subtitle) subtitle.textContent = 'Create a free account to get started — then choose a plan to download tracks.';
+        if (primaryBtn) { primaryBtn.textContent = 'Sign Up Free'; primaryBtn.onclick = () => window.location.href = '/signup.html'; }
+        if (infoText) infoText.style.display = '';
+    }
+
     overlay.classList.add('visible');
     setTimeout(() => {
         modal.classList.add('visible');
