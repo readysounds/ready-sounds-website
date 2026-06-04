@@ -4104,10 +4104,13 @@
                 <button class="tablet-filter-toggle" id="tabletFilterToggle" onclick="toggleTabletSidebar()">
                     <span>▼</span> Filters
                 </button>
-                <!-- Catalog Headline -->
-                <div class="catalog-headline" style="padding: 0 0 32px 0;">
-                    <h1 style="font-size: 1.3em; font-weight: 700; color: #fff; margin-bottom: 8px;">No middlemen. No algorithms. Just music.</h1>
-                    <p style="color: #888; font-size: 0.95em; letter-spacing: 0.03em;">Human-made tracks, stems, and alternate versions — direct from the producer.</p>
+                <!-- Search -->
+                <div class="search-section">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="searchInput" class="search-input" placeholder="search by mood, genre, instrument..." oninput="searchTracks()">
+                    </div>
+                    <div id="searchResultsLabel" class="search-results-label"></div>
                 </div>
 
                 <!-- Featured Playlists -->
@@ -4126,15 +4129,6 @@
                         <button class="rp-clear" onclick="clearRecentlyPlayed()">Clear</button>
                     </div>
                     <div class="rp-scroll"></div>
-                </div>
-
-                <!-- Search -->
-                <div class="search-section">
-                    <div class="search-box">
-                        <span class="search-icon">🔍</span>
-                        <input type="text" id="searchInput" class="search-input" placeholder="search by mood, genre, instrument..." oninput="searchTracks()">
-                    </div>
-                    <div id="searchResultsLabel" class="search-results-label"></div>
                 </div>
 
                 <!-- Mobile Filter Button -->
