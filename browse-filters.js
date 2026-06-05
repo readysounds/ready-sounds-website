@@ -213,5 +213,26 @@ function applyFilters() {
         }
     }
 
+    // Hide featured playlists and recently played when a search query is active
+    const hasQuery = query.length > 0;
+    const playlistsSection = document.getElementById('featuredPlaylistsSection');
+    const recentlyPlayedSection = document.getElementById('recentlyPlayedSection');
+    if (playlistsSection) {
+        if (hasQuery) {
+            playlistsSection.style.display = 'none';
+        } else {
+            const hasContent = playlistsSection.querySelector('.featured-playlist-card');
+            if (hasContent) playlistsSection.style.display = 'block';
+        }
+    }
+    if (recentlyPlayedSection) {
+        if (hasQuery) {
+            recentlyPlayedSection.style.display = 'none';
+        } else {
+            const hasContent = recentlyPlayedSection.querySelector('.track-item, .rp-item');
+            if (hasContent) recentlyPlayedSection.style.display = 'block';
+        }
+    }
+
     renderFilterChips();
 }

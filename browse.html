@@ -4108,7 +4108,7 @@
                 <div class="search-section">
                     <div class="search-box">
                         <span class="search-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6.5" cy="6.5" r="5" stroke="#888" stroke-width="1.5"/><line x1="10.5" y1="10.5" x2="14.5" y2="14.5" stroke="#888" stroke-width="1.5" stroke-linecap="round"/></svg></span>
-                        <input type="text" id="searchInput" class="search-input" placeholder="search by mood, genre, instrument..." oninput="searchTracks()">
+                        <input type="search" id="searchInput" class="search-input" placeholder="search by mood, genre, instrument..." oninput="searchTracks()" onkeydown="if(event.key==='Enter'){this.blur();scrollToFirstResult();}"  autocomplete="off" autocorrect="off" spellcheck="false">
                     </div>
                     <div id="searchResultsLabel" class="search-results-label"></div>
                 </div>

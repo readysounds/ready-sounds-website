@@ -62,8 +62,8 @@ function syncPlayButtons(playing) {
     const miniBtn    = document.getElementById('miniPlayBtn');
     const modalIcon  = document.getElementById('playerModalPlayIcon');
     // Desktop bar and mini bar use text (small size, text is fine)
-    if (desktopBtn) desktopBtn.textContent = playing ? '⏸' : '▶';
-    if (miniBtn)    miniBtn.textContent    = playing ? '⏸' : '▶';
+    if (desktopBtn) desktopBtn.textContent = playing ? '⏸︎' : '▶︎';
+    if (miniBtn)    miniBtn.textContent    = playing ? '⏸︎' : '▶︎';
     // Modal uses sharp SVG
     if (modalIcon) modalIcon.innerHTML = playing ? SVG_PAUSE : SVG_PLAY;
 }
@@ -351,10 +351,10 @@ function playTrack(event, trackId) {
     if (currentAudio && currentPlayButton === button) {
         if (currentAudio.paused) {
             currentAudio.play();
-            button.textContent = '⏸';
+            button.textContent = '⏸︎';
         } else {
             currentAudio.pause();
-            button.textContent = '▶';
+            button.textContent = '▶︎';
         }
         return;
     }
@@ -370,7 +370,7 @@ function playTrack(event, trackId) {
     }
 
     // Reset all buttons
-    document.querySelectorAll('.track-play').forEach(btn => btn.textContent = '▶');
+    document.querySelectorAll('.track-play').forEach(btn => btn.textContent = '▶︎');
 
     // Play new track
     if (streamUrl) {
@@ -397,9 +397,9 @@ function playTrack(event, trackId) {
 
         currentAudio.play().catch(err => {
             console.error('Audio playback error:', err);
-            button.textContent = '▶';
+            button.textContent = '▶︎';
         });
-        button.textContent = '⏸';
+        button.textContent = '⏸︎';
 
         // Record in recently played (skip alternate versions)
         if (typeof addToRecentlyPlayed === 'function' && !item.classList.contains('alternate')) {
@@ -410,7 +410,7 @@ function playTrack(event, trackId) {
         updateNowPlayingBar(trackId);
 
         currentAudio.onended = function() {
-            button.textContent = '▶';
+            button.textContent = '▶︎';
             syncPlayButtons(false);
             const progressBar = document.getElementById(`progress-${trackId}`);
             if (progressBar) progressBar.style.width = '0%';

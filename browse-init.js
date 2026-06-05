@@ -10,6 +10,11 @@ function searchTracks() {
     applyFilters();
 }
 
+function scrollToFirstResult() {
+    const first = document.querySelector('.track-group:not([style*="display: none"]):not([style*="display:none"])');
+    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function togglePanelSection(section) {
     const submenu = document.getElementById(section + 'Submenu');
     const btn = document.getElementById(section + 'Btn');
@@ -211,7 +216,10 @@ function handleTrackAutoPlay() {
 
 // ── Track Detail Panel ───────────────────────────────────────────────────────
 
+let currentPanelTrackId = null;
+
 function openTrackPanel(event, trackId) {
+    currentPanelTrackId = trackId;
     event.stopPropagation();
     const data = trackData[trackId];
     if (!data) return;
@@ -276,6 +284,7 @@ function closeTrackPanel() {
     document.getElementById('trackPanelOverlay').classList.remove('active');
     document.getElementById('trackPanel').classList.remove('active');
     document.removeEventListener('keydown', handlePanelEsc);
+    currentPanelTrackId = null;
 }
 
 function handlePanelEsc(e) {

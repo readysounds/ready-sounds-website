@@ -33,7 +33,7 @@
             console.error('Logout error:', err);
         }
         localStorage.removeItem('readysounds_favorites');
-        window.location.href = redirectTo || 'index.html';
+        window.location.href = redirectTo || '/';
     }
 
     // ── Nav UI update ─────────────────────────────────────────────────────────

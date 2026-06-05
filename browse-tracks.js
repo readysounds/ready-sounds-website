@@ -29,7 +29,7 @@ function renderAlternate(alt, track) {
          data-track-id="${domId}"
          data-stream-url="${alt.stream_url}"
          ${downloadAttr}>
-        <div class="track-play" onclick="playTrack(event, ${domId})">&#9654;</div>
+        <div class="track-play" onclick="playTrack(event, ${domId})">&#9654;&#65038;</div>
         <div class="track-artwork">
             <img src="${track.artwork_url || ''}" alt="${escHtml(track.artist)}" onerror="this.style.display='none'; this.parentElement.innerHTML='&#127925;';">
         </div>
@@ -71,7 +71,7 @@ function renderTrackGroup(track) {
              data-best-moments="${escAttr(track.best_moments || '')}"
              ${downloadAttr}
              ${toggleAttr}>
-            <div class="track-play" onclick="playTrack(event, ${track.id})">&#9654;</div>
+            <div class="track-play" onclick="playTrack(event, ${track.id})">&#9654;&#65038;</div>
             <div class="track-artwork">
                 <img src="${track.artwork_url || ''}" alt="${escHtml(track.artist)}" onerror="this.style.display='none'; this.parentElement.innerHTML='&#127925;';">
             </div>
@@ -146,6 +146,31 @@ function openMoreMenu(event, trackId) {
     } else {
         shareUrl = `${window.location.origin}/track.html?id=${trackId}`;
     }
+
+    // Download / licensing option — delegates to downloadTrack which handles auth + subscription checks
+    const downloadItem = document.createElement('div');
+    downloadItem.className = 'playlist-menu-item';
+    downloadItem.innerHTML = '&#8659;&nbsp; Download';
+    downloadItem.onclick = (e) => {
+        e.stopPropagation();
+        menu.remove();
+        downloadTrack(e, trackId);
+    };
+    menu.appendChild(downloadItem);
+
+    const licenseItem = document.createElement('div');
+    licenseItem.className = 'playlist-menu-item';
+    licenseItem.innerHTML = '&#128273;&nbsp; Buy License';
+    licenseItem.onclick = (e) => {
+        e.stopPropagation();
+        menu.remove();
+        buyLicense(e, trackId);
+    };
+    menu.appendChild(licenseItem);
+
+    const divider = document.createElement('div');
+    divider.style.cssText = 'height:1px;background:rgba(255,255,255,0.1);margin:4px 0;';
+    menu.appendChild(divider);
 
     const shareItem = document.createElement('div');
     shareItem.className = 'playlist-menu-item';

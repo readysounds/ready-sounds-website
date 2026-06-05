@@ -44,8 +44,10 @@ async function hasActiveSubscription() {
             return false;
         }
 
-        // Check if subscription is active
-        if (profile && profile.subscription_status === 'active') {
+        console.log('[RS] Profile subscription_status:', profile?.subscription_status, '| plan:', profile?.subscription_plan);
+
+        // Check if subscription is active or cancelling
+        if (profile && (profile.subscription_status === 'active' || profile.subscription_status === 'cancelling')) {
             return true;
         }
 
@@ -599,8 +601,11 @@ function showLoginPrompt(action) {
     }
 
     // Preserve the currently selected track so it can be restored after login/signup
-    if (typeof currentTrackId !== 'undefined' && currentTrackId) {
-        sessionStorage.setItem('rs_restore_track', currentTrackId);
+    const trackToRestore = (typeof currentPanelTrackId !== 'undefined' && currentPanelTrackId)
+        ? currentPanelTrackId
+        : (typeof currentTrackId !== 'undefined' ? currentTrackId : null);
+    if (trackToRestore) {
+        sessionStorage.setItem('rs_restore_track', trackToRestore);
     }
 
     overlay.classList.add('active');

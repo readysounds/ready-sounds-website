@@ -43,7 +43,7 @@ exports.handler = async (event, context) => {
     let sessionConfig = {
       payment_method_types: ['card'],
       success_url: `${process.env.URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.URL}/`,
+      cancel_url: `${process.env.URL}/browse.html`,
       metadata: {}
     };
 

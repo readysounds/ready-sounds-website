@@ -190,6 +190,14 @@ function renderCart() {
 async function proceedToCheckout() {
     if (cart.length === 0) return;
 
+    // Save the current track so the user lands back on it after checkout/cancel
+    const trackToRestore = (typeof currentPanelTrackId !== 'undefined' && currentPanelTrackId)
+        ? currentPanelTrackId
+        : (typeof currentTrackId !== 'undefined' ? currentTrackId : null);
+    if (trackToRestore) {
+        sessionStorage.setItem('rs_restore_track', trackToRestore);
+    }
+
     const lineItems = cart.map(item => ({
         trackId: item.id,
         trackTitle: trackData[item.id] ? trackData[item.id].title : item.title,
