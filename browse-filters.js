@@ -38,6 +38,7 @@ function toggleFilter(element, category, value) {
     }
 
     applyFilters();
+    renderFilterChips();
 }
 
 // Clear all filters
