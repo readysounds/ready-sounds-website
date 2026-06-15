@@ -34,7 +34,9 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Bot verification failed. Please try again.' }) };
   }
 
-  // Create user via Supabase admin (bypasses RLS, sends confirmation email per project settings)
+  // Create user via Supabase admin (bypasses RLS). Note: admin.createUser does NOT
+  // send a confirmation email by itself, so we explicitly create the user as
+  // unconfirmed and then trigger the confirmation email via auth.resend below.
   const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -44,11 +46,27 @@ exports.handler = async (event) => {
     email,
     password,
     user_metadata: { full_name: fullName || '' },
+    email_confirm: false,
   });
 
   if (error) {
     console.log('Supabase createUser error:', error.message);
     return { statusCode: 400, headers, body: JSON.stringify({ error: error.message }) };
+  }
+
+  // Send the verification email using the public client (admin API does not send it).
+  const supabaseAnon = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY
+  );
+
+  const { error: resendError } = await supabaseAnon.auth.resend({
+    type: 'signup',
+    email,
+  });
+
+  if (resendError) {
+    console.log('Supabase resend confirmation error:', resendError.message);
   }
 
   return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
