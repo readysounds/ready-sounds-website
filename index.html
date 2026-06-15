@@ -625,7 +625,9 @@
                 // Logged in — redirect to browse page
                 const mobilePanelAuth = document.getElementById('mobilePanelAuthBtns');
                 if (mobilePanelAuth) mobilePanelAuth.style.display = 'none';
-                window.location.href = '/browse.html';
+                // Email confirmation links land here with #...&type=signup — greet new users
+                const justConfirmed = window.location.hash.includes('type=signup');
+                window.location.href = justConfirmed ? '/browse.html?welcome=1' : '/browse.html';
                 return;
             } else {
                 // Logged out

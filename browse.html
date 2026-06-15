@@ -1241,6 +1241,48 @@
             padding: 40px 0;
         }
         
+        .welcome-banner {
+            max-width: 1400px;
+            margin: 0 auto 24px;
+            padding: 16px 24px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            background: linear-gradient(135deg, rgba(156, 39, 176, 0.15), rgba(74, 20, 140, 0.15));
+            border: 1px solid var(--color-purple-border);
+            border-radius: 12px;
+            color: var(--color-text);
+        }
+
+        .welcome-banner.show {
+            display: flex;
+        }
+
+        .welcome-banner p {
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .welcome-banner strong {
+            color: var(--color-purple);
+        }
+
+        .welcome-banner-close {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .welcome-banner-close:hover {
+            color: var(--color-text);
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -3978,6 +4020,10 @@
 
     <!-- Main Content -->
     <main class="main">
+        <div class="welcome-banner" id="welcomeBanner">
+            <p><strong>Welcome to Ready Sounds!</strong> Your account is confirmed — start browsing tracks and add your favorites.</p>
+            <button class="welcome-banner-close" id="welcomeBannerClose" aria-label="Dismiss">&times;</button>
+        </div>
         <div class="container">
             <!-- Sidebar Filters -->
             <aside class="sidebar">
@@ -4327,6 +4373,23 @@
     <script src="/browse-favorites.js"></script>
     <script src="/browse-recently-played.js"></script>
     <script src="/browse-init.js"></script>
+    <script>
+        (function () {
+            if (new URLSearchParams(window.location.search).get('welcome') !== '1') return;
+
+            var banner = document.getElementById('welcomeBanner');
+            var closeBtn = document.getElementById('welcomeBannerClose');
+            if (banner) banner.classList.add('show');
+            if (closeBtn) closeBtn.addEventListener('click', function () {
+                banner.classList.remove('show');
+            });
+
+            // Remove the query param so refreshing/sharing the URL doesn't re-show it
+            var url = new URL(window.location.href);
+            url.searchParams.delete('welcome');
+            window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+        }());
+    </script>
 
     <!-- Track Detail Panel -->
     <div id="trackPanelOverlay" class="track-panel-overlay" onclick="closeTrackPanel()"></div>
